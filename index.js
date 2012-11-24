@@ -1,1 +1,1 @@
-module.exports = require('./lib/hulk');
+module.exports = require('./lib/hawk');

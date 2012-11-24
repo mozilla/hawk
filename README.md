@@ -1,4 +1,4 @@
-holk
+hawk
 ====
 
-HTTP Holk Authentication Scheme
+HTTP Hawk Authentication Scheme

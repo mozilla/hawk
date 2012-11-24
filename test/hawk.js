@@ -1,13 +1,11 @@
 // Load modules
 
 var expect = require('chai').expect;
-var assert = require('assert');
 var should = require('should');
-var sinon = require('sinon');
-var Holk = require('../lib/holk');
+var Hawk = require('../lib/hawk');
 
 
-describe('Holk', function () {
+describe('Hawk', function () {
 
     describe('#authenticate', function () {
 
@@ -15,7 +13,7 @@ describe('Holk', function () {
 
             var req = {
                 headers: {
-                    authentication: 'Holk id="123", ts="1353788437", mac="", ext="hello"',
+                    authentication: 'Hawk id="123", ts="1353788437", mac="", ext="hello"',
                     host: 'example.com:8080'
                 },
                 method: 'GET',
@@ -33,7 +31,7 @@ describe('Holk', function () {
                 return callback(null, credentials);
             };
 
-            Holk.authenticate(req, encryptionPassword, {}, function (err, ticket, attributes) {
+            Hawk.authenticate(req, encryptionPassword, {}, function (err, ticket, attributes) {
 
                 should.not.exist(err);
                 attributes.ext.should.equal('"welcome"');
