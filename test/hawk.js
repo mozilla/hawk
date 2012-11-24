@@ -2,79 +2,132 @@
 
 var expect = require('chai').expect;
 var should = require('should');
-var Hawk = require('../lib/hawk');
+var Hawk = process.env.TEST_COV ? require('../lib-cov/hawk') : require('../lib/hawk');
 
 
 describe('Hawk', function () {
 
     describe('#authenticate', function () {
 
+        var credentialsFunc = function (id, callback) {
+
+            var credentials = {
+                key: 'werxhqb98rpaxn39848xrunpaw3489ruxnpa98w4rxn',
+                algorithm: 'hmac-sha-256',
+                user: 'steve'
+            };
+
+            return callback(null, credentials);
+        };
+
         it('should parse a valid authentication header', function (done) {
 
             var req = {
                 headers: {
-                    authentication: 'Hawk id="123", ts="1353788437", mac="", ext="hello"',
+                    authorization: 'Hawk id="123", ts="1353788437", mac="/qwS4UjfVWMcUyW6EEgUH4jlr7T/wuKe3dKijvTvSos=", ext="hello"',
                     host: 'example.com:8080'
                 },
                 method: 'GET',
                 url: '/resource/4?filter=a'
             };
 
-            var credentialsFunc = function (id, callback) {
-
-                var credentials = {
-                    key: 'werxhqb98rpaxn39848xrunpaw3489ruxnpa98w4rxn',
-                    algorithm: 'hmac-sha-256',
-                    user: 'steve'
-                };
-
-                return callback(null, credentials);
-            };
-
-            Hawk.authenticate(req, encryptionPassword, {}, function (err, ticket, attributes) {
+            Hawk.authenticate(req, credentialsFunc, {}, function (err, isAuthenticated, credentials) {
 
                 should.not.exist(err);
-                attributes.ext.should.equal('"welcome"');
+                credentials.user.should.equal('steve');
                 done();
             });
         });
 
-        it('should return an error for an invalid authentication header', function (done) {
-
-            // Note: the ticket.id already encodes all the other ticket attributes and they cannot be manually changed
-
-            var encryptionPassword = 'example';
-
-            var ticket = {
-                id: '4deee737c1810925ace5aa5292c4e761f2325eb1286bc5c69cbf00b3f5de3abc:eL5Zvd2wyIiMc-6Adk2SUy7i4TjZKLnV_KTUYnTri5Q:a5f7aa17320716247dd18fd87f04e7c0495980b3417d94185f0feb6c052e123e:p1BY4SLSY-5fjKuPSz_GwQ:UDPFp5jLSyYZmGrlD111XxNrZzhvWdU32k_05EjPm4vi0pynvYpGGXYTuuxlEj7hwUR4BOmFumASxvZJVRMMERhCtOjqBwUbU9L8MzI2wYYEryFImSwDkxZAamsG37KH6K1w-rTP-UgP8mVpmboA9-vzwRrlaPzvV19VS7kLGEUeDR8DFzwQpMl2lK-dw4KQPPmsKSGFzxlUO-9hpvWdU6lyTdMYAoy8MPTNCMT4NbgRrjitYV-6YKmhJNHMErzs',
-                key: 'wrong',
-                algorithm: 'sha256',
-                app: '123'
-            };
-
-            var request = {
-                method: 'GET',
-                resource: '/path?query',
-                host: 'example.com',
-                port: 80
-            };
-
-            var attributes = {
-                ext: '"welcome"'
-            };
+        it('should fail on an invalid authentication header: wrong scheme', function (done) {
 
             var req = {
-                method: request.method,
-                url: request.resource,
                 headers: {
-                    authorization: Oz.request.generateHeader(request, ticket, attributes),
-                    host: request.host + ':' + request.port
-                }
+                    authorization: 'Basic asdasdasdasd',
+                    host: 'example.com:8080'
+                },
+                method: 'GET',
+                url: '/resource/4?filter=a'
             };
 
-            Oz.request.authenticate(req, encryptionPassword, {}, function (err, ticket, attributes) {
+            Hawk.authenticate(req, credentialsFunc, {}, function (err, isAuthenticated, credentials) {
 
                 should.exist(err);
+                err.message.should.equal('Incorrect authentication scheme');
+                done();
+            });
+        });
+
+        it('should fail on an missing authorization header', function (done) {
+
+            var req = {
+                headers: {
+                    host: 'example.com:8080'
+                },
+                method: 'GET',
+                url: '/resource/4?filter=a'
+            };
+
+            Hawk.authenticate(req, credentialsFunc, {}, function (err, isAuthenticated, credentials) {
+
+                should.exist(err);
+                err.message.should.equal('Missing Authorization header');
+                done();
+            });
+        });
+
+        it('should fail on an missing host header', function (done) {
+
+            var req = {
+                headers: {
+                    authorization: 'Hawk id="123", ts="1353788437", mac="/qwS4UjfVWMcUyW6EEgUH4jlr7T/wuKe3dKijvTvSos=", ext="hello"'
+                },
+                method: 'GET',
+                url: '/resource/4?filter=a'
+            };
+
+            Hawk.authenticate(req, credentialsFunc, {}, function (err, isAuthenticated, credentials) {
+
+                should.exist(err);
+                err.message.should.equal('Missing Host header');
+                done();
+            });
+        });
+
+        it('should fail on an missing authorization attribute', function (done) {
+
+            var req = {
+                headers: {
+                    authorization: 'Hawk ts="1353788437", mac="/qwS4UjfVWMcUyW6EEgUH4jlr7T/wuKe3dKijvTvSos=", ext="hello"',
+                    host: 'example.com:8080'
+                },
+                method: 'GET',
+                url: '/resource/4?filter=a'
+            };
+
+            Hawk.authenticate(req, credentialsFunc, {}, function (err, isAuthenticated, credentials) {
+
+                should.exist(err);
+                err.message.should.equal('Missing attributes');
+                done();
+            });
+        });
+
+        it('should fail on an bad host header', function (done) {
+
+            var req = {
+                headers: {
+                    authorization: 'Hawk id="123", ts="1353788437", mac="/qwS4UjfVWMcUyW6EEgUH4jlr7T/wuKe3dKijvTvSos=", ext="hello"',
+                    host: 'example.com:8080:90'
+                },
+                method: 'GET',
+                url: '/resource/4?filter=a'
+            };
+
+            Hawk.authenticate(req, credentialsFunc, {}, function (err, isAuthenticated, credentials) {
+
+                should.exist(err);
+                err.message.should.equal('Bad Host header');
                 done();
             });
         });
