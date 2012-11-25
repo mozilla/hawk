@@ -177,26 +177,26 @@ The greatest sources of security risks are usually found not in **Hawk** but in 
 Implementers are strongly encouraged to assess how this module addresses their security requirements. This section includes
 an incomplete list of security considerations that must be reviewed and understood before deploying **Hawk** on the server.
 
-## MAC Keys Transmission
+### MAC Keys Transmission
 
 **Hawk** does not provide any mechanism for obtaining or transmitting the set of shared credentials required. Any mechanism used
 to obtain **Hawk** credentials must ensure that these transmissions are protected using transport-layer mechanisms such as TLS.
 
-## Confidentiality of Requests
+### Confidentiality of Requests
 
 While **Hawk** provides a mechanism for verifying the integrity of HTTP requests, it provides no guarantee of request
 confidentiality. Unless other precautions are taken, eavesdroppers will have full access to the request content. Servers should
 carefully consider the types of data likely to be sent as part of such requests, and employ transport-layer security mechanisms
 to protect sensitive resources.
 
-## Spoofing by Counterfeit Servers
+### Spoofing by Counterfeit Servers
 
 **Hawk** makes no attempt to verify the authenticity of the server. A hostile party could take advantage of this by intercepting
 the client's requests and returning misleading or otherwise incorrect responses. Service providers should consider such attacks
 when developing services using this protocol, and should require transport-layer security for any requests where the authenticity
 of the resource server or of server responses is an issue.
 
-## Plaintext Storage of Credentials
+### Plaintext Storage of Credentials
 
 The **Hawk** key functions the same way passwords do in traditional authentication systems. In order to compute the request MAC,
 the server must have access to the key in plaintext form. This is in contrast, for example, to modern operating systems, which
@@ -206,7 +206,7 @@ If an attacker were to gain access to these keys - or worse, to the server's dat
 to perform any action on behalf of any resource owner. Accordingly, it is critical that servers protect these keys from unauthorized
 access.
 
-## Entropy of Keys
+### Entropy of Keys
 
 Unless a transport-layer security protocol is used, eavesdroppers will have full access to authenticated requests and request
 MAC values, and will thus be able to mount offline brute-force attacks to recover the key used. Servers should be careful to
@@ -222,7 +222,7 @@ quality. Many PRNG implementations generate number sequences that may appear to 
 patterns or other weaknesses which make cryptanalysis or brute force attacks easier. Implementers should be careful to use
 cryptographically secure PRNGs to avoid these problems.
 
-## Coverage Limitations
+### Coverage Limitations
 
 The request MAC only covers the HTTP `Host` header and does not cover any other headers which can often affect how the request
 body is interpreted by the server (i.e. Content-Type). If the server behavior is influenced by the presence or value of such headers,
