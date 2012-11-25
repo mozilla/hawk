@@ -235,7 +235,7 @@ application-specific information via the Authorization header which is protected
 ### Where is the protocol specification?
 
 If you are looking for some prose explaining how all this works, there isn't any. **Hawk** is being developed as an open source
-project instead of a standard. In other words, the [code](tree/master/lib) is the specification.
+project instead of a standard. In other words, the [code](/hueniverse/hawk/tree/master/lib) is the specification.
 
 ### Does **Hawk** have anything to do with OAuth?
 
