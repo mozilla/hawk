@@ -72,7 +72,7 @@ describe('Hawk', function () {
             Hawk.authenticate(req, credentialsFunc, {}, function (err, isAuthenticated, credentials) {
 
                 should.exist(err);
-                err.message.should.equal('Incorrect authentication scheme');
+                err.message.should.equal('Incorrect scheme');
                 done();
             });
         });
@@ -128,6 +128,44 @@ describe('Hawk', function () {
 
                 should.exist(err);
                 err.message.should.equal('Missing attributes');
+                done();
+            });
+        });
+
+        it('should fail on an unknown authorization attribute', function (done) {
+
+            var req = {
+                headers: {
+                    authorization: 'Hawk id="123", ts="1353788437", x="3", mac="/qwS4UjfVWMcUyW6EEgUH4jlr7T/wuKe3dKijvTvSos=", ext="hello"',
+                    host: 'example.com:8080'
+                },
+                method: 'GET',
+                url: '/resource/4?filter=a'
+            };
+
+            Hawk.authenticate(req, credentialsFunc, {}, function (err, isAuthenticated, credentials) {
+
+                should.exist(err);
+                err.message.should.equal('Unknown attributes');
+                done();
+            });
+        });
+
+        it('should fail on an invalid authorization header format', function (done) {
+
+            var req = {
+                headers: {
+                    authorization: 'Hawk',
+                    host: 'example.com:8080'
+                },
+                method: 'GET',
+                url: '/resource/4?filter=a'
+            };
+
+            Hawk.authenticate(req, credentialsFunc, {}, function (err, isAuthenticated, credentials) {
+
+                should.exist(err);
+                err.message.should.equal('Invalid header format');
                 done();
             });
         });
@@ -300,6 +338,56 @@ describe('Hawk', function () {
         it('should return a valid Hawk header without error', function (done) {
 
             Hawk.getWWWAuthenticateHeader().should.equal('Hawk');
+            done();
+        });
+    });
+
+    describe('#calculateMAC', function () {
+
+        it('should return an empty value on unknown algorithm', function (done) {
+
+            Hawk.calculateMAC('dasdfasdf', 'hmac-sha-0', Date.now() / 1000, 'GET', '/resource/something', 'example.com', 8080).should.equal('');
+            done();
+        });
+    });
+
+    describe('#getAuthorizationHeader', function () {
+
+        it('should return a valid authorization header', function (done) {
+
+            var credentials = {
+                id: '123456',
+                key: '2983d45yun89q',
+                algorithm: 'hmac-sha-256'
+            };
+
+            var header = Hawk.getAuthorizationHeader(credentials, 'POST', '/somewhere/over/the/rainbow', 'example.net', 443, 'Bazinga!', 1353809207);
+            header.should.equal('Hawk id="123456", ts="1353809207", ext="Bazinga!", mac="LYUkYKYkQsQstqNQHcnAzDXce0oHsmS049rv4EalMb8="');
+            done();
+        });
+
+        it('should return an empty authorization header on invalid credentials', function (done) {
+
+            var credentials = {
+                key: '2983d45yun89q',
+                algorithm: 'hmac-sha-256'
+            };
+
+            var header = Hawk.getAuthorizationHeader(credentials, 'POST', '/somewhere/over/the/rainbow', 'example.net', 443, 'Bazinga!', 1353809207);
+            header.should.equal('');
+            done();
+        });
+
+        it('should return an empty authorization header on invalid algorithm', function (done) {
+
+            var credentials = {
+                id: '123456',
+                key: '2983d45yun89q',
+                algorithm: 'hmac-sha-0'
+            };
+
+            var header = Hawk.getAuthorizationHeader(credentials, 'POST', '/somewhere/over/the/rainbow', 'example.net', 443, 'Bazinga!', 1353809207);
+            header.should.equal('');
             done();
         });
     });
