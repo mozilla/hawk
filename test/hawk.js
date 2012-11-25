@@ -7,18 +7,42 @@ var Hawk = process.env.TEST_COV ? require('../lib-cov/hawk') : require('../lib/h
 
 describe('Hawk', function () {
 
-    describe('#authenticate', function () {
+    var credentialsFunc = function (id, callback) {
 
-        var credentialsFunc = function (id, callback) {
-
-            var credentials = {
-                key: 'werxhqb98rpaxn39848xrunpaw3489ruxnpa98w4rxn',
-                algorithm: (id === '1' ? 'hmac-sha-1' : 'hmac-sha-256'),
-                user: 'steve'
-            };
-
-            return callback(null, credentials);
+        var credentials = {
+            id: id,
+            key: 'werxhqb98rpaxn39848xrunpaw3489ruxnpa98w4rxn',
+            algorithm: (id === '1' ? 'hmac-sha-1' : 'hmac-sha-256'),
+            user: 'steve'
         };
+
+        return callback(null, credentials);
+    };
+
+    it('should generate a header then successfully parse it', function (done) {
+
+        var req = {
+            headers: {
+                host: 'example.com:8080'
+            },
+            method: 'GET',
+            url: '/resource/4?filter=a'
+        };
+
+        credentialsFunc('123456', function (err, credentials) {
+
+            req.headers.authorization = Hawk.getAuthorizationHeader(credentials, req.method, req.url, 'example.com', 8080, null, 1353809207);
+
+            Hawk.authenticate(req, credentialsFunc, {}, function (err, isAuthenticated, credentials) {
+
+                should.not.exist(err);
+                credentials.user.should.equal('steve');
+                done();
+            });
+        });
+    });
+
+    describe('#authenticate', function () {
 
         it('should parse a valid authentication header (hmac-sha-1)', function (done) {
 
