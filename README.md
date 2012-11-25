@@ -1,4 +1,4 @@
-# **hawk**
+![hawk Logo](https://raw.github.com/hueniverse/hawk/master/images/hawk.png)
 
 **Hawk** is HTTP authentication scheme using a message authentication code (MAC) algorithm to provide partial HTTP request cryptographic verification.
 
