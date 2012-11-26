@@ -1,12 +1,11 @@
 ![hawk Logo](https://raw.github.com/hueniverse/hawk/master/images/hawk.png)
 
-**Hawk** is an HTTP authentication scheme using a message authentication code (MAC) algorithm to provide partial
+<img align="right" src="https://raw.github.com/hueniverse/hawk/master/images/logo.png" /> **Hawk** is an HTTP authentication scheme using a message authentication code (MAC) algorithm to provide partial
 HTTP request cryptographic verification. For more complex use cases such as access delegation, see [Oz](/hueniverse/oz).
 
 Current version: **0.0.x**
 
 [![Build Status](https://secure.travis-ci.org/hueniverse/hawk.png)](http://travis-ci.org/hueniverse/hawk)
-
 
 # Table of Content
 
@@ -17,7 +16,8 @@ Current version: **0.0.x**
 - [**Security Considerations**](#security-considerations)
 <p></p>
 - [**Frequently Asked Questions**](#frequently-asked-questions)
-
+<p></p>
+- [**Acknowledgements**](#acknowledgements)
 
 # Introduction
 
@@ -279,3 +279,12 @@ a protocol handshake to the server. This pattern has become unacceptable for mos
 where extra round-trip are costly. While Hawk includes support for sending a challenge when a request lacks
 authentication, it does not require it.
 
+
+# Acknowledgements
+
+**Hawk** is a derivative work of the [HTTP MAC Authentication Scheme](http://tools.ietf.org/html/draft-hammer-oauth-v2-mac-token-05) proposal
+Co-authored by Ben Adida, Adam Barth, and Eran Hammer, which in turn was based on the OAuth 1.0 community specification.
+
+Special thanks to Ben Laurie for his always insightful feedback and advice.
+
+The **Hawk** logo was created by [Chris Carrasco](http://chriscarrasco.com).
