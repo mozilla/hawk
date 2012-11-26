@@ -237,6 +237,11 @@ application-specific information via the Authorization header which is protected
 If you are looking for some prose explaining how all this works, there isn't any. **Hawk** is being developed as an open source
 project instead of a standard. In other words, the [code](/hueniverse/hawk/tree/master/lib) is the specification.
 
+### Is it done?
+
+Far from it. Until this module reaches version 1.0.0 it is considered experimental and is likely to change. This also
+means your feedback and contribution are very welcome. Feel free to open issues with questions and suggestions.
+
 ### Does **Hawk** have anything to do with OAuth?
 
 Short answer: no.
