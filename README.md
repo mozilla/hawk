@@ -272,6 +272,10 @@ design violates the HTTP header boundaries, repeats information, and introduces 
 will not be aware of these “hidden” headers. In addition, any information repeated must be compared to the duplicated
 information in the header and therefore only moves the problem elsewhere.
 
+### Why not just use HTTP Digest?
 
-
+Digest requires pre-negotiation to establish a nonce. This means you can't just make a request - you must first send
+a protocol handshake to the server. This pattern has become unacceptable for most web services, especially mobile
+where extra round-trip are costly. While Hawk includes support for sending a challenge when a request lacks
+authentication, it does not require it.
 
