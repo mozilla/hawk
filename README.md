@@ -253,3 +253,20 @@ of delegating access to a third party. If you are looking for an OAuth alternati
 At this time, **Hawk** is only implemented in JavaScript as a node.js module. Check this space for future support of other
 languages (and such contributions are always welcome).
 
+### Why isn't the algorithm part of the challenge or dynamically negotiated?
+
+The algorithm used is closely related to the key issued as different algorithms require different key sizes (and other
+requirements). While some keys can be used for multiple algorithm, the protocol is designed to closely bind the key and algorithm together as part of the issued credentials.
+
+### Why is Host the only header covered by the request MAC?
+
+It is really had to include other headers. Headers can be changed by proxies and other intermediaries and there is no
+well-established way to normalize them. The only straight-forward solution is to include the headers in some blob (say,
+bas64 encoded JSON) and include that with the request, an approach taken by JWT and other such formats. However, that
+design violates the HTTP header boundaries, repeats information, and introduces other security issues because firewalls
+will not be aware of these “hidden” headers. In addition, any information repeated must be compared to the duplicated
+information in the header and therefore only moves the problem elsewhere.
+
+
+
+
