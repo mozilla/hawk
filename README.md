@@ -143,7 +143,6 @@ The client generates the authentication header by calculating a timestamp (e.g. 
 
 ```
 1353832234
-dh37fgj492je
 GET
 /resource/1?b=1&a=2
 127.0.0.1
