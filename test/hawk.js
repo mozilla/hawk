@@ -121,7 +121,7 @@ describe('Hawk', function () {
             Hawk.authenticate(req, credentialsFunc, {}, function (err, credentials, ext) {
 
                 should.exist(err);
-                err.message.should.equal('Incorrect scheme');
+                err.toResponse().payload.message.should.equal('Incorrect scheme');
                 done();
             });
         });
@@ -139,7 +139,7 @@ describe('Hawk', function () {
             Hawk.authenticate(req, credentialsFunc, {}, function (err, credentials, ext) {
 
                 should.exist(err);
-                err.message.should.equal('Missing Authorization header');
+                err.toResponse().payload.message.should.equal('Missing Authorization header');
                 done();
             });
         });
@@ -157,7 +157,7 @@ describe('Hawk', function () {
             Hawk.authenticate(req, credentialsFunc, {}, function (err, credentials, ext) {
 
                 should.exist(err);
-                err.message.should.equal('Missing Host header');
+                err.toResponse().payload.message.should.equal('Missing Host header');
                 done();
             });
         });
@@ -176,7 +176,7 @@ describe('Hawk', function () {
             Hawk.authenticate(req, credentialsFunc, {}, function (err, credentials, ext) {
 
                 should.exist(err);
-                err.message.should.equal('Missing attributes');
+                err.toResponse().payload.message.should.equal('Missing attributes');
                 done();
             });
         });
@@ -195,7 +195,7 @@ describe('Hawk', function () {
             Hawk.authenticate(req, credentialsFunc, {}, function (err, credentials, ext) {
 
                 should.exist(err);
-                err.message.should.equal('Unknown attributes');
+                err.toResponse().payload.message.should.equal('Unknown attributes');
                 done();
             });
         });
@@ -214,7 +214,7 @@ describe('Hawk', function () {
             Hawk.authenticate(req, credentialsFunc, {}, function (err, credentials, ext) {
 
                 should.exist(err);
-                err.message.should.equal('Invalid header format');
+                err.toResponse().payload.message.should.equal('Invalid header format');
                 done();
             });
         });
@@ -233,7 +233,7 @@ describe('Hawk', function () {
             Hawk.authenticate(req, credentialsFunc, {}, function (err, credentials, ext) {
 
                 should.exist(err);
-                err.message.should.equal('Bad Host header');
+                err.toResponse().payload.message.should.equal('Bad Host header');
                 done();
             });
         });
@@ -281,7 +281,7 @@ describe('Hawk', function () {
             Hawk.authenticate(req, credentialsFunc, {}, function (err, credentials, ext) {
 
                 should.exist(err);
-                err.message.should.equal('Missing credentials');
+                err.toResponse().payload.message.should.equal('Missing credentials');
                 done();
             });
         });
@@ -311,6 +311,7 @@ describe('Hawk', function () {
 
                 should.exist(err);
                 err.message.should.equal('Invalid credentials');
+                err.toResponse().payload.message.should.equal('An internal server error occurred');
                 done();
             });
         });
@@ -341,6 +342,7 @@ describe('Hawk', function () {
 
                 should.exist(err);
                 err.message.should.equal('Unknown algorithm');
+                err.toResponse().payload.message.should.equal('An internal server error occurred');
                 done();
             });
         });
@@ -370,24 +372,9 @@ describe('Hawk', function () {
             Hawk.authenticate(req, credentialsFunc, {}, function (err, credentials, ext) {
 
                 should.exist(err);
-                err.message.should.equal('Bad mac');
+                err.toResponse().payload.message.should.equal('Bad mac');
                 done();
             });
-        });
-    });
-
-    describe('#getWWWAuthenticateHeader', function () {
-
-        it('should return a valid Hawk header with error', function (done) {
-
-            Hawk.getWWWAuthenticateHeader('boom').should.equal('Hawk error="boom"');
-            done();
-        });
-
-        it('should return a valid Hawk header without error', function (done) {
-
-            Hawk.getWWWAuthenticateHeader().should.equal('Hawk');
-            done();
         });
     });
 
