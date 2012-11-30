@@ -33,7 +33,7 @@ describe('Hawk', function () {
 
             req.headers.authorization = Hawk.getAuthorizationHeader(credentials, req.method, req.url, 'example.com', 8080, 'some-app-data', 1353809207);
 
-            Hawk.authenticate(req, credentialsFunc, {}, function (err, isAuthenticated, credentials, ext) {
+            Hawk.authenticate(req, credentialsFunc, {}, function (err, credentials, ext) {
 
                 should.not.exist(err);
                 credentials.user.should.equal('steve');
@@ -58,10 +58,10 @@ describe('Hawk', function () {
             req.headers.authorization = Hawk.getAuthorizationHeader(credentials, req.method, req.url, 'example.com', 8080, 'some-app-data', 1353809207);
             req.url = '/something/else';
 
-            Hawk.authenticate(req, credentialsFunc, {}, function (err, isAuthenticated, credentials, ext) {
+            Hawk.authenticate(req, credentialsFunc, {}, function (err, credentials, ext) {
 
                 should.exist(err);
-                isAuthenticated.should.equal(false);
+                should.exist(credentials);
                 done();
             });
         });
@@ -80,7 +80,7 @@ describe('Hawk', function () {
                 url: '/resource/4?filter=a'
             };
 
-            Hawk.authenticate(req, credentialsFunc, {}, function (err, isAuthenticated, credentials, ext) {
+            Hawk.authenticate(req, credentialsFunc, {}, function (err, credentials, ext) {
 
                 should.not.exist(err);
                 credentials.user.should.equal('steve');
@@ -99,7 +99,7 @@ describe('Hawk', function () {
                 url: '/resource/4?filter=a'
             };
 
-            Hawk.authenticate(req, credentialsFunc, {}, function (err, isAuthenticated, credentials, ext) {
+            Hawk.authenticate(req, credentialsFunc, {}, function (err, credentials, ext) {
 
                 should.not.exist(err);
                 credentials.user.should.equal('steve');
@@ -118,7 +118,7 @@ describe('Hawk', function () {
                 url: '/resource/4?filter=a'
             };
 
-            Hawk.authenticate(req, credentialsFunc, {}, function (err, isAuthenticated, credentials, ext) {
+            Hawk.authenticate(req, credentialsFunc, {}, function (err, credentials, ext) {
 
                 should.exist(err);
                 err.message.should.equal('Incorrect scheme');
@@ -136,7 +136,7 @@ describe('Hawk', function () {
                 url: '/resource/4?filter=a'
             };
 
-            Hawk.authenticate(req, credentialsFunc, {}, function (err, isAuthenticated, credentials, ext) {
+            Hawk.authenticate(req, credentialsFunc, {}, function (err, credentials, ext) {
 
                 should.exist(err);
                 err.message.should.equal('Missing Authorization header');
@@ -154,7 +154,7 @@ describe('Hawk', function () {
                 url: '/resource/4?filter=a'
             };
 
-            Hawk.authenticate(req, credentialsFunc, {}, function (err, isAuthenticated, credentials, ext) {
+            Hawk.authenticate(req, credentialsFunc, {}, function (err, credentials, ext) {
 
                 should.exist(err);
                 err.message.should.equal('Missing Host header');
@@ -173,7 +173,7 @@ describe('Hawk', function () {
                 url: '/resource/4?filter=a'
             };
 
-            Hawk.authenticate(req, credentialsFunc, {}, function (err, isAuthenticated, credentials, ext) {
+            Hawk.authenticate(req, credentialsFunc, {}, function (err, credentials, ext) {
 
                 should.exist(err);
                 err.message.should.equal('Missing attributes');
@@ -192,7 +192,7 @@ describe('Hawk', function () {
                 url: '/resource/4?filter=a'
             };
 
-            Hawk.authenticate(req, credentialsFunc, {}, function (err, isAuthenticated, credentials, ext) {
+            Hawk.authenticate(req, credentialsFunc, {}, function (err, credentials, ext) {
 
                 should.exist(err);
                 err.message.should.equal('Unknown attributes');
@@ -211,7 +211,7 @@ describe('Hawk', function () {
                 url: '/resource/4?filter=a'
             };
 
-            Hawk.authenticate(req, credentialsFunc, {}, function (err, isAuthenticated, credentials, ext) {
+            Hawk.authenticate(req, credentialsFunc, {}, function (err, credentials, ext) {
 
                 should.exist(err);
                 err.message.should.equal('Invalid header format');
@@ -230,7 +230,7 @@ describe('Hawk', function () {
                 url: '/resource/4?filter=a'
             };
 
-            Hawk.authenticate(req, credentialsFunc, {}, function (err, isAuthenticated, credentials, ext) {
+            Hawk.authenticate(req, credentialsFunc, {}, function (err, credentials, ext) {
 
                 should.exist(err);
                 err.message.should.equal('Bad Host header');
@@ -254,7 +254,7 @@ describe('Hawk', function () {
                 return callback(new Error('Unknown user'));
             };
 
-            Hawk.authenticate(req, credentialsFunc, {}, function (err, isAuthenticated, credentials, ext) {
+            Hawk.authenticate(req, credentialsFunc, {}, function (err, credentials, ext) {
 
                 should.exist(err);
                 err.message.should.equal('Unknown user');
@@ -278,7 +278,7 @@ describe('Hawk', function () {
                 return callback(null, null);
             };
 
-            Hawk.authenticate(req, credentialsFunc, {}, function (err, isAuthenticated, credentials, ext) {
+            Hawk.authenticate(req, credentialsFunc, {}, function (err, credentials, ext) {
 
                 should.exist(err);
                 err.message.should.equal('Missing credentials');
@@ -307,7 +307,7 @@ describe('Hawk', function () {
                 return callback(null, credentials);
             };
 
-            Hawk.authenticate(req, credentialsFunc, {}, function (err, isAuthenticated, credentials, ext) {
+            Hawk.authenticate(req, credentialsFunc, {}, function (err, credentials, ext) {
 
                 should.exist(err);
                 err.message.should.equal('Invalid credentials');
@@ -337,7 +337,7 @@ describe('Hawk', function () {
                 return callback(null, credentials);
             };
 
-            Hawk.authenticate(req, credentialsFunc, {}, function (err, isAuthenticated, credentials, ext) {
+            Hawk.authenticate(req, credentialsFunc, {}, function (err, credentials, ext) {
 
                 should.exist(err);
                 err.message.should.equal('Unknown algorithm');
@@ -367,7 +367,7 @@ describe('Hawk', function () {
                 return callback(null, credentials);
             };
 
-            Hawk.authenticate(req, credentialsFunc, {}, function (err, isAuthenticated, credentials, ext) {
+            Hawk.authenticate(req, credentialsFunc, {}, function (err, credentials, ext) {
 
                 should.exist(err);
                 err.message.should.equal('Bad mac');
