@@ -1,8 +1,17 @@
 // Load modules
 
-var expect = require('chai').expect;
-var should = require('should');
-var Hawk = process.env.TEST_COV ? require('../lib-cov/hawk') : require('../lib/hawk');
+var Chai = require('chai');
+var Hawk = process.env.TEST_COV ? require('../lib-cov') : require('../lib');
+
+
+// Declare internals
+
+var internals = {};
+
+
+// Test shortcuts
+
+var expect = Chai.expect;
 
 
 describe('Hawk', function () {
@@ -35,9 +44,9 @@ describe('Hawk', function () {
 
             Hawk.authenticate(req, credentialsFunc, {}, function (err, credentials, ext) {
 
-                should.not.exist(err);
-                credentials.user.should.equal('steve');
-                ext.should.equal('some-app-data');
+                expect(err).to.not.exist;
+                expect(credentials.user).to.equal('steve');
+                expect(ext).to.equal('some-app-data');
                 done();
             });
         });
@@ -60,8 +69,8 @@ describe('Hawk', function () {
 
             Hawk.authenticate(req, credentialsFunc, {}, function (err, credentials, ext) {
 
-                should.exist(err);
-                should.exist(credentials);
+                expect(err).to.exist;
+                expect(credentials).to.exist;
                 done();
             });
         });
@@ -82,8 +91,8 @@ describe('Hawk', function () {
 
             Hawk.authenticate(req, credentialsFunc, {}, function (err, credentials, ext) {
 
-                should.not.exist(err);
-                credentials.user.should.equal('steve');
+                expect(err).to.not.exist;
+                expect(credentials.user).to.equal('steve');
                 done();
             });
         });
@@ -101,8 +110,8 @@ describe('Hawk', function () {
 
             Hawk.authenticate(req, credentialsFunc, {}, function (err, credentials, ext) {
 
-                should.not.exist(err);
-                credentials.user.should.equal('steve');
+                expect(err).to.not.exist;
+                expect(credentials.user).to.equal('steve');
                 done();
             });
         });
@@ -120,8 +129,8 @@ describe('Hawk', function () {
 
             Hawk.authenticate(req, credentialsFunc, {}, function (err, credentials, ext) {
 
-                should.exist(err);
-                err.toResponse().payload.message.should.equal('Incorrect scheme');
+                expect(err).to.exist;
+                expect(err.toResponse().payload.message).to.equal('Incorrect scheme');
                 done();
             });
         });
@@ -138,8 +147,8 @@ describe('Hawk', function () {
 
             Hawk.authenticate(req, credentialsFunc, {}, function (err, credentials, ext) {
 
-                should.exist(err);
-                err.toResponse().payload.message.should.equal('Missing Authorization header');
+                expect(err).to.exist;
+                expect(err.toResponse().payload.message).to.equal('Missing Authorization header');
                 done();
             });
         });
@@ -156,8 +165,8 @@ describe('Hawk', function () {
 
             Hawk.authenticate(req, credentialsFunc, {}, function (err, credentials, ext) {
 
-                should.exist(err);
-                err.toResponse().payload.message.should.equal('Missing Host header');
+                expect(err).to.exist;
+                expect(err.toResponse().payload.message).to.equal('Missing Host header');
                 done();
             });
         });
@@ -175,8 +184,8 @@ describe('Hawk', function () {
 
             Hawk.authenticate(req, credentialsFunc, {}, function (err, credentials, ext) {
 
-                should.exist(err);
-                err.toResponse().payload.message.should.equal('Missing attributes');
+                expect(err).to.exist;
+                expect(err.toResponse().payload.message).to.equal('Missing attributes');
                 done();
             });
         });
@@ -194,8 +203,8 @@ describe('Hawk', function () {
 
             Hawk.authenticate(req, credentialsFunc, {}, function (err, credentials, ext) {
 
-                should.exist(err);
-                err.toResponse().payload.message.should.equal('Unknown attributes');
+                expect(err).to.exist;
+                expect(err.toResponse().payload.message).to.equal('Unknown attributes');
                 done();
             });
         });
@@ -213,8 +222,8 @@ describe('Hawk', function () {
 
             Hawk.authenticate(req, credentialsFunc, {}, function (err, credentials, ext) {
 
-                should.exist(err);
-                err.toResponse().payload.message.should.equal('Invalid header format');
+                expect(err).to.exist;
+                expect(err.toResponse().payload.message).to.equal('Invalid header format');
                 done();
             });
         });
@@ -232,8 +241,8 @@ describe('Hawk', function () {
 
             Hawk.authenticate(req, credentialsFunc, {}, function (err, credentials, ext) {
 
-                should.exist(err);
-                err.toResponse().payload.message.should.equal('Bad Host header');
+                expect(err).to.exist;
+                expect(err.toResponse().payload.message).to.equal('Bad Host header');
                 done();
             });
         });
@@ -256,8 +265,8 @@ describe('Hawk', function () {
 
             Hawk.authenticate(req, credentialsFunc, {}, function (err, credentials, ext) {
 
-                should.exist(err);
-                err.message.should.equal('Unknown user');
+                expect(err).to.exist;
+                expect(err.message).to.equal('Unknown user');
                 done();
             });
         });
@@ -280,8 +289,8 @@ describe('Hawk', function () {
 
             Hawk.authenticate(req, credentialsFunc, {}, function (err, credentials, ext) {
 
-                should.exist(err);
-                err.toResponse().payload.message.should.equal('Missing credentials');
+                expect(err).to.exist;
+                expect(err.toResponse().payload.message).to.equal('Missing credentials');
                 done();
             });
         });
@@ -309,9 +318,9 @@ describe('Hawk', function () {
 
             Hawk.authenticate(req, credentialsFunc, {}, function (err, credentials, ext) {
 
-                should.exist(err);
-                err.message.should.equal('Invalid credentials');
-                err.toResponse().payload.message.should.equal('An internal server error occurred');
+                expect(err).to.exist;
+                expect(err.message).to.equal('Invalid credentials');
+                expect(err.toResponse().payload.message).to.equal('An internal server error occurred');
                 done();
             });
         });
@@ -340,9 +349,9 @@ describe('Hawk', function () {
 
             Hawk.authenticate(req, credentialsFunc, {}, function (err, credentials, ext) {
 
-                should.exist(err);
-                err.message.should.equal('Unknown algorithm');
-                err.toResponse().payload.message.should.equal('An internal server error occurred');
+                expect(err).to.exist;
+                expect(err.message).to.equal('Unknown algorithm');
+                expect(err.toResponse().payload.message).to.equal('An internal server error occurred');
                 done();
             });
         });
@@ -371,8 +380,8 @@ describe('Hawk', function () {
 
             Hawk.authenticate(req, credentialsFunc, {}, function (err, credentials, ext) {
 
-                should.exist(err);
-                err.toResponse().payload.message.should.equal('Bad mac');
+                expect(err).to.exist;
+                expect(err.toResponse().payload.message).to.equal('Bad mac');
                 done();
             });
         });
@@ -382,7 +391,7 @@ describe('Hawk', function () {
 
         it('should return an empty value on unknown algorithm', function (done) {
 
-            Hawk.calculateMAC('dasdfasdf', 'hmac-sha-0', Date.now() / 1000, 'GET', '/resource/something', 'example.com', 8080).should.equal('');
+            expect(Hawk.calculateMAC('dasdfasdf', 'hmac-sha-0', Date.now() / 1000, 'GET', '/resource/something', 'example.com', 8080)).to.equal('');
             done();
         });
     });
@@ -398,7 +407,7 @@ describe('Hawk', function () {
             };
 
             var header = Hawk.getAuthorizationHeader(credentials, 'POST', '/somewhere/over/the/rainbow', 'example.net', 443, 'Bazinga!', 1353809207);
-            header.should.equal('Hawk id="123456", ts="1353809207", ext="Bazinga!", mac="LYUkYKYkQsQstqNQHcnAzDXce0oHsmS049rv4EalMb8="');
+            expect(header).to.equal('Hawk id="123456", ts="1353809207", ext="Bazinga!", mac="LYUkYKYkQsQstqNQHcnAzDXce0oHsmS049rv4EalMb8="');
             done();
         });
 
@@ -410,7 +419,7 @@ describe('Hawk', function () {
             };
 
             var header = Hawk.getAuthorizationHeader(credentials, 'POST', '/somewhere/over/the/rainbow', 'example.net', 443, 'Bazinga!', 1353809207);
-            header.should.equal('');
+            expect(header).to.equal('');
             done();
         });
 
@@ -423,7 +432,7 @@ describe('Hawk', function () {
             };
 
             var header = Hawk.getAuthorizationHeader(credentials, 'POST', '/somewhere/over/the/rainbow', 'example.net', 443, 'Bazinga!', 1353809207);
-            header.should.equal('');
+            expect(header).to.equal('');
             done();
         });
     });
