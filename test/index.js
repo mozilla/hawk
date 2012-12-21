@@ -531,5 +531,49 @@ describe('Hawk', function () {
             done();
         });
     });
+
+    describe('#fixedTimeComparison', function () {
+
+        var a = Hawk.randomString(50000);
+        var b = Hawk.randomString(150000);
+
+        it('should take the same amount of time comparing different string sizes', function (done) {
+
+            var now = Date.now();
+            Hawk.fixedTimeComparison(b, a);
+            var t1 = Date.now() - now;
+
+            now = Date.now();
+            Hawk.fixedTimeComparison(b, b);
+            var t2 = Date.now() - now;
+
+            expect(t2 - t1).to.be.within(-1, 1);
+            done();
+        });
+
+        it('should return true for equal strings', function (done) {
+
+            expect(Hawk.fixedTimeComparison(a, a)).to.equal(true);
+            done();
+        });
+
+        it('should return false for different strings (size, a < b)', function (done) {
+
+            expect(Hawk.fixedTimeComparison(a, a + 'x')).to.equal(false);
+            done();
+        });
+
+        it('should return false for different strings (size, a > b)', function (done) {
+
+            expect(Hawk.fixedTimeComparison(a + 'x', a)).to.equal(false);
+            done();
+        });
+
+        it('should return false for different strings (size, a = b)', function (done) {
+
+            expect(Hawk.fixedTimeComparison(a + 'x', a + 'y')).to.equal(false);
+            done();
+        });
+    });
 });
 
