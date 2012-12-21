@@ -101,11 +101,11 @@ describe('Hawk', function () {
 
             var req = {
                 headers: {
-                    authorization: 'Hawk id="123", ts="1353788437", nonce="k3j4h2", mac="ZPa2zWC3WUAYXrwPzJ3DpF54xjQ2ZDLe8GF1ny6JJFI=", ext="hello"',
-                    host: 'example.com:8080'
+                    authorization: 'Hawk id="dh37fgj492je", ts="1353832234", nonce="j4h3g2", mac="hpf5lg0G0rtKrT04CiRf0Q+IDjkGkyvKdMjtqu1XV/s=", ext="some-app-data"',
+                    host: 'example.com:8000'
                 },
                 method: 'GET',
-                url: '/resource/4?filter=a'
+                url: '/resource/1?b=1&a=2'
             };
 
             Hawk.authenticate(req, credentialsFunc, {}, function (err, credentials, ext) {

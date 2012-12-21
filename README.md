@@ -3,7 +3,7 @@
 <img align="right" src="https://raw.github.com/hueniverse/hawk/master/images/logo.png" /> **Hawk** is an HTTP authentication scheme using a message authentication code (MAC) algorithm to provide partial
 HTTP request cryptographic verification. For more complex use cases such as access delegation, see [Oz](/hueniverse/oz).
 
-Current version: **0.0.x**
+Current version: **0.1.0**
 
 [![Build Status](https://secure.travis-ci.org/hueniverse/hawk.png)](http://travis-ci.org/hueniverse/hawk)
 
@@ -79,7 +79,7 @@ var handler = function (req, res) {
     });
 };
 
-Http.createServer(handler).listen(8000, '127.0.0.1');
+Http.createServer(handler).listen(8000, 'example.com');
 ```
 
 Client code:
@@ -100,10 +100,10 @@ var credentials = {
 // Send authenticated request
 
 var options = {
-    uri: 'http://127.0.0.1:8000/resource/1?b=1&a=2',
+    uri: 'http://example.com:8000/resource/1?b=1&a=2',
     method: 'GET',
     headers: {
-        authorization: Hawk.getAuthorizationHeader(credentials, 'GET', '/resource/1?b=1&a=2', '127.0.0.1', 8000, 'some-app-data')
+        authorization: Hawk.getAuthorizationHeader(credentials, 'GET', '/resource/1?b=1&a=2', 'example.com', 8000, 'some-app-data')
     }
 };
 
@@ -121,7 +121,7 @@ the resource server:
 
 ```
 GET /resource/1?b=1&a=2 HTTP/1.1
-Host: 127.0.0.1:8000
+Host: example.com:8000
 ```
 
 The resource server returns the following authentication challenge:
@@ -134,18 +134,19 @@ WWW-Authenticate: Hawk
 The client has previously obtained a set of **Hawk** credentials for accessing resources on the "http://example.com/"
 server. The **Hawk** credentials issued to the client include the following attributes:
 
-* Key identifier:  dh37fgj492je
-* Key:  werxhqb98rpaxn39848xrunpaw3489ruxnpa98w4rxn
-* Algorithm:  hmac-sha-256
+* Key identifier: dh37fgj492je
+* Key: werxhqb98rpaxn39848xrunpaw3489ruxnpa98w4rxn
+* Algorithm: hmac-sha-256
 
 The client generates the authentication header by calculating a timestamp (e.g. the number of seconds since January 1,
-1970 00:00:00 GMT) and constructs the normalized request string (newline separated values):
+1970 00:00:00 GMT), generates a nonce, and constructs the normalized request string (newline separated values):
 
 ```
 1353832234
+j4h3g2
 GET
 /resource/1?b=1&a=2
-127.0.0.1
+example.com
 8000
 some-app-data
 ```
@@ -154,7 +155,7 @@ The request MAC is calculated using the specified algorithm "hmac-sha-256" and t
 The result is base64-encoded to produce the request MAC:
 
 ```
-/uYWR6W5vTbY3WKUAN6fa+7p1t+1Yl6hFxKeMLfR6kk=
+hpf5lg0G0rtKrT04CiRf0Q+IDjkGkyvKdMjtqu1XV/s=
 ```
 
 The client includes the **Hawk** key identifier, timestamp, and request MAC with the request using the HTTP "Authorization"
@@ -162,8 +163,8 @@ request header field:
 
 ```
 GET /resource/1?b=1&a=2 HTTP/1.1
-Host: 127.0.0.1:8000
-Authorization: Hawk id="dh37fgj492je", ts="1353832234", ext="some-app-data", mac="/uYWR6W5vTbY3WKUAN6fa+7p1t+1Yl6hFxKeMLfR6kk="
+Host: example.com:8000
+Authorization: Hawk id="dh37fgj492je", ts="1353832234", ext="some-app-data", mac="hpf5lg0G0rtKrT04CiRf0Q+IDjkGkyvKdMjtqu1XV/s="
 ```
 
 The server validates the request by calculating the request MAC again based on the request received and verifies the validity
