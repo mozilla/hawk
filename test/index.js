@@ -40,7 +40,7 @@ describe('Hawk', function () {
 
         credentialsFunc('123456', function (err, credentials) {
 
-            req.headers.authorization = Hawk.getAuthorizationHeader(credentials, req.method, req.url, 'example.com', 8080, 'some-app-data', 1353809207);
+            req.headers.authorization = Hawk.getAuthorizationHeader(credentials, req.method, req.url, 'example.com', 8080, 'some-app-data');
 
             Hawk.authenticate(req, credentialsFunc, {}, function (err, credentials, ext) {
 
@@ -64,7 +64,7 @@ describe('Hawk', function () {
 
         credentialsFunc('123456', function (err, credentials) {
 
-            req.headers.authorization = Hawk.getAuthorizationHeader(credentials, req.method, req.url, 'example.com', 8080, 'some-app-data', 1353809207);
+            req.headers.authorization = Hawk.getAuthorizationHeader(credentials, req.method, req.url, 'example.com', 8080, 'some-app-data');
             req.url = '/something/else';
 
             Hawk.authenticate(req, credentialsFunc, {}, function (err, credentials, ext) {
@@ -82,7 +82,7 @@ describe('Hawk', function () {
 
             var req = {
                 headers: {
-                    authorization: 'Hawk id="1", ts="1353788437", mac="lDdDLlWQhgcxTvYgzzLo3EZExog=", ext="hello"',
+                    authorization: 'Hawk id="1", ts="1353788437", nonce="k3j4h2", mac="qrP6b5tiS2CO330rpjUEym/USBM=", ext="hello"',
                     host: 'example.com:8080'
                 },
                 method: 'GET',
@@ -101,11 +101,11 @@ describe('Hawk', function () {
 
             var req = {
                 headers: {
-                    authorization: 'Hawk id="123", ts="1353788437", mac="/qwS4UjfVWMcUyW6EEgUH4jlr7T/wuKe3dKijvTvSos=", ext="hello"',
-                    host: 'example.com:8080'
+                    authorization: 'Hawk id="dh37fgj492je", ts="1353832234", nonce="j4h3g2", mac="hpf5lg0G0rtKrT04CiRf0Q+IDjkGkyvKdMjtqu1XV/s=", ext="some-app-data"',
+                    host: 'example.com:8000'
                 },
                 method: 'GET',
-                url: '/resource/4?filter=a'
+                url: '/resource/1?b=1&a=2'
             };
 
             Hawk.authenticate(req, credentialsFunc, {}, function (err, credentials, ext) {
@@ -113,6 +113,44 @@ describe('Hawk', function () {
                 expect(err).to.not.exist;
                 expect(credentials.user).to.equal('steve');
                 done();
+            });
+        });
+
+        it('should fail on a replay', function (done) {
+
+            var req = {
+                headers: {
+                    authorization: 'Hawk id="123", ts="1353788437", nonce="k3j4h2", mac="ZPa2zWC3WUAYXrwPzJ3DpF54xjQ2ZDLe8GF1ny6JJFI=", ext="hello"',
+                    host: 'example.com:8080'
+                },
+                method: 'GET',
+                url: '/resource/4?filter=a'
+            };
+
+            var memoryCache = {};
+            var options = {
+                nonceFunc: function (nonce, ts, callback) {
+
+                    if (memoryCache[nonce]) {
+                        return callback(new Error());
+                    }
+
+                    memoryCache[nonce] = true;
+                    return callback();
+                }
+            };
+
+            Hawk.authenticate(req, credentialsFunc, options, function (err, credentials, ext) {
+
+                expect(err).to.not.exist;
+                expect(credentials.user).to.equal('steve');
+
+                Hawk.authenticate(req, credentialsFunc, options, function (err, credentials, ext) {
+
+                    expect(err).to.exist;
+                    expect(err.toResponse().payload.message).to.equal('Invalid nonce');
+                    done();
+                });
             });
         });
 
@@ -157,7 +195,7 @@ describe('Hawk', function () {
 
             var req = {
                 headers: {
-                    authorization: 'Hawk id="123", ts="1353788437", mac="/qwS4UjfVWMcUyW6EEgUH4jlr7T/wuKe3dKijvTvSos=", ext="hello"'
+                    authorization: 'Hawk id="123", ts="1353788437", nonce="k3j4h2", mac="/qwS4UjfVWMcUyW6EEgUH4jlr7T/wuKe3dKijvTvSos=", ext="hello"'
                 },
                 method: 'GET',
                 url: '/resource/4?filter=a'
@@ -171,11 +209,68 @@ describe('Hawk', function () {
             });
         });
 
-        it('should fail on an missing authorization attribute', function (done) {
+        it('should fail on an missing authorization attribute (id)', function (done) {
 
             var req = {
                 headers: {
-                    authorization: 'Hawk ts="1353788437", mac="/qwS4UjfVWMcUyW6EEgUH4jlr7T/wuKe3dKijvTvSos=", ext="hello"',
+                    authorization: 'Hawk ts="1353788437", nonce="k3j4h2", mac="/qwS4UjfVWMcUyW6EEgUH4jlr7T/wuKe3dKijvTvSos=", ext="hello"',
+                    host: 'example.com:8080'
+                },
+                method: 'GET',
+                url: '/resource/4?filter=a'
+            };
+
+            Hawk.authenticate(req, credentialsFunc, {}, function (err, credentials, ext) {
+
+                expect(err).to.exist;
+                expect(err.toResponse().payload.message).to.equal('Missing attributes');
+                done();
+            });
+        });
+
+        it('should fail on an missing authorization attribute (ts)', function (done) {
+
+            var req = {
+                headers: {
+                    authorization: 'Hawk id="123", nonce="k3j4h2", mac="/qwS4UjfVWMcUyW6EEgUH4jlr7T/wuKe3dKijvTvSos=", ext="hello"',
+                    host: 'example.com:8080'
+                },
+                method: 'GET',
+                url: '/resource/4?filter=a'
+            };
+
+            Hawk.authenticate(req, credentialsFunc, {}, function (err, credentials, ext) {
+
+                expect(err).to.exist;
+                expect(err.toResponse().payload.message).to.equal('Missing attributes');
+                done();
+            });
+        });
+
+        it('should fail on an missing authorization attribute (nonce)', function (done) {
+
+            var req = {
+                headers: {
+                    authorization: 'Hawk id="123", ts="1353788437", mac="/qwS4UjfVWMcUyW6EEgUH4jlr7T/wuKe3dKijvTvSos=", ext="hello"',
+                    host: 'example.com:8080'
+                },
+                method: 'GET',
+                url: '/resource/4?filter=a'
+            };
+
+            Hawk.authenticate(req, credentialsFunc, {}, function (err, credentials, ext) {
+
+                expect(err).to.exist;
+                expect(err.toResponse().payload.message).to.equal('Missing attributes');
+                done();
+            });
+        });
+
+        it('should fail on an missing authorization attribute (mac)', function (done) {
+
+            var req = {
+                headers: {
+                    authorization: 'Hawk id="123", ts="1353788437", nonce="k3j4h2", ext="hello"',
                     host: 'example.com:8080'
                 },
                 method: 'GET',
@@ -194,7 +289,7 @@ describe('Hawk', function () {
 
             var req = {
                 headers: {
-                    authorization: 'Hawk id="123", ts="1353788437", x="3", mac="/qwS4UjfVWMcUyW6EEgUH4jlr7T/wuKe3dKijvTvSos=", ext="hello"',
+                    authorization: 'Hawk id="123", ts="1353788437", nonce="k3j4h2", x="3", mac="/qwS4UjfVWMcUyW6EEgUH4jlr7T/wuKe3dKijvTvSos=", ext="hello"',
                     host: 'example.com:8080'
                 },
                 method: 'GET',
@@ -232,7 +327,7 @@ describe('Hawk', function () {
 
             var req = {
                 headers: {
-                    authorization: 'Hawk id="123", ts="1353788437", mac="/qwS4UjfVWMcUyW6EEgUH4jlr7T/wuKe3dKijvTvSos=", ext="hello"',
+                    authorization: 'Hawk id="123", ts="1353788437", nonce="k3j4h2", mac="/qwS4UjfVWMcUyW6EEgUH4jlr7T/wuKe3dKijvTvSos=", ext="hello"',
                     host: 'example.com:8080:90'
                 },
                 method: 'GET',
@@ -251,7 +346,7 @@ describe('Hawk', function () {
 
             var req = {
                 headers: {
-                    authorization: 'Hawk id="123", ts="1353788437", mac="/qwS4UjfVWMcUyW6EEgUH4jlr7T/wuKe3dKijvTvSos=", ext="hello"',
+                    authorization: 'Hawk id="123", ts="1353788437", nonce="k3j4h2", mac="/qwS4UjfVWMcUyW6EEgUH4jlr7T/wuKe3dKijvTvSos=", ext="hello"',
                     host: 'example.com:8080'
                 },
                 method: 'GET',
@@ -275,7 +370,7 @@ describe('Hawk', function () {
 
             var req = {
                 headers: {
-                    authorization: 'Hawk id="123", ts="1353788437", mac="/qwS4UjfVWMcUyW6EEgUH4jlr7T/wuKe3dKijvTvSos=", ext="hello"',
+                    authorization: 'Hawk id="123", ts="1353788437", nonce="k3j4h2", mac="/qwS4UjfVWMcUyW6EEgUH4jlr7T/wuKe3dKijvTvSos=", ext="hello"',
                     host: 'example.com:8080'
                 },
                 method: 'GET',
@@ -299,7 +394,7 @@ describe('Hawk', function () {
 
             var req = {
                 headers: {
-                    authorization: 'Hawk id="123", ts="1353788437", mac="/qwS4UjfVWMcUyW6EEgUH4jlr7T/wuKe3dKijvTvSos=", ext="hello"',
+                    authorization: 'Hawk id="123", ts="1353788437", nonce="k3j4h2", mac="/qwS4UjfVWMcUyW6EEgUH4jlr7T/wuKe3dKijvTvSos=", ext="hello"',
                     host: 'example.com:8080'
                 },
                 method: 'GET',
@@ -329,7 +424,7 @@ describe('Hawk', function () {
 
             var req = {
                 headers: {
-                    authorization: 'Hawk id="123", ts="1353788437", mac="/qwS4UjfVWMcUyW6EEgUH4jlr7T/wuKe3dKijvTvSos=", ext="hello"',
+                    authorization: 'Hawk id="123", ts="1353788437", nonce="k3j4h2", mac="/qwS4UjfVWMcUyW6EEgUH4jlr7T/wuKe3dKijvTvSos=", ext="hello"',
                     host: 'example.com:8080'
                 },
                 method: 'GET',
@@ -360,7 +455,7 @@ describe('Hawk', function () {
 
             var req = {
                 headers: {
-                    authorization: 'Hawk id="123", ts="1353788437", mac="/qwS4UjfVWMcU4jlr7T/wuKe3dKijvTvSos=", ext="hello"',
+                    authorization: 'Hawk id="123", ts="1353788437", nonce="k3j4h2", mac="/qwS4UjfVWMcU4jlr7T/wuKe3dKijvTvSos=", ext="hello"',
                     host: 'example.com:8080'
                 },
                 method: 'GET',
@@ -391,7 +486,7 @@ describe('Hawk', function () {
 
         it('should return an empty value on unknown algorithm', function (done) {
 
-            expect(Hawk.calculateMAC('dasdfasdf', 'hmac-sha-0', Date.now() / 1000, 'GET', '/resource/something', 'example.com', 8080)).to.equal('');
+            expect(Hawk.calculateMAC('dasdfasdf', 'hmac-sha-0', Date.now() / 1000, 'k3k4j5', 'GET', '/resource/something', 'example.com', 8080)).to.equal('');
             done();
         });
     });
@@ -406,8 +501,8 @@ describe('Hawk', function () {
                 algorithm: 'hmac-sha-256'
             };
 
-            var header = Hawk.getAuthorizationHeader(credentials, 'POST', '/somewhere/over/the/rainbow', 'example.net', 443, 'Bazinga!', 1353809207);
-            expect(header).to.equal('Hawk id="123456", ts="1353809207", ext="Bazinga!", mac="LYUkYKYkQsQstqNQHcnAzDXce0oHsmS049rv4EalMb8="');
+            var header = Hawk.getAuthorizationHeader(credentials, 'POST', '/somewhere/over/the/rainbow', 'example.net', 443, 'Bazinga!', 1353809207, 'Ygvqdz');
+            expect(header).to.equal('Hawk id="123456", ts="1353809207", nonce="Ygvqdz", ext="Bazinga!", mac="qSK1cZEkqPwE2ttBX8QSXxO+NE3epFMu4tyVpGKjdnU="');
             done();
         });
 
@@ -433,6 +528,50 @@ describe('Hawk', function () {
 
             var header = Hawk.getAuthorizationHeader(credentials, 'POST', '/somewhere/over/the/rainbow', 'example.net', 443, 'Bazinga!', 1353809207);
             expect(header).to.equal('');
+            done();
+        });
+    });
+
+    describe('#fixedTimeComparison', function () {
+
+        var a = Hawk.randomString(50000);
+        var b = Hawk.randomString(150000);
+
+        it('should take the same amount of time comparing different string sizes', function (done) {
+
+            var now = Date.now();
+            Hawk.fixedTimeComparison(b, a);
+            var t1 = Date.now() - now;
+
+            now = Date.now();
+            Hawk.fixedTimeComparison(b, b);
+            var t2 = Date.now() - now;
+
+            expect(t2 - t1).to.be.within(-1, 1);
+            done();
+        });
+
+        it('should return true for equal strings', function (done) {
+
+            expect(Hawk.fixedTimeComparison(a, a)).to.equal(true);
+            done();
+        });
+
+        it('should return false for different strings (size, a < b)', function (done) {
+
+            expect(Hawk.fixedTimeComparison(a, a + 'x')).to.equal(false);
+            done();
+        });
+
+        it('should return false for different strings (size, a > b)', function (done) {
+
+            expect(Hawk.fixedTimeComparison(a + 'x', a)).to.equal(false);
+            done();
+        });
+
+        it('should return false for different strings (size, a = b)', function (done) {
+
+            expect(Hawk.fixedTimeComparison(a + 'x', a + 'y')).to.equal(false);
             done();
         });
     });
