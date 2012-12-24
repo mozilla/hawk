@@ -131,7 +131,10 @@ describe('Hawk', function () {
 
                 expect(err).to.exist;
                 expect(err.toResponse().payload.message).to.equal('Stale timestamp');
-                expect(err.headers['WWW-Authenticate']).to.equal('Hawk ts="' + Date.now() + '", ntp="pool.ntp.org", error="Stale timestamp"');
+                var header = err.headers['WWW-Authenticate'];
+                var ts = header.match(/^Hawk ts\=\"(\d+)\"\, ntp\=\"pool.ntp.org\"\, error=\"Stale timestamp\"$/);
+                var now = Date.now();
+                expect(parseInt(ts[1], 10)).to.be.within(now - 1, now + 1);
                 done();
             });
         });
@@ -194,6 +197,25 @@ describe('Hawk', function () {
             });
         });
 
+        it('should fail on an invalid authentication header: no scheme', function (done) {
+
+            var req = {
+                headers: {
+                    authorization: '!@#',
+                    host: 'example.com:8080'
+                },
+                method: 'GET',
+                url: '/resource/4?filter=a'
+            };
+
+            Hawk.authenticate(req, credentialsFunc, { localtimeOffsetMsec: 1353788437000 - Date.now() }, function (err, credentials, ext) {
+
+                expect(err).to.exist;
+                expect(err.toResponse().payload.message).to.equal('Invalid header syntax');
+                done();
+            });
+        });
+
         it('should fail on an missing authorization header', function (done) {
 
             var req = {
@@ -207,7 +229,10 @@ describe('Hawk', function () {
             Hawk.authenticate(req, credentialsFunc, {}, function (err, credentials, ext) {
 
                 expect(err).to.exist;
-                expect(err.headers['WWW-Authenticate']).to.equal('Hawk ts="' + Date.now() + '", ntp="pool.ntp.org"');
+                var header = err.headers['WWW-Authenticate'];
+                var ts = header.match(/^Hawk ts\=\"(\d+)\"\, ntp\=\"pool.ntp.org\"$/);
+                var now = Date.now();
+                expect(parseInt(ts[1], 10)).to.be.within(now - 1, now + 1);
                 done();
             });
         });

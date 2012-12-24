@@ -254,17 +254,17 @@ application-specific information via the Authorization header which is protected
 
 ### Future Time Manipulation
 
-NOTE: This attack is documented until the protocol address it by adding MAC calculation to server responses which will authenticate
-the time information provided.
-
 The protocol relies on a clock sync between the client and server. To accomplish this, the server informs the client of its
-current time as well as identifies the ntp server used (the client can opt to use either one to adjust its clock or calculate
-an offset used for further interactions with the server).
+current time as well as identifies the NTP server used (the client can opt to use either one to calculate the offset used for
+further interactions with the server).
 
 If an attacker is able to manipulate this information and cause the client to use an incorrect time, it would be able to cause
 the client to generate authenticated requests using time in the future. Such requests will fail when sent by the client, and will
 not likely leave a trace on the server (given the common implementation of nonce, if at all enforced). The attacker will then
 be able to replay the request at the correct time without detection.
+
+The client must only use the time information provided by the server if it is sent over a TLS connection and the server identity
+has been verified.
 
 ### Client Clock Poisoning
 
