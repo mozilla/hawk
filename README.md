@@ -10,6 +10,7 @@ Current version: **0.2.0**
 # Table of Content
 
 - [**Introduction**](#introduction)
+  - [Time Synchronization](#time-synchronization)
   - [Usage Example](#usage-example)
   - [Protocol Example](#protocol-example)
 <p></p>
@@ -302,8 +303,11 @@ of delegating access to a third party. If you are looking for an OAuth alternati
 
 ### Where can I find **Hawk** implementations in other languages?
 
-At this time, **Hawk** is only implemented in JavaScript as a node.js module. Check this space for future support of other
-languages (and such contributions are always welcome).
+**Hawk** is only officially implemented in JavaScript as a node.js module. However, others are actively porting it to other
+platforms. There is already a [PHP](https://github.com/alexbilbie/PHP-Hawk),
+[.NET](https://github.com/pcibraro/hawknet), and [JAVA](https://github.com/wealdtech/hawk) libraries available. The full list
+is maintained [here](https://github.com/hueniverse/hawk/issues?labels=port). Please add an issue is you are working on another
+port. A cross-platform test-suite is in the works.
 
 ### Why isn't the algorithm part of the challenge or dynamically negotiated?
 
@@ -328,6 +332,14 @@ authentication, it does not require it.
 
 ### Why bother with all this nonce and timestamp business?
 
+**Hawk** is an attempt to find a reasonable, practical compromise between security and usability. OAuth 1.0 got timestamp
+and nonces half the way right but failed when it came to scalability and consistent developer experience. **Hawk** addresses
+it by requiring the client to sync its clock, but provides it with tools to accomplish it.
+
+In general, replay protection is a matter of application-specific threat model. It is less of an issue on a TLS-protected
+system where the clients are implemented using best practices and are under the control of the server. Instead of dropping
+replay protection, **Hawk** offers a required time window and an optional nonce verification. Together, it provides developers
+with the ability to decide how to enforce their security policy without impacting the client's implementation.
 
 
 # Acknowledgements
