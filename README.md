@@ -15,7 +15,7 @@ Current version: **0.2.0**
   - [Protocol Example](#protocol-example)
 <p></p>
 - [**Security Considerations**](#security-considerations)
-  - [MAC Keys Transmission](#mac-key-transmission)
+  - [MAC Keys Transmission](#mac-keys-transmission)
   - [Confidentiality of Requests](#confidentiality-of-requests)
   - [Spoofing by Counterfeit Servers](#spoofing-by-counterfeit-servers)
   - [Plaintext Storage of Credentials](#plaintext-storage-of-credentials)
