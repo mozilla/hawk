@@ -3,7 +3,7 @@
 <img align="right" src="https://raw.github.com/hueniverse/hawk/master/images/logo.png" /> **Hawk** is an HTTP authentication scheme using a message authentication code (MAC) algorithm to provide partial
 HTTP request cryptographic verification. For more complex use cases such as access delegation, see [Oz](/hueniverse/oz).
 
-Current version: **0.2.0**
+Current version: **0.3.0**
 
 [![Build Status](https://secure.travis-ci.org/hueniverse/hawk.png)](http://travis-ci.org/hueniverse/hawk)
 
@@ -13,6 +13,8 @@ Current version: **0.2.0**
   - [Time Synchronization](#time-synchronization)
   - [Usage Example](#usage-example)
   - [Protocol Example](#protocol-example)
+<p></p>
+- [**Single URI Authorization**](#single-uri-authorization)
 <p></p>
 - [**Security Considerations**](#security-considerations)
   - [MAC Keys Transmission](#mac-keys-transmission)
@@ -102,10 +104,10 @@ var credentialsFunc = function (id, callback) {
 
 var handler = function (req, res) {
 
-    Hawk.authenticate(req, credentialsFunc, {}, function (err, isAuthenticated, credentials, ext) {
+    Hawk.authenticate(req, credentialsFunc, {}, function (err, credentials, ext) {
 
-        res.writeHead(isAuthenticated ? 200 : 401, { 'Content-Type': 'text/plain' });
-        res.end(isAuthenticated ? 'Hello ' + credentials.user : 'Shoosh!');
+        res.writeHead(!err ? 200 : 401, { 'Content-Type': 'text/plain' });
+        res.end(!err ? 'Hello ' + credentials.user : 'Shoosh!');
     });
 };
 
@@ -133,7 +135,7 @@ var options = {
     uri: 'http://example.com:8000/resource/1?b=1&a=2',
     method: 'GET',
     headers: {
-        authorization: Hawk.getAuthorizationHeader(credentials, 'GET', '/resource/1?b=1&a=2', 'example.com', 8000, 'some-app-data')
+        authorization: Hawk.getAuthorizationHeader(credentials, 'GET', '/resource/1?b=1&a=2', 'example.com', 8000, { ext: 'some-app-data' })
     }
 };
 
@@ -200,6 +202,79 @@ Authorization: Hawk id="dh37fgj492je", ts="1353832234", ext="some-app-data", mac
 
 The server validates the request by calculating the request MAC again based on the request received and verifies the validity
 and scope of the **Hawk** credentials. If valid, the server responds with the requested resource.
+
+
+# Single URI Authorization
+
+There are often cases in which limited and short-term access is granted to protected resource to a third party which does not
+have access to the shared credentials. For example, displaying a protected image on a web page accessed by anyone. **Hawk**
+provides limited support for such URIs in the form of a _bewit_ - a URI query parameter appended to the request URI which contains
+the necessary credentials to authenticate the request.
+
+Because of the significant security risks involved in issuing such access, bewit usage is purposely limited to only GET requests
+and for a finite period of time. Both the client and server can issue bewit credentials, however, the server should not use the same
+credentials as the client to maintain clear traceability as to who issued which credentials.
+
+In order to simplify implementation, bewit credentials do not support single-use policy and can be replayed multiple times within
+the granted access timeframe. 
+
+
+## Usage Example
+
+Server code:
+
+```javascript
+var Http = require('http');
+var Hawk = require('hawk');
+
+
+// Credentials lookup function
+
+var credentialsFunc = function (id, callback) {
+
+    var credentials = {
+        key: 'werxhqb98rpaxn39848xrunpaw3489ruxnpa98w4rxn',
+        algorithm: 'hmac-sha-256'
+    };
+
+    return callback(null, credentials);
+};
+
+// Create HTTP server
+
+var handler = function (req, res) {
+
+    Hawk.uri.authenticate(req, credentialsFunc, {}, function (err, credentials, ext) {
+
+        res.writeHead(!err ? 200 : 401, { 'Content-Type': 'text/plain' });
+        res.end(!err ? 'Access granted' : 'Shoosh!');
+    });
+};
+
+Http.createServer(handler).listen(8000, 'example.com');
+```
+
+Bewit code generation:
+
+```javascript
+var Request = require('request');
+var Hawk = require('hawk');
+
+
+// Client credentials
+
+var credentials = {
+    id: 'dh37fgj492je',
+    key: 'werxhqb98rpaxn39848xrunpaw3489ruxnpa98w4rxn',
+    algorithm: 'hmac-sha-256'
+}
+
+// Generate bewit
+
+var duration = 60 * 5;      // 5 Minutes
+var bewit = Hawk.uri.getBewit(credentials, '/resource/1?b=1&a=2', 'example.com', 8080, duration, { ext: 'some-app-data' });
+var uri = 'http://example.com:8000/resource/1?b=1&a=2' + '&bewit=' + bewit;
+```
 
 
 # Security Considerations
@@ -353,7 +428,7 @@ with the ability to decide how to enforce their security policy without impactin
 # Acknowledgements
 
 **Hawk** is a derivative work of the [HTTP MAC Authentication Scheme](http://tools.ietf.org/html/draft-hammer-oauth-v2-mac-token-05) proposal
-Co-authored by Ben Adida, Adam Barth, and Eran Hammer, which in turn was based on the OAuth 1.0 community specification.
+co-authored by Ben Adida, Adam Barth, and Eran Hammer, which in turn was based on the OAuth 1.0 community specification.
 
 Special thanks to Ben Laurie for his always insightful feedback and advice.
 

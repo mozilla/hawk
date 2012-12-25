@@ -40,7 +40,7 @@ describe('Hawk', function () {
 
         credentialsFunc('123456', function (err, credentials) {
 
-            req.headers.authorization = Hawk.getAuthorizationHeader(credentials, req.method, req.url, 'example.com', 8080, 'some-app-data');
+            req.headers.authorization = Hawk.getAuthorizationHeader(credentials, req.method, req.url, 'example.com', 8080, { ext: 'some-app-data' });
 
             Hawk.authenticate(req, credentialsFunc, {}, function (err, credentials, ext) {
 
@@ -64,7 +64,7 @@ describe('Hawk', function () {
 
         credentialsFunc('123456', function (err, credentials) {
 
-            req.headers.authorization = Hawk.getAuthorizationHeader(credentials, req.method, req.url, 'example.com', 8080, 'some-app-data');
+            req.headers.authorization = Hawk.getAuthorizationHeader(credentials, req.method, req.url, 'example.com', 8080, { ext: 'some-app-data' });
             req.url = '/something/else';
 
             Hawk.authenticate(req, credentialsFunc, {}, function (err, credentials, ext) {
@@ -250,7 +250,7 @@ describe('Hawk', function () {
             Hawk.authenticate(req, credentialsFunc, { localtimeOffsetMsec: 1353788437000 - Date.now() }, function (err, credentials, ext) {
 
                 expect(err).to.exist;
-                expect(err.toResponse().payload.message).to.equal('Missing Host header');
+                expect(err.toResponse().payload.message).to.equal('Invalid Host header');
                 done();
             });
         });
@@ -459,7 +459,7 @@ describe('Hawk', function () {
             Hawk.authenticate(req, credentialsFunc, { localtimeOffsetMsec: 1353788437000 - Date.now() }, function (err, credentials, ext) {
 
                 expect(err).to.exist;
-                expect(err.toResponse().payload.message).to.equal('Bad Host header');
+                expect(err.toResponse().payload.message).to.equal('Invalid Host header');
                 done();
             });
         });
@@ -507,7 +507,7 @@ describe('Hawk', function () {
             Hawk.authenticate(req, credentialsFunc, { localtimeOffsetMsec: 1353788437000 - Date.now() }, function (err, credentials, ext) {
 
                 expect(err).to.exist;
-                expect(err.toResponse().payload.message).to.equal('Missing credentials');
+                expect(err.toResponse().payload.message).to.equal('Unknown credentials');
                 done();
             });
         });
@@ -604,15 +604,6 @@ describe('Hawk', function () {
         });
     });
 
-    describe('#calculateMAC', function () {
-
-        it('should return an empty value on unknown algorithm', function (done) {
-
-            expect(Hawk.calculateMAC('dasdfasdf', 'hmac-sha-0', Date.now() / 1000, 'k3k4j5', 'GET', '/resource/something', 'example.com', 8080)).to.equal('');
-            done();
-        });
-    });
-
     describe('#getAuthorizationHeader', function () {
 
         it('should return a valid authorization header', function (done) {
@@ -623,7 +614,7 @@ describe('Hawk', function () {
                 algorithm: 'hmac-sha-256'
             };
 
-            var header = Hawk.getAuthorizationHeader(credentials, 'POST', '/somewhere/over/the/rainbow', 'example.net', 443, 'Bazinga!', 1353809207, 'Ygvqdz');
+            var header = Hawk.getAuthorizationHeader(credentials, 'POST', '/somewhere/over/the/rainbow', 'example.net', 443, { ext: 'Bazinga!', timestamp: 1353809207, nonce: 'Ygvqdz' });
             expect(header).to.equal('Hawk id="123456", ts="1353809207", nonce="Ygvqdz", ext="Bazinga!", mac="qSK1cZEkqPwE2ttBX8QSXxO+NE3epFMu4tyVpGKjdnU="');
             done();
         });
@@ -635,7 +626,7 @@ describe('Hawk', function () {
                 algorithm: 'hmac-sha-256'
             };
 
-            var header = Hawk.getAuthorizationHeader(credentials, 'POST', '/somewhere/over/the/rainbow', 'example.net', 443, 'Bazinga!', 1353809207);
+            var header = Hawk.getAuthorizationHeader(credentials, 'POST', '/somewhere/over/the/rainbow', 'example.net', 443, { ext: 'Bazinga!', timestamp: 1353809207 });
             expect(header).to.equal('');
             done();
         });
@@ -648,7 +639,7 @@ describe('Hawk', function () {
                 algorithm: 'hmac-sha-0'
             };
 
-            var header = Hawk.getAuthorizationHeader(credentials, 'POST', '/somewhere/over/the/rainbow', 'example.net', 443, 'Bazinga!', 1353809207);
+            var header = Hawk.getAuthorizationHeader(credentials, 'POST', '/somewhere/over/the/rainbow', 'example.net', 443, { ext: 'Bazinga!', timestamp: 1353809207 });
             expect(header).to.equal('');
             done();
         });
