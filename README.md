@@ -15,6 +15,7 @@ Current version: **0.3.0**
   - [Protocol Example](#protocol-example)
 <p></p>
 - [**Single URI Authorization**](#single-uri-authorization)
+  - [Usage Example](#bewit-usage-example)
 <p></p>
 - [**Security Considerations**](#security-considerations)
   - [MAC Keys Transmission](#mac-keys-transmission)
@@ -219,7 +220,7 @@ In order to simplify implementation, bewit credentials do not support single-use
 the granted access timeframe. 
 
 
-## Usage Example
+## Bewit Usage Example
 
 Server code:
 
