@@ -26,6 +26,7 @@ Current version: **0.3.0**
   - [Coverage Limitations](#coverage-limitations)
   - [Future Time Manipulation](#future-time-manipulation)
   - [Client Clock Poisoning](#client-clock-poisoning)
+  - [Bewit Limitations](#bewit-limitations)
 <p></p>
 - [**Frequently Asked Questions**](#frequently-asked-questions)
 <p></p>
@@ -56,6 +57,9 @@ protection against replay attacks which does not require prior interaction with 
 provides a timestamp and a nonce which the server can use to prevent replay attacks outside a narrow time window.
 Also unlike Digest, this mechanism is not intended to protect the key itself (user's password in Digest) because
 the client and server must both have access to the key material in the clear.
+
+In addition, **Hawk** supports a method for granting third-parties temporary access to individual resources using
+a query parameter called _bewit_ (leather straps used to attach a tracking device to the leg of a hawk).
 
 
 ## Time Synchronization
@@ -359,6 +363,14 @@ clock, and must only use it to calculate an offset for communicating with that p
 In addition, the client must not draw any correlation between the server's time provided via the 'ts' attribute and the current
 time at the NTP server indicated via the 'ntp' variable. In other works, the client must not make any conclusion about the NTP
 server indicated based on the server response.
+
+### Bewit Limitations
+
+Special care must be taken when issuing bewit credentials to third parties. Bewit credentials are valid until expiration and cannot
+be revoked or limited without using other means. Whatever resource they grant access to will be completely exposed to anyone with
+access to the bewit credentials which act as bearer credentials for that particular resource. While bewit usage is limited to GET
+requests only and therefore cannot be used to perform transactions or change server state, it can still be used to expose private
+and sensitive information.
 
 
 # Frequently Asked Questions
