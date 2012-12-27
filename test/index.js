@@ -131,6 +131,7 @@ describe('Hawk', function () {
 
                 expect(err).to.exist;
                 expect(err.toResponse().payload.message).to.equal('Stale timestamp');
+                expect(err.headers['WWW-Authenticate']).to.equal('Hawk ts="' + Date.now() + '", ntp="pool.ntp.org", error="Stale timestamp"');
                 done();
             });
         });
@@ -188,7 +189,7 @@ describe('Hawk', function () {
             Hawk.authenticate(req, credentialsFunc, { localtimeOffsetMsec:  1353788437000 - Date.now() }, function (err, credentials, ext) {
 
                 expect(err).to.exist;
-                expect(err.toResponse().payload.message).to.equal('Incorrect scheme');
+                expect(err.toResponse().payload.message).to.equal('');
                 done();
             });
         });
@@ -203,10 +204,10 @@ describe('Hawk', function () {
                 url: '/resource/4?filter=a'
             };
 
-            Hawk.authenticate(req, credentialsFunc, { localtimeOffsetMsec:  1353788437000 - Date.now() }, function (err, credentials, ext) {
+            Hawk.authenticate(req, credentialsFunc, {}, function (err, credentials, ext) {
 
                 expect(err).to.exist;
-                expect(err.toResponse().payload.message).to.equal('Missing Authorization header');
+                expect(err.headers['WWW-Authenticate']).to.equal('Hawk ts="' + Date.now() + '", ntp="pool.ntp.org"');
                 done();
             });
         });
