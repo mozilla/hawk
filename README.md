@@ -3,7 +3,7 @@
 <img align="right" src="https://raw.github.com/hueniverse/hawk/master/images/logo.png" /> **Hawk** is an HTTP authentication scheme using a message authentication code (MAC) algorithm to provide partial
 HTTP request cryptographic verification. For more complex use cases such as access delegation, see [Oz](/hueniverse/oz).
 
-Current version: **0.1.0**
+Current version: **0.2.0**
 
 [![Build Status](https://secure.travis-ci.org/hueniverse/hawk.png)](http://travis-ci.org/hueniverse/hawk)
 
@@ -124,11 +124,12 @@ GET /resource/1?b=1&a=2 HTTP/1.1
 Host: example.com:8000
 ```
 
-The resource server returns the following authentication challenge:
+The resource server returns the following authentication challenge which enables the client to ensure its clock is synced
+to the server (or at least the time used by the application is adjusted when making requests):
 
 ```
 HTTP/1.1 401 Unauthorized
-WWW-Authenticate: Hawk
+WWW-Authenticate: Hawk ts="1353832200", ntp="pool.ntp.org"
 ```
 
 The client has previously obtained a set of **Hawk** credentials for accessing resources on the "http://example.com/"
@@ -229,6 +230,19 @@ body is interpreted by the server (i.e. Content-Type). If the server behavior is
 an attacker can manipulate the request header without being detected. Implementers should use the `ext` feature to pass
 application-specific information via the Authorization header which is protected by the request MAC.
 
+### Time Manipulation
+
+NOTE: This attack is documented until the protocol address it by adding MAC calculation to server responses which will authenticate
+the time information provided.
+
+The protocol relies on a clock sync between the client and server. To accomplish this, the server informs the client of its
+current time as well as identifies the ntp server used (the client can opt to use either one to adjust its clock or calculate
+an offset used for further interactions with the server).
+
+If an attacker is able to manipulate this information and cause the client to use an incorrect time, it would be able to cause
+the client to generate authenticated requests using time in the future. Such requests will fail when sent by the client, and will
+not likely leave a trace on the server (given the common implementation of nonce, if at all enforced). The attacker will then
+be able to replay the request at the correct time without detection.
 
 # Frequently Asked Questions
 
