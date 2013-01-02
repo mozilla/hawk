@@ -43,7 +43,7 @@ describe('Hawk', function () {
                 Hawk.utils.fixedTimeComparison(b, b);
                 var t2 = Date.now() - now;
 
-                expect(t2 - t1).to.be.within(-1, 1);
+                expect(t2 - t1).to.be.within(-2, 2);
                 done();
             });
 
