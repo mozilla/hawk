@@ -412,7 +412,7 @@ requirements). While some keys can be used for multiple algorithm, the protocol 
 
 ### Why is Host the only header covered by the request MAC?
 
-It is really had to include other headers. Headers can be changed by proxies and other intermediaries and there is no
+It is really hard to include other headers. Headers can be changed by proxies and other intermediaries and there is no
 well-established way to normalize them. The only straight-forward solution is to include the headers in some blob (say,
 bas64 encoded JSON) and include that with the request, an approach taken by JWT and other such formats. However, that
 design violates the HTTP header boundaries, repeats information, and introduces other security issues because firewalls
