@@ -202,7 +202,7 @@ request header field:
 ```
 GET /resource/1?b=1&a=2 HTTP/1.1
 Host: example.com:8000
-Authorization: Hawk id="dh37fgj492je", ts="1353832234", ext="some-app-data", mac="hpf5lg0G0rtKrT04CiRf0Q+IDjkGkyvKdMjtqu1XV/s="
+Authorization: Hawk id="dh37fgj492je", ts="1353832234", nonce="j4h3g2", ext="some-app-data", mac="hpf5lg0G0rtKrT04CiRf0Q+IDjkGkyvKdMjtqu1XV/s="
 ```
 
 The server validates the request by calculating the request MAC again based on the request received and verifies the validity
