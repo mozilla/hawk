@@ -3,7 +3,7 @@
 <img align="right" src="https://raw.github.com/hueniverse/hawk/master/images/logo.png" /> **Hawk** is an HTTP authentication scheme using a message authentication code (MAC) algorithm to provide partial
 HTTP request cryptographic verification. For more complex use cases such as access delegation, see [Oz](/hueniverse/oz).
 
-Current version: **0.3.0**
+Current version: **0.4.0**
 
 [![Build Status](https://secure.travis-ci.org/hueniverse/hawk.png)](http://travis-ci.org/hueniverse/hawk)
 
@@ -180,6 +180,7 @@ The client generates the authentication header by calculating a timestamp (e.g. 
 1970 00:00:00 GMT), generates a nonce, and constructs the normalized request string (newline separated values):
 
 ```
+core.1
 1353832234
 j4h3g2
 GET

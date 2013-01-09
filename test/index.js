@@ -82,7 +82,7 @@ describe('Hawk', function () {
 
             var req = {
                 headers: {
-                    authorization: 'Hawk id="1", ts="1353788437", nonce="k3j4h2", mac="qrP6b5tiS2CO330rpjUEym/USBM=", ext="hello"',
+                    authorization: 'Hawk id="1", ts="1353788437", nonce="k3j4h2", mac="qk3onE3/tko0WylI4lQHMAra98A=", ext="hello"',
                     host: 'example.com:8080'
                 },
                 method: 'GET',
@@ -101,7 +101,7 @@ describe('Hawk', function () {
 
             var req = {
                 headers: {
-                    authorization: 'Hawk id="dh37fgj492je", ts="1353832234", nonce="j4h3g2", mac="hpf5lg0G0rtKrT04CiRf0Q+IDjkGkyvKdMjtqu1XV/s=", ext="some-app-data"',
+                    authorization: 'Hawk id="dh37fgj492je", ts="1353832234", nonce="j4h3g2", mac="/4mn/w+FiIx5GO0TtwLmseu2YQc3xUqRV9sJmNHqcG0=", ext="some-app-data"',
                     host: 'example.com:8000'
                 },
                 method: 'GET',
@@ -120,7 +120,7 @@ describe('Hawk', function () {
 
             var req = {
                 headers: {
-                    authorization: 'Hawk id="dh37fgj492je", ts="1353832234", nonce="j4h3g2", mac="hpf5lg0G0rtKrT04CiRf0Q+IDjkGkyvKdMjtqu1XV/s=", ext="some-app-data"',
+                    authorization: 'Hawk id="dh37fgj492je", ts="1353832234", nonce="j4h3g2", mac="/4mn/w+FiIx5GO0TtwLmseu2YQc3xUqRV9sJmNHqcG0=", ext="some-app-data"',
                     host: 'example.com:8000'
                 },
                 method: 'GET',
@@ -143,7 +143,7 @@ describe('Hawk', function () {
 
             var req = {
                 headers: {
-                    authorization: 'Hawk id="123", ts="1353788437", nonce="k3j4h2", mac="ZPa2zWC3WUAYXrwPzJ3DpF54xjQ2ZDLe8GF1ny6JJFI=", ext="hello"',
+                    authorization: 'Hawk id="123", ts="1353788437", nonce="k3j4h2", mac="WBOsuQGaxVMdLd3Gzz5WqsS2AB0l4VkpsvRWbfWzYK4=", ext="hello"',
                     host: 'example.com:8080'
                 },
                 method: 'GET',
@@ -615,7 +615,7 @@ describe('Hawk', function () {
             };
 
             var header = Hawk.getAuthorizationHeader(credentials, 'POST', '/somewhere/over/the/rainbow', 'example.net', 443, { ext: 'Bazinga!', timestamp: 1353809207, nonce: 'Ygvqdz' });
-            expect(header).to.equal('Hawk id="123456", ts="1353809207", nonce="Ygvqdz", ext="Bazinga!", mac="qSK1cZEkqPwE2ttBX8QSXxO+NE3epFMu4tyVpGKjdnU="');
+            expect(header).to.equal('Hawk id="123456", ts="1353809207", nonce="Ygvqdz", ext="Bazinga!", mac="VW+mnJDkcWbM+fgBBeJzfUkrKReXmcl9bRH9WY6qjPg="');
             done();
         });
 

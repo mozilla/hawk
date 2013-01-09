@@ -62,7 +62,7 @@ describe('Hawk', function () {
                         host: 'example.com:8080'
                     },
                     method: 'GET',
-                    url: '/resource/4?a=1&b=2&bewit=MTIzNDU2XDQ1MDk5OTE1ODJcRUQ0ZHJtYytVQzAvaFpYQWR0QzVYOFlaU1NHc2pLYWhjSDVDdEhYaFJZUT1cc29tZS1hcHAtZGF0YQ'
+                    url: '/resource/4?a=1&b=2&bewit=MTIzNDU2XDQ1MTEzNDU4OTBcSTdWQWJqMWVtOG1vdmZLV1pLUVlvbEVlM2tsYkRlRU9yVllCYVdWMGdXRT1cc29tZS1hcHAtZGF0YQ'
                 };
 
                 Hawk.uri.authenticate(req, credentialsFunc, {}, function (err, credentials, ext) {
@@ -81,7 +81,7 @@ describe('Hawk', function () {
                     host: 'example.com:8080'
                 },
                 method: 'GET',
-                url: '/resource/4?bewit=MTIzNDU2XDQ1MDk5OTE1ODJcRUQ0ZHJtYytVQzAvaFpYQWR0QzVYOFlaU1NHc2pLYWhjSDVDdEhYaFJZUT1cc29tZS1hcHAtZGF0YQ&a=1&b=2'
+                url: '/resource/4?bewit=MTIzNDU2XDQ1MTEzNDU4OTBcSTdWQWJqMWVtOG1vdmZLV1pLUVlvbEVlM2tsYkRlRU9yVllCYVdWMGdXRT1cc29tZS1hcHAtZGF0YQ&a=1&b=2'
             };
 
             Hawk.uri.authenticate(req, credentialsFunc, {}, function (err, credentials, ext) {
@@ -100,7 +100,7 @@ describe('Hawk', function () {
                     host: 'example.com:8080'
                 },
                 method: 'GET',
-                url: '/resource/4?bewit=MTIzNDU2XDQ1MDk5OTE3MTlcTUE2eWkwRWRwR0pEcWRwb0JkYVdvVDJrL0hDSzA1T0Y3MkhuZlVmVy96Zz1cc29tZS1hcHAtZGF0YQ'
+                url: '/resource/4?bewit=MTIzNDU2XDQ1MTEzNDU5NjBcZlE5ejBiZUpzelIxMnkwR0tTYTFITEtKVm9OWVA3S0JLOVl2VXI5S0FvST1cc29tZS1hcHAtZGF0YQ'
             };
 
             Hawk.uri.authenticate(req, credentialsFunc, {}, function (err, credentials, ext) {
@@ -126,7 +126,19 @@ describe('Hawk', function () {
 
                 var exp = Math.floor(Date.now() / 1000) + 60;
                 var ext = 'some-app-data';
-                var mac = Hawk.crypto.calculateMAC(credentials.key, credentials.algorithm, exp, '', 'POST', req.url, 'example.com', 8080, ext);
+                var mac = Hawk.crypto.calculateMAC({
+                    header: 'bewit',
+                    key: credentials.key,
+                    algorithm: credentials.algorithm,
+                    timestamp: exp,
+                    nonce: '',
+                    method: 'POST',
+                    uri: req.url,
+                    host: 'example.com',
+                    port: 8080,
+                    ext: ext
+                });
+
                 var bewit = credentials.id + '\\' + exp + '\\' + mac + '\\' + ext;
 
                 req.url += '&bewit=' + Hawk.utils.base64urlEncode(bewit);
@@ -368,7 +380,7 @@ describe('Hawk', function () {
             };
 
             var bewit = Hawk.uri.getBewit(credentials, '/somewhere/over/the/rainbow', 'example.com', 443, 300, { localtimeOffsetMsec: 1356420407232 - Date.now(), ext: 'xandyandz' });
-            expect(bewit).to.equal('MTIzNDU2XDEzNTY0MjA3MDdcT2U3TzF4ZXNSTE5GTEphODBEdGRsdlVGbURzc0RnQ0gwUDRsWWxSWWloWT1ceGFuZHlhbmR6');
+            expect(bewit).to.equal('MTIzNDU2XDEzNTY0MjA3MDdcTWEveU4wU2dsWWNBWmJCTEk2cDNvZEppWlVKR2VDTWcyZ043MkF3aVNwZz1ceGFuZHlhbmR6');
             done();
         });
 
