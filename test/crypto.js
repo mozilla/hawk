@@ -22,7 +22,18 @@ describe('Hawk', function () {
 
             it('should return an empty value on unknown algorithm', function (done) {
 
-                expect(Hawk.crypto.calculateMAC('dasdfasdf', 'hmac-sha-0', Date.now() / 1000, 'k3k4j5', 'GET', '/resource/something', 'example.com', 8080)).to.equal('');
+                expect(Hawk.crypto.calculateMAC({
+                    header: 'core',
+                    key: 'dasdfasdf',
+                    algorithm: 'hmac-sha-0',
+                    timestamp: Date.now() / 1000,
+                    nonce: 'k3k4j5',
+                    method: 'GET',
+                    uri: '/resource/something',
+                    host: 'example.com',
+                    port: 8080
+                })).to.equal('');
+
                 done();
             });
         });
