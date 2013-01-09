@@ -190,11 +190,16 @@ example.com
 some-app-data
 ```
 
+The 'core.1' normalized string header is used to prevent MAC values from being reused after a potential change in how the
+protocol creates the normalized string. For example, if a future version would switch the order of nonce and timestamp, it
+can create an exploit opportunity for cases where the nonce is similar in format to a timestamp. In addition, the header
+prevents switching MAC values between a header request and a bewit request.
+
 The request MAC is calculated using the specified algorithm "hmac-sha-256" and the key over the normalized request string.
 The result is base64-encoded to produce the request MAC:
 
 ```
-hpf5lg0G0rtKrT04CiRf0Q+IDjkGkyvKdMjtqu1XV/s=
+/4mn/w+FiIx5GO0TtwLmseu2YQc3xUqRV9sJmNHqcG0=
 ```
 
 The client includes the **Hawk** key identifier, timestamp, and request MAC with the request using the HTTP "Authorization"
@@ -203,7 +208,7 @@ request header field:
 ```
 GET /resource/1?b=1&a=2 HTTP/1.1
 Host: example.com:8000
-Authorization: Hawk id="dh37fgj492je", ts="1353832234", nonce="j4h3g2", ext="some-app-data", mac="hpf5lg0G0rtKrT04CiRf0Q+IDjkGkyvKdMjtqu1XV/s="
+Authorization: Hawk id="dh37fgj492je", ts="1353832234", nonce="j4h3g2", ext="some-app-data", mac="/4mn/w+FiIx5GO0TtwLmseu2YQc3xUqRV9sJmNHqcG0="
 ```
 
 The server validates the request by calculating the request MAC again based on the request received and verifies the validity
