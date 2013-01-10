@@ -3,7 +3,7 @@
 <img align="right" src="https://raw.github.com/hueniverse/hawk/master/images/logo.png" /> **Hawk** is an HTTP authentication scheme using a message authentication code (MAC) algorithm to provide partial
 HTTP request cryptographic verification. For more complex use cases such as access delegation, see [Oz](/hueniverse/oz).
 
-Current version: **0.4.0**
+Current version: **0.5.0**
 
 [![Build Status](https://secure.travis-ci.org/hueniverse/hawk.png)](http://travis-ci.org/hueniverse/hawk)
 
@@ -180,7 +180,7 @@ The client generates the authentication header by calculating a timestamp (e.g. 
 1970 00:00:00 GMT), generates a nonce, and constructs the normalized request string (newline separated values):
 
 ```
-core.1
+hawk.1.header
 1353832234
 j4h3g2
 GET
@@ -190,7 +190,7 @@ example.com
 some-app-data
 ```
 
-The 'core.1' normalized string header is used to prevent MAC values from being reused after a potential change in how the
+The 'hawk.1.header' normalized string header is used to prevent MAC values from being reused after a potential change in how the
 protocol creates the normalized string. For example, if a future version would switch the order of nonce and timestamp, it
 can create an exploit opportunity for cases where the nonce is similar in format to a timestamp. In addition, the header
 prevents switching MAC values between a header request and a bewit request.
@@ -199,7 +199,7 @@ The request MAC is calculated using the specified algorithm "hmac-sha-256" and t
 The result is base64-encoded to produce the request MAC:
 
 ```
-/4mn/w+FiIx5GO0TtwLmseu2YQc3xUqRV9sJmNHqcG0=
+OND4NsC2gqscN2dh71FWPEvUnQ7t4bNcmTCeZolOI68=
 ```
 
 The client includes the **Hawk** key identifier, timestamp, and request MAC with the request using the HTTP "Authorization"
@@ -208,7 +208,7 @@ request header field:
 ```
 GET /resource/1?b=1&a=2 HTTP/1.1
 Host: example.com:8000
-Authorization: Hawk id="dh37fgj492je", ts="1353832234", nonce="j4h3g2", ext="some-app-data", mac="/4mn/w+FiIx5GO0TtwLmseu2YQc3xUqRV9sJmNHqcG0="
+Authorization: Hawk id="dh37fgj492je", ts="1353832234", nonce="j4h3g2", ext="some-app-data", mac="OND4NsC2gqscN2dh71FWPEvUnQ7t4bNcmTCeZolOI68="
 ```
 
 The server validates the request by calculating the request MAC again based on the request received and verifies the validity

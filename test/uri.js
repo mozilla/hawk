@@ -62,7 +62,7 @@ describe('Hawk', function () {
                         host: 'example.com:8080'
                     },
                     method: 'GET',
-                    url: '/resource/4?a=1&b=2&bewit=MTIzNDU2XDQ1MTEzNDU4OTBcSTdWQWJqMWVtOG1vdmZLV1pLUVlvbEVlM2tsYkRlRU9yVllCYVdWMGdXRT1cc29tZS1hcHAtZGF0YQ'
+                    url: '/resource/4?a=1&b=2&bewit=MTIzNDU2XDQ1MTE0NTU1MTZcMjR2UjF0N2Jia0xQdkpmWDdGS2tHSEVMbkRpNmQ3TmdlejMzMEZxMkJ0WT1cc29tZS1hcHAtZGF0YQ'
                 };
 
                 Hawk.uri.authenticate(req, credentialsFunc, {}, function (err, credentials, ext) {
@@ -81,7 +81,7 @@ describe('Hawk', function () {
                     host: 'example.com:8080'
                 },
                 method: 'GET',
-                url: '/resource/4?bewit=MTIzNDU2XDQ1MTEzNDU4OTBcSTdWQWJqMWVtOG1vdmZLV1pLUVlvbEVlM2tsYkRlRU9yVllCYVdWMGdXRT1cc29tZS1hcHAtZGF0YQ&a=1&b=2'
+                url: '/resource/4?bewit=MTIzNDU2XDQ1MTE0NTU1MTZcMjR2UjF0N2Jia0xQdkpmWDdGS2tHSEVMbkRpNmQ3TmdlejMzMEZxMkJ0WT1cc29tZS1hcHAtZGF0YQ&a=1&b=2'
             };
 
             Hawk.uri.authenticate(req, credentialsFunc, {}, function (err, credentials, ext) {
@@ -100,7 +100,7 @@ describe('Hawk', function () {
                     host: 'example.com:8080'
                 },
                 method: 'GET',
-                url: '/resource/4?bewit=MTIzNDU2XDQ1MTEzNDU5NjBcZlE5ejBiZUpzelIxMnkwR0tTYTFITEtKVm9OWVA3S0JLOVl2VXI5S0FvST1cc29tZS1hcHAtZGF0YQ'
+                url: '/resource/4?bewit=MTIzNDU2XDQ1MTE0NTU1NDZca2VaNHhiWnNOd3VPYkJ2MS90cDY4U0Vxanp0dG8wMjl2L2ZoRnFxZVRJaz1cc29tZS1hcHAtZGF0YQ'
             };
 
             Hawk.uri.authenticate(req, credentialsFunc, {}, function (err, credentials, ext) {
@@ -127,7 +127,7 @@ describe('Hawk', function () {
                 var exp = Math.floor(Date.now() / 1000) + 60;
                 var ext = 'some-app-data';
                 var mac = Hawk.crypto.calculateMAC({
-                    header: 'bewit',
+                    type: 'bewit',
                     key: credentials.key,
                     algorithm: credentials.algorithm,
                     timestamp: exp,
@@ -380,7 +380,7 @@ describe('Hawk', function () {
             };
 
             var bewit = Hawk.uri.getBewit(credentials, '/somewhere/over/the/rainbow', 'example.com', 443, 300, { localtimeOffsetMsec: 1356420407232 - Date.now(), ext: 'xandyandz' });
-            expect(bewit).to.equal('MTIzNDU2XDEzNTY0MjA3MDdcTWEveU4wU2dsWWNBWmJCTEk2cDNvZEppWlVKR2VDTWcyZ043MkF3aVNwZz1ceGFuZHlhbmR6');
+            expect(bewit).to.equal('MTIzNDU2XDEzNTY0MjA3MDdcRjNEUDZSU0p6R1UyWDVsNkVTSEJHTjdlL0ExQ2lHSzZsSWZUQ0N1UjBMcz1ceGFuZHlhbmR6');
             done();
         });
 
