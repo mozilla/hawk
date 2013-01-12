@@ -1,5 +1,6 @@
 // Load modules
 
+var Http = require('http');
 var Chai = require('chai');
 var Hawk = process.env.TEST_COV ? require('../lib-cov') : require('../lib');
 
@@ -33,11 +34,10 @@ describe('Hawk', function () {
         it('should generate a bewit then successfully authenticate it', function (done) {
 
             var req = {
-                headers: {
-                    host: 'example.com:8080'
-                },
                 method: 'GET',
-                url: '/resource/4?a=1&b=2'
+                url: '/resource/4?a=1&b=2',
+                host: 'example.com',
+                port: 8080
             };
 
             credentialsFunc('123456', function (err, credentials) {
@@ -58,11 +58,10 @@ describe('Hawk', function () {
         it('should successfully authenticate a request (last param)', function (done) {
 
                 var req = {
-                    headers: {
-                        host: 'example.com:8080'
-                    },
                     method: 'GET',
-                    url: '/resource/4?a=1&b=2&bewit=MTIzNDU2XDQ1MTE0ODQ2MjFcMzFjMmNkbUJFd1NJRVZDOVkva1NFb2c3d3YrdEVNWjZ3RXNmOGNHU2FXQT1cc29tZS1hcHAtZGF0YQ'
+                    url: '/resource/4?a=1&b=2&bewit=MTIzNDU2XDQ1MTE0ODQ2MjFcMzFjMmNkbUJFd1NJRVZDOVkva1NFb2c3d3YrdEVNWjZ3RXNmOGNHU2FXQT1cc29tZS1hcHAtZGF0YQ',
+                    host: 'example.com',
+                    port: 8080
                 };
 
                 Hawk.uri.authenticate(req, credentialsFunc, {}, function (err, credentials, attributes) {
@@ -77,11 +76,10 @@ describe('Hawk', function () {
         it('should successfully authenticate a request (first param)', function (done) {
 
             var req = {
-                headers: {
-                    host: 'example.com:8080'
-                },
                 method: 'GET',
-                url: '/resource/4?bewit=MTIzNDU2XDQ1MTE0ODQ2MjFcMzFjMmNkbUJFd1NJRVZDOVkva1NFb2c3d3YrdEVNWjZ3RXNmOGNHU2FXQT1cc29tZS1hcHAtZGF0YQ&a=1&b=2'
+                url: '/resource/4?bewit=MTIzNDU2XDQ1MTE0ODQ2MjFcMzFjMmNkbUJFd1NJRVZDOVkva1NFb2c3d3YrdEVNWjZ3RXNmOGNHU2FXQT1cc29tZS1hcHAtZGF0YQ&a=1&b=2',
+                host: 'example.com',
+                port: 8080
             };
 
             Hawk.uri.authenticate(req, credentialsFunc, {}, function (err, credentials, attributes) {
@@ -96,11 +94,10 @@ describe('Hawk', function () {
         it('should successfully authenticate a request (only param)', function (done) {
 
             var req = {
-                headers: {
-                    host: 'example.com:8080'
-                },
                 method: 'GET',
-                url: '/resource/4?bewit=MTIzNDU2XDQ1MTE0ODQ2NDFcZm1CdkNWT3MvcElOTUUxSTIwbWhrejQ3UnBwTmo4Y1VrSHpQd3Q5OXJ1cz1cc29tZS1hcHAtZGF0YQ'
+                url: '/resource/4?bewit=MTIzNDU2XDQ1MTE0ODQ2NDFcZm1CdkNWT3MvcElOTUUxSTIwbWhrejQ3UnBwTmo4Y1VrSHpQd3Q5OXJ1cz1cc29tZS1hcHAtZGF0YQ',
+                host: 'example.com',
+                port: 8080
             };
 
             Hawk.uri.authenticate(req, credentialsFunc, {}, function (err, credentials, attributes) {
@@ -117,11 +114,10 @@ describe('Hawk', function () {
             credentialsFunc('123456', function (err, credentials) {
 
                 var req = {
-                    headers: {
-                        host: 'example.com:8080'
-                    },
                     method: 'POST',
-                    url: '/resource/4?filter=a'
+                    url: '/resource/4?filter=a',
+                    host: 'example.com',
+                    port: 8080
                 };
 
                 var exp = Math.floor(Date.now() / 1000) + 60;
@@ -132,10 +128,10 @@ describe('Hawk', function () {
                     algorithm: credentials.algorithm,
                     timestamp: exp,
                     nonce: '',
-                    method: 'POST',
+                    method: req.method,
                     uri: req.url,
-                    host: 'example.com',
-                    port: 8080,
+                    host: req.host,
+                    port: req.port,
                     ext: ext
                 });
 
@@ -154,13 +150,10 @@ describe('Hawk', function () {
 
         it('should fail on invalid host header', function (done) {
 
-            var req = {
-                headers: {
-                    host: ''
-                },
-                method: 'GET',
-                url: '/resource/4?bewit=MTIzNDU2XDQ1MDk5OTE3MTlcTUE2eWkwRWRwR0pEcWRwb0JkYVdvVDJrL0hDSzA1T0Y3MkhuZlVmVy96Zz1cc29tZS1hcHAtZGF0YQ'
-            };
+            var req = new Http.IncomingMessage();
+            req.headers.host = 'example.com:something',
+            req.method = 'GET';
+            req.url = '/resource/4?bewit=MTIzNDU2XDQ1MDk5OTE3MTlcTUE2eWkwRWRwR0pEcWRwb0JkYVdvVDJrL0hDSzA1T0Y3MkhuZlVmVy96Zz1cc29tZS1hcHAtZGF0YQ';
 
             Hawk.uri.authenticate(req, credentialsFunc, {}, function (err, credentials, attributes) {
 
@@ -173,11 +166,10 @@ describe('Hawk', function () {
         it('should fail on empty bewit', function (done) {
 
             var req = {
-                headers: {
-                    host: 'example.com:8080'
-                },
                 method: 'GET',
-                url: '/resource/4?bewit='
+                url: '/resource/4?bewit=',
+                host: 'example.com',
+                port: 8080
             };
 
             Hawk.uri.authenticate(req, credentialsFunc, {}, function (err, credentials, attributes) {
@@ -191,11 +183,10 @@ describe('Hawk', function () {
         it('should fail on invalid bewit', function (done) {
 
             var req = {
-                headers: {
-                    host: 'example.com:8080'
-                },
                 method: 'GET',
-                url: '/resource/4?bewit=*'
+                url: '/resource/4?bewit=*',
+                host: 'example.com',
+                port: 8080
             };
 
             Hawk.uri.authenticate(req, credentialsFunc, {}, function (err, credentials, attributes) {
@@ -209,11 +200,10 @@ describe('Hawk', function () {
         it('should fail on missing bewit', function (done) {
 
             var req = {
-                headers: {
-                    host: 'example.com:8080'
-                },
                 method: 'GET',
-                url: '/resource/4'
+                url: '/resource/4',
+                host: 'example.com',
+                port: 8080
             };
 
             Hawk.uri.authenticate(req, credentialsFunc, {}, function (err, credentials, attributes) {
@@ -227,11 +217,10 @@ describe('Hawk', function () {
         it('should fail on invalid bewit structure', function (done) {
 
             var req = {
-                headers: {
-                    host: 'example.com:8080'
-                },
                 method: 'GET',
-                url: '/resource/4?bewit=abc'
+                url: '/resource/4?bewit=abc',
+                host: 'example.com',
+                port: 8080
             };
 
             Hawk.uri.authenticate(req, credentialsFunc, {}, function (err, credentials, attributes) {
@@ -245,11 +234,10 @@ describe('Hawk', function () {
         it('should fail on empty bewit attribute', function (done) {
 
             var req = {
-                headers: {
-                    host: 'example.com:8080'
-                },
                 method: 'GET',
-                url: '/resource/4?bewit=YVxcY1xk'
+                url: '/resource/4?bewit=YVxcY1xk',
+                host: 'example.com',
+                port: 8080
             };
 
             Hawk.uri.authenticate(req, credentialsFunc, {}, function (err, credentials, attributes) {
@@ -263,11 +251,10 @@ describe('Hawk', function () {
         it('should fail on expired access', function (done) {
 
             var req = {
-                headers: {
-                    host: 'example.com:8080'
-                },
                 method: 'GET',
-                url: '/resource/4?a=1&b=2&bewit=MTIzNDU2XDEzNTY0MTg1ODNcWk1wZlMwWU5KNHV0WHpOMmRucTRydEk3NXNXTjFjeWVITTcrL0tNZFdVQT1cc29tZS1hcHAtZGF0YQ'
+                url: '/resource/4?a=1&b=2&bewit=MTIzNDU2XDEzNTY0MTg1ODNcWk1wZlMwWU5KNHV0WHpOMmRucTRydEk3NXNXTjFjeWVITTcrL0tNZFdVQT1cc29tZS1hcHAtZGF0YQ',
+                host: 'example.com',
+                port: 8080
             };
 
             Hawk.uri.authenticate(req, credentialsFunc, {}, function (err, credentials, attributes) {
@@ -281,11 +268,10 @@ describe('Hawk', function () {
         it('should fail on credentials function error', function (done) {
 
             var req = {
-                headers: {
-                    host: 'example.com:8080'
-                },
                 method: 'GET',
-                url: '/resource/4?bewit=MTIzNDU2XDQ1MDk5OTE3MTlcTUE2eWkwRWRwR0pEcWRwb0JkYVdvVDJrL0hDSzA1T0Y3MkhuZlVmVy96Zz1cc29tZS1hcHAtZGF0YQ'
+                url: '/resource/4?bewit=MTIzNDU2XDQ1MDk5OTE3MTlcTUE2eWkwRWRwR0pEcWRwb0JkYVdvVDJrL0hDSzA1T0Y3MkhuZlVmVy96Zz1cc29tZS1hcHAtZGF0YQ',
+                host: 'example.com',
+                port: 8080
             };
 
             Hawk.uri.authenticate(req, function (id, callback) { callback(Hawk.error.badRequest('Boom')); }, {}, function (err, credentials, attributes) {
@@ -299,11 +285,10 @@ describe('Hawk', function () {
         it('should fail on null credentials function response', function (done) {
 
             var req = {
-                headers: {
-                    host: 'example.com:8080'
-                },
                 method: 'GET',
-                url: '/resource/4?bewit=MTIzNDU2XDQ1MDk5OTE3MTlcTUE2eWkwRWRwR0pEcWRwb0JkYVdvVDJrL0hDSzA1T0Y3MkhuZlVmVy96Zz1cc29tZS1hcHAtZGF0YQ'
+                url: '/resource/4?bewit=MTIzNDU2XDQ1MDk5OTE3MTlcTUE2eWkwRWRwR0pEcWRwb0JkYVdvVDJrL0hDSzA1T0Y3MkhuZlVmVy96Zz1cc29tZS1hcHAtZGF0YQ',
+                host: 'example.com',
+                port: 8080
             };
 
             Hawk.uri.authenticate(req, function (id, callback) { callback(null, null); }, {}, function (err, credentials, attributes) {
@@ -317,11 +302,10 @@ describe('Hawk', function () {
         it('should fail on invalid credentials function response', function (done) {
 
             var req = {
-                headers: {
-                    host: 'example.com:8080'
-                },
                 method: 'GET',
-                url: '/resource/4?bewit=MTIzNDU2XDQ1MDk5OTE3MTlcTUE2eWkwRWRwR0pEcWRwb0JkYVdvVDJrL0hDSzA1T0Y3MkhuZlVmVy96Zz1cc29tZS1hcHAtZGF0YQ'
+                url: '/resource/4?bewit=MTIzNDU2XDQ1MDk5OTE3MTlcTUE2eWkwRWRwR0pEcWRwb0JkYVdvVDJrL0hDSzA1T0Y3MkhuZlVmVy96Zz1cc29tZS1hcHAtZGF0YQ',
+                host: 'example.com',
+                port: 8080
             };
 
             Hawk.uri.authenticate(req, function (id, callback) { callback(null, {}); }, {}, function (err, credentials, attributes) {
@@ -335,11 +319,10 @@ describe('Hawk', function () {
         it('should fail on invalid credentials function response (unknown algorithm)', function (done) {
 
             var req = {
-                headers: {
-                    host: 'example.com:8080'
-                },
                 method: 'GET',
-                url: '/resource/4?bewit=MTIzNDU2XDQ1MDk5OTE3MTlcTUE2eWkwRWRwR0pEcWRwb0JkYVdvVDJrL0hDSzA1T0Y3MkhuZlVmVy96Zz1cc29tZS1hcHAtZGF0YQ'
+                url: '/resource/4?bewit=MTIzNDU2XDQ1MDk5OTE3MTlcTUE2eWkwRWRwR0pEcWRwb0JkYVdvVDJrL0hDSzA1T0Y3MkhuZlVmVy96Zz1cc29tZS1hcHAtZGF0YQ',
+                host: 'example.com',
+                port: 8080
             };
 
             Hawk.uri.authenticate(req, function (id, callback) { callback(null, { key: 'xxx', algorithm: 'xxx' }); }, {}, function (err, credentials, attributes) {
@@ -353,11 +336,10 @@ describe('Hawk', function () {
         it('should fail on expired access', function (done) {
 
             var req = {
-                headers: {
-                    host: 'example.com:8080'
-                },
                 method: 'GET',
-                url: '/resource/4?bewit=MTIzNDU2XDQ1MDk5OTE3MTlcTUE2eWkwRWRwR0pEcWRwb0JkYVdvVDJrL0hDSzA1T0Y3MkhuZlVmVy96Zz1cc29tZS1hcHAtZGF0YQ'
+                url: '/resource/4?bewit=MTIzNDU2XDQ1MDk5OTE3MTlcTUE2eWkwRWRwR0pEcWRwb0JkYVdvVDJrL0hDSzA1T0Y3MkhuZlVmVy96Zz1cc29tZS1hcHAtZGF0YQ',
+                host: 'example.com',
+                port: 8080
             };
 
             Hawk.uri.authenticate(req, function (id, callback) { callback(null, { key: 'xxx', algorithm: 'sha256' }); }, {}, function (err, credentials, attributes) {
