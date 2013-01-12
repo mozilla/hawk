@@ -1,7 +1,7 @@
 {
   "name": "hawk",
   "description": "HTTP Hawk Authentication Scheme",
-  "version": "0.4.0",
+  "version": "0.5.0",
   "author": "Eran Hammer <eran@hueniverse.com> (http://hueniverse.com)",
   "contributors": [],
   "repository": "git://github.com/hueniverse/hawk",
@@ -20,7 +20,8 @@
   },
   "devDependencies": {
     "mocha": "1.x.x",
-    "chai": "1.x.x"
+    "chai": "1.x.x",
+    "request": "2.12.x"
   },
   "scripts": {
     "test": "make test && make unit"
