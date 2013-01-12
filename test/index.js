@@ -51,12 +51,15 @@ describe('Hawk', function () {
         });
     });
 
-    it('should generate a header then successfully parse it (IncomingMessage)', function (done) {
+    it('should generate a header then successfully parse it (node request)', function (done) {
 
-        var req = new Http.IncomingMessage();
-        req.method = 'GET';
-        req.url = '/resource/4?filter=a';
-        req.headers.host = 'example.com:8080';
+        var req = {
+            method: 'GET',
+            url: '/resource/4?filter=a',
+            headers: {
+                host: 'example.com:8080'
+            }
+        };
 
         credentialsFunc('123456', function (err, credentials) {
 
@@ -353,10 +356,13 @@ describe('Hawk', function () {
 
         it('should fail on an missing host header', function (done) {
 
-            var req = new Http.IncomingMessage();
-            req.headers.authorization = 'Hawk id="123", ts="1353788437", nonce="k3j4h2", mac="/qwS4UjfVWMcUyW6EEgUH4jlr7T/wuKe3dKijvTvSos=", ext="hello"';
-            req.method = 'GET';
-            req.url = '/resource/4?filter=a';
+            var req = {
+                method: 'GET',
+                url: '/resource/4?filter=a',
+                headers: {
+                    authorization: 'Hawk id="123", ts="1353788437", nonce="k3j4h2", mac="/qwS4UjfVWMcUyW6EEgUH4jlr7T/wuKe3dKijvTvSos=", ext="hello"'
+                }
+            };
 
             Hawk.authenticate(req, credentialsFunc, { localtimeOffsetMsec: 1353788437000 - Date.now() }, function (err, credentials, attributes) {
 
@@ -548,11 +554,14 @@ describe('Hawk', function () {
 
         it('should fail on an bad host header (missing host)', function (done) {
 
-            var req = new Http.IncomingMessage();
-            req.headers.host = ':10',
-            req.headers.authorization = 'Hawk id="123", ts="1353788437", nonce="k3j4h2", mac="/qwS4UjfVWMcUyW6EEgUH4jlr7T/wuKe3dKijvTvSos=", ext="hello"';
-            req.method = 'GET';
-            req.url = '/resource/4?filter=a';
+            var req = {
+                method: 'GET',
+                url: '/resource/4?filter=a',
+                headers: {
+                    host: ':8080',
+                    authorization: 'Hawk id="123", ts="1353788437", nonce="k3j4h2", mac="/qwS4UjfVWMcUyW6EEgUH4jlr7T/wuKe3dKijvTvSos=", ext="hello"'
+                }
+            };
 
             Hawk.authenticate(req, credentialsFunc, { localtimeOffsetMsec: 1353788437000 - Date.now() }, function (err, credentials, attributes) {
 
@@ -564,11 +573,14 @@ describe('Hawk', function () {
 
         it('should fail on an bad host header (pad port)', function (done) {
 
-            var req = new Http.IncomingMessage();
-            req.headers.host = 'example.com:something',
-            req.headers.authorization = 'Hawk id="123", ts="1353788437", nonce="k3j4h2", mac="/qwS4UjfVWMcUyW6EEgUH4jlr7T/wuKe3dKijvTvSos=", ext="hello"';
-            req.method = 'GET';
-            req.url = '/resource/4?filter=a';
+            var req = {
+                method: 'GET',
+                url: '/resource/4?filter=a',
+                headers: {
+                    host: 'example.com:something',
+                    authorization: 'Hawk id="123", ts="1353788437", nonce="k3j4h2", mac="/qwS4UjfVWMcUyW6EEgUH4jlr7T/wuKe3dKijvTvSos=", ext="hello"'
+                }
+            };
 
             Hawk.authenticate(req, credentialsFunc, { localtimeOffsetMsec: 1353788437000 - Date.now() }, function (err, credentials, attributes) {
 

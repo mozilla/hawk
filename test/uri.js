@@ -150,10 +150,13 @@ describe('Hawk', function () {
 
         it('should fail on invalid host header', function (done) {
 
-            var req = new Http.IncomingMessage();
-            req.headers.host = 'example.com:something',
-            req.method = 'GET';
-            req.url = '/resource/4?bewit=MTIzNDU2XDQ1MDk5OTE3MTlcTUE2eWkwRWRwR0pEcWRwb0JkYVdvVDJrL0hDSzA1T0Y3MkhuZlVmVy96Zz1cc29tZS1hcHAtZGF0YQ';
+            var req = {
+                method: 'GET',
+                url: '/resource/4?bewit=MTIzNDU2XDQ1MDk5OTE3MTlcTUE2eWkwRWRwR0pEcWRwb0JkYVdvVDJrL0hDSzA1T0Y3MkhuZlVmVy96Zz1cc29tZS1hcHAtZGF0YQ',
+                headers: {
+                    host: 'example.com:something'
+                }
+            };
 
             Hawk.uri.authenticate(req, credentialsFunc, {}, function (err, credentials, attributes) {
 
