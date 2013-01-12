@@ -13,6 +13,7 @@ Current version: **0.5.0**
   - [Time Synchronization](#time-synchronization)
   - [Usage Example](#usage-example)
   - [Protocol Example](#protocol-example)
+    - [Payload Validation](#payload-validation)
 <p></p>
 - [**Single URI Authorization**](#single-uri-authorization)
   - [Usage Example](#bewit-usage-example)
@@ -35,7 +36,8 @@ Current version: **0.5.0**
 # Introduction
 
 **Hawk** is an HTTP authentication scheme providing methods for making authenticated HTTP requests with
-partial cryptographic verification of the request, covering the HTTP method, request URI, and host.
+partial cryptographic verification of the request, covering the HTTP method, request URI, host, and optionally
+the request payload.
 
 Similar to the HTTP [Basic access authentication scheme](http://www.ietf.org/rfc/rfc2617.txt), the **Hawk**
 scheme utilizes a set of client credentials which include an identifier and key. However, in contrast with
@@ -98,7 +100,7 @@ var credentialsFunc = function (id, callback) {
 
     var credentials = {
         key: 'werxhqb98rpaxn39848xrunpaw3489ruxnpa98w4rxn',
-        algorithm: 'hmac-sha-256',
+        algorithm: 'sha256',
         user: 'Steve'
     };
 
@@ -109,7 +111,7 @@ var credentialsFunc = function (id, callback) {
 
 var handler = function (req, res) {
 
-    Hawk.authenticate(req, credentialsFunc, {}, function (err, credentials, ext) {
+    Hawk.authenticate(req, credentialsFunc, {}, function (err, credentials, attributes) {
 
         res.writeHead(!err ? 200 : 401, { 'Content-Type': 'text/plain' });
         res.end(!err ? 'Hello ' + credentials.user : 'Shoosh!');
@@ -131,7 +133,7 @@ var Hawk = require('hawk');
 var credentials = {
     id: 'dh37fgj492je',
     key: 'werxhqb98rpaxn39848xrunpaw3489ruxnpa98w4rxn',
-    algorithm: 'hmac-sha-256'
+    algorithm: 'sha256'
 }
 
 // Send authenticated request
@@ -174,20 +176,22 @@ server. The **Hawk** credentials issued to the client include the following attr
 
 * Key identifier: dh37fgj492je
 * Key: werxhqb98rpaxn39848xrunpaw3489ruxnpa98w4rxn
-* Algorithm: hmac-sha-256
+* Algorithm: sha256
 
 The client generates the authentication header by calculating a timestamp (e.g. the number of seconds since January 1,
-1970 00:00:00 GMT), generates a nonce, and constructs the normalized request string (newline separated values):
+1970 00:00:00 GMT), generating a nonce, and constructing the normalized request string (newline separated values):
 
 ```
 hawk.1.header
 1353832234
 j4h3g2
 GET
-/resource/1?b=1&a=2
+/resource?a=1&b=2
 example.com
 8000
-some-app-data
+
+some-app-ext-data
+
 ```
 
 The 'hawk.1.header' normalized string header is used to prevent MAC values from being reused after a potential change in how the
@@ -195,24 +199,58 @@ protocol creates the normalized string. For example, if a future version would s
 can create an exploit opportunity for cases where the nonce is similar in format to a timestamp. In addition, the header
 prevents switching MAC values between a header request and a bewit request.
 
-The request MAC is calculated using the specified algorithm "hmac-sha-256" and the key over the normalized request string.
+The request MAC is calculated using HMAC with the specified hash algorithm "sha256" and the key over the normalized request string.
 The result is base64-encoded to produce the request MAC:
 
 ```
-OND4NsC2gqscN2dh71FWPEvUnQ7t4bNcmTCeZolOI68=
+6R4rV5iE+NPoym+WwjeHzjAGXUtLNIxmo1vpMofpLAE=
 ```
 
-The client includes the **Hawk** key identifier, timestamp, and request MAC with the request using the HTTP "Authorization"
-request header field:
+The client includes the **Hawk** key identifier, timestamp, nonce, application specific data, and request MAC with the request using
+the HTTP "Authorization" request header field:
 
 ```
 GET /resource/1?b=1&a=2 HTTP/1.1
 Host: example.com:8000
-Authorization: Hawk id="dh37fgj492je", ts="1353832234", nonce="j4h3g2", ext="some-app-data", mac="OND4NsC2gqscN2dh71FWPEvUnQ7t4bNcmTCeZolOI68="
+Hawk id="dh37fgj492je", ts="1353832234", nonce="j4h3g2", ext="some-app-ext-data", mac="6R4rV5iE+NPoym+WwjeHzjAGXUtLNIxmo1vpMofpLAE="
 ```
 
 The server validates the request by calculating the request MAC again based on the request received and verifies the validity
 and scope of the **Hawk** credentials. If valid, the server responds with the requested resource.
+
+
+### Payload Validation
+
+**Hawk** provides optional payload validation. When generating the authentication header, the client calculates a payload hash
+using the specified hash algorithm. The hash is calculated over the request payload prior to any content encoding (the exact
+representation requirements should be specified by the server for payloads other than simple single-part ascii to ensure interoperability):
+
+Payload: `Thank you for flying Hawk`
+Hash (sha256): `CBbyqZ/H0rd6nKdg3O9FS5uiQZ5NmgcXUPLut9heuyo=`
+
+The client constructs the normalized request string (newline separated values):
+
+```
+hawk.1.header
+1353832234
+j4h3g2
+POST
+/resource?a=1&b=2
+example.com
+8000
+CBbyqZ/H0rd6nKdg3O9FS5uiQZ5NmgcXUPLut9heuyo=
+some-app-ext-data
+
+```
+
+Then calculates the request MAC and includes the **Hawk** key identifier, timestamp, nonce, payload hash, application specific data,
+and request MAC with the request using the HTTP "Authorization" request header field:
+
+```
+POST /resource/1 HTTP/1.1
+Host: example.com:8000
+Hawk id="dh37fgj492je", ts="1353832234", nonce="j4h3g2", hash="CBbyqZ/H0rd6nKdg3O9FS5uiQZ5NmgcXUPLut9heuyo=", ext="some-app-ext-data", mac="D0pHf7mKEh55AxFZ+qyiJ/fVE8uL0YgkoJjOMcOhVQU="
+```
 
 
 # Single URI Authorization
@@ -245,7 +283,7 @@ var credentialsFunc = function (id, callback) {
 
     var credentials = {
         key: 'werxhqb98rpaxn39848xrunpaw3489ruxnpa98w4rxn',
-        algorithm: 'hmac-sha-256'
+        algorithm: 'sha256'
     };
 
     return callback(null, credentials);
@@ -255,7 +293,7 @@ var credentialsFunc = function (id, callback) {
 
 var handler = function (req, res) {
 
-    Hawk.uri.authenticate(req, credentialsFunc, {}, function (err, credentials, ext) {
+    Hawk.uri.authenticate(req, credentialsFunc, {}, function (err, credentials, attributes) {
 
         res.writeHead(!err ? 200 : 401, { 'Content-Type': 'text/plain' });
         res.end(!err ? 'Access granted' : 'Shoosh!');
@@ -277,7 +315,7 @@ var Hawk = require('hawk');
 var credentials = {
     id: 'dh37fgj492je',
     key: 'werxhqb98rpaxn39848xrunpaw3489ruxnpa98w4rxn',
-    algorithm: 'hmac-sha-256'
+    algorithm: 'sha256'
 }
 
 // Generate bewit
@@ -389,7 +427,7 @@ something? Open an issue!
 
 ### Is it done?
 
-Far from it. Until this module reaches version 1.0.0 it is considered experimental and is likely to change. This also
+No but it's getting close. Until this module reaches version 1.0.0 it is considered experimental and is likely to change. This also
 means your feedback and contribution are very welcome. Feel free to open issues with questions and suggestions.
 
 ### Does **Hawk** have anything to do with OAuth?
@@ -414,7 +452,8 @@ port. A cross-platform test-suite is in the works.
 ### Why isn't the algorithm part of the challenge or dynamically negotiated?
 
 The algorithm used is closely related to the key issued as different algorithms require different key sizes (and other
-requirements). While some keys can be used for multiple algorithm, the protocol is designed to closely bind the key and algorithm together as part of the issued credentials.
+requirements). While some keys can be used for multiple algorithm, the protocol is designed to closely bind the key and algorithm
+ together as part of the issued credentials.
 
 ### Why is Host the only header covered by the request MAC?
 
@@ -442,6 +481,13 @@ In general, replay protection is a matter of application-specific threat model. 
 system where the clients are implemented using best practices and are under the control of the server. Instead of dropping
 replay protection, **Hawk** offers a required time window and an optional nonce verification. Together, it provides developers
 with the ability to decide how to enforce their security policy without impacting the client's implementation.
+
+### Is the NTP attribute really necessary?
+
+It's a good investment for the future. While clients can use the server time to calculate clock skew, large scale deployment
+of clients talking to many servers is going to make this very expensive. Such clients will need to maintain a large data set
+of clock offsets, and keep updating it. Instead, the NTP information allows them to keep track of much fewer clocks, especially
+when using the default 'pool.ntp.org' service.
 
 
 # Acknowledgements

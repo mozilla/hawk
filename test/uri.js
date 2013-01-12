@@ -23,7 +23,7 @@ describe('Hawk', function () {
             var credentials = {
                 id: id,
                 key: 'werxhqb98rpaxn39848xrunpaw3489ruxnpa98w4rxn',
-                algorithm: 'hmac-sha-256',
+                algorithm: 'sha256',
                 user: 'steve'
             };
 
@@ -45,11 +45,11 @@ describe('Hawk', function () {
                 var bewit = Hawk.uri.getBewit(credentials, req.url, 'example.com', 8080, 60 * 60 * 24 * 365 * 100, { ext: 'some-app-data' });
                 req.url += '&bewit=' + bewit;
 
-                Hawk.uri.authenticate(req, credentialsFunc, {}, function (err, credentials, ext) {
+                Hawk.uri.authenticate(req, credentialsFunc, {}, function (err, credentials, attributes) {
 
                     expect(err).to.not.exist;
                     expect(credentials.user).to.equal('steve');
-                    expect(ext).to.equal('some-app-data');
+                    expect(attributes.ext).to.equal('some-app-data');
                     done();
                 });
             });
@@ -62,14 +62,14 @@ describe('Hawk', function () {
                         host: 'example.com:8080'
                     },
                     method: 'GET',
-                    url: '/resource/4?a=1&b=2&bewit=MTIzNDU2XDQ1MTE0NTU1MTZcMjR2UjF0N2Jia0xQdkpmWDdGS2tHSEVMbkRpNmQ3TmdlejMzMEZxMkJ0WT1cc29tZS1hcHAtZGF0YQ'
+                    url: '/resource/4?a=1&b=2&bewit=MTIzNDU2XDQ1MTE0ODQ2MjFcMzFjMmNkbUJFd1NJRVZDOVkva1NFb2c3d3YrdEVNWjZ3RXNmOGNHU2FXQT1cc29tZS1hcHAtZGF0YQ'
                 };
 
-                Hawk.uri.authenticate(req, credentialsFunc, {}, function (err, credentials, ext) {
+                Hawk.uri.authenticate(req, credentialsFunc, {}, function (err, credentials, attributes) {
 
                     expect(err).to.not.exist;
                     expect(credentials.user).to.equal('steve');
-                    expect(ext).to.equal('some-app-data');
+                    expect(attributes.ext).to.equal('some-app-data');
                     done();
                 });
         });
@@ -81,14 +81,14 @@ describe('Hawk', function () {
                     host: 'example.com:8080'
                 },
                 method: 'GET',
-                url: '/resource/4?bewit=MTIzNDU2XDQ1MTE0NTU1MTZcMjR2UjF0N2Jia0xQdkpmWDdGS2tHSEVMbkRpNmQ3TmdlejMzMEZxMkJ0WT1cc29tZS1hcHAtZGF0YQ&a=1&b=2'
+                url: '/resource/4?bewit=MTIzNDU2XDQ1MTE0ODQ2MjFcMzFjMmNkbUJFd1NJRVZDOVkva1NFb2c3d3YrdEVNWjZ3RXNmOGNHU2FXQT1cc29tZS1hcHAtZGF0YQ&a=1&b=2'
             };
 
-            Hawk.uri.authenticate(req, credentialsFunc, {}, function (err, credentials, ext) {
+            Hawk.uri.authenticate(req, credentialsFunc, {}, function (err, credentials, attributes) {
 
                 expect(err).to.not.exist;
                 expect(credentials.user).to.equal('steve');
-                expect(ext).to.equal('some-app-data');
+                expect(attributes.ext).to.equal('some-app-data');
                 done();
             });
         });
@@ -100,14 +100,14 @@ describe('Hawk', function () {
                     host: 'example.com:8080'
                 },
                 method: 'GET',
-                url: '/resource/4?bewit=MTIzNDU2XDQ1MTE0NTU1NDZca2VaNHhiWnNOd3VPYkJ2MS90cDY4U0Vxanp0dG8wMjl2L2ZoRnFxZVRJaz1cc29tZS1hcHAtZGF0YQ'
+                url: '/resource/4?bewit=MTIzNDU2XDQ1MTE0ODQ2NDFcZm1CdkNWT3MvcElOTUUxSTIwbWhrejQ3UnBwTmo4Y1VrSHpQd3Q5OXJ1cz1cc29tZS1hcHAtZGF0YQ'
             };
 
-            Hawk.uri.authenticate(req, credentialsFunc, {}, function (err, credentials, ext) {
+            Hawk.uri.authenticate(req, credentialsFunc, {}, function (err, credentials, attributes) {
 
                 expect(err).to.not.exist;
                 expect(credentials.user).to.equal('steve');
-                expect(ext).to.equal('some-app-data');
+                expect(attributes.ext).to.equal('some-app-data');
                 done();
             });
         });
@@ -126,7 +126,7 @@ describe('Hawk', function () {
 
                 var exp = Math.floor(Date.now() / 1000) + 60;
                 var ext = 'some-app-data';
-                var mac = Hawk.crypto.calculateMAC({
+                var mac = Hawk.crypto.calculateMac({
                     type: 'bewit',
                     key: credentials.key,
                     algorithm: credentials.algorithm,
@@ -143,7 +143,7 @@ describe('Hawk', function () {
 
                 req.url += '&bewit=' + Hawk.utils.base64urlEncode(bewit);
 
-                Hawk.uri.authenticate(req, credentialsFunc, {}, function (err, credentials, ext) {
+                Hawk.uri.authenticate(req, credentialsFunc, {}, function (err, credentials, attributes) {
 
                     expect(err).to.exist;
                     expect(err.toResponse().payload.message).to.equal('Invalid method');
@@ -162,7 +162,7 @@ describe('Hawk', function () {
                 url: '/resource/4?bewit=MTIzNDU2XDQ1MDk5OTE3MTlcTUE2eWkwRWRwR0pEcWRwb0JkYVdvVDJrL0hDSzA1T0Y3MkhuZlVmVy96Zz1cc29tZS1hcHAtZGF0YQ'
             };
 
-            Hawk.uri.authenticate(req, credentialsFunc, {}, function (err, credentials, ext) {
+            Hawk.uri.authenticate(req, credentialsFunc, {}, function (err, credentials, attributes) {
 
                 expect(err).to.exist;
                 expect(err.toResponse().payload.message).to.equal('Invalid Host header');
@@ -180,7 +180,7 @@ describe('Hawk', function () {
                 url: '/resource/4?bewit='
             };
 
-            Hawk.uri.authenticate(req, credentialsFunc, {}, function (err, credentials, ext) {
+            Hawk.uri.authenticate(req, credentialsFunc, {}, function (err, credentials, attributes) {
 
                 expect(err).to.exist;
                 expect(err.toResponse().payload.message).to.equal('Missing bewit');
@@ -198,7 +198,7 @@ describe('Hawk', function () {
                 url: '/resource/4?bewit=*'
             };
 
-            Hawk.uri.authenticate(req, credentialsFunc, {}, function (err, credentials, ext) {
+            Hawk.uri.authenticate(req, credentialsFunc, {}, function (err, credentials, attributes) {
 
                 expect(err).to.exist;
                 expect(err.toResponse().payload.message).to.equal('Invalid bewit encoding');
@@ -216,7 +216,7 @@ describe('Hawk', function () {
                 url: '/resource/4'
             };
 
-            Hawk.uri.authenticate(req, credentialsFunc, {}, function (err, credentials, ext) {
+            Hawk.uri.authenticate(req, credentialsFunc, {}, function (err, credentials, attributes) {
 
                 expect(err).to.exist;
                 expect(err.toResponse().payload.message).to.equal('Missing bewit');
@@ -234,7 +234,7 @@ describe('Hawk', function () {
                 url: '/resource/4?bewit=abc'
             };
 
-            Hawk.uri.authenticate(req, credentialsFunc, {}, function (err, credentials, ext) {
+            Hawk.uri.authenticate(req, credentialsFunc, {}, function (err, credentials, attributes) {
 
                 expect(err).to.exist;
                 expect(err.toResponse().payload.message).to.equal('Invalid bewit structure');
@@ -252,7 +252,7 @@ describe('Hawk', function () {
                 url: '/resource/4?bewit=YVxcY1xk'
             };
 
-            Hawk.uri.authenticate(req, credentialsFunc, {}, function (err, credentials, ext) {
+            Hawk.uri.authenticate(req, credentialsFunc, {}, function (err, credentials, attributes) {
 
                 expect(err).to.exist;
                 expect(err.toResponse().payload.message).to.equal('Missing bewit attributes');
@@ -270,7 +270,7 @@ describe('Hawk', function () {
                 url: '/resource/4?a=1&b=2&bewit=MTIzNDU2XDEzNTY0MTg1ODNcWk1wZlMwWU5KNHV0WHpOMmRucTRydEk3NXNXTjFjeWVITTcrL0tNZFdVQT1cc29tZS1hcHAtZGF0YQ'
             };
 
-            Hawk.uri.authenticate(req, credentialsFunc, {}, function (err, credentials, ext) {
+            Hawk.uri.authenticate(req, credentialsFunc, {}, function (err, credentials, attributes) {
 
                 expect(err).to.exist;
                 expect(err.toResponse().payload.message).to.equal('Access expired');
@@ -288,7 +288,7 @@ describe('Hawk', function () {
                 url: '/resource/4?bewit=MTIzNDU2XDQ1MDk5OTE3MTlcTUE2eWkwRWRwR0pEcWRwb0JkYVdvVDJrL0hDSzA1T0Y3MkhuZlVmVy96Zz1cc29tZS1hcHAtZGF0YQ'
             };
 
-            Hawk.uri.authenticate(req, function (id, callback) { callback(Hawk.error.badRequest('Boom')); }, {}, function (err, credentials, ext) {
+            Hawk.uri.authenticate(req, function (id, callback) { callback(Hawk.error.badRequest('Boom')); }, {}, function (err, credentials, attributes) {
 
                 expect(err).to.exist;
                 expect(err.toResponse().payload.message).to.equal('Boom');
@@ -306,7 +306,7 @@ describe('Hawk', function () {
                 url: '/resource/4?bewit=MTIzNDU2XDQ1MDk5OTE3MTlcTUE2eWkwRWRwR0pEcWRwb0JkYVdvVDJrL0hDSzA1T0Y3MkhuZlVmVy96Zz1cc29tZS1hcHAtZGF0YQ'
             };
 
-            Hawk.uri.authenticate(req, function (id, callback) { callback(null, null); }, {}, function (err, credentials, ext) {
+            Hawk.uri.authenticate(req, function (id, callback) { callback(null, null); }, {}, function (err, credentials, attributes) {
 
                 expect(err).to.exist;
                 expect(err.toResponse().payload.message).to.equal('Unknown credentials');
@@ -324,7 +324,7 @@ describe('Hawk', function () {
                 url: '/resource/4?bewit=MTIzNDU2XDQ1MDk5OTE3MTlcTUE2eWkwRWRwR0pEcWRwb0JkYVdvVDJrL0hDSzA1T0Y3MkhuZlVmVy96Zz1cc29tZS1hcHAtZGF0YQ'
             };
 
-            Hawk.uri.authenticate(req, function (id, callback) { callback(null, {}); }, {}, function (err, credentials, ext) {
+            Hawk.uri.authenticate(req, function (id, callback) { callback(null, {}); }, {}, function (err, credentials, attributes) {
 
                 expect(err).to.exist;
                 expect(err.message).to.equal('Invalid credentials');
@@ -342,7 +342,7 @@ describe('Hawk', function () {
                 url: '/resource/4?bewit=MTIzNDU2XDQ1MDk5OTE3MTlcTUE2eWkwRWRwR0pEcWRwb0JkYVdvVDJrL0hDSzA1T0Y3MkhuZlVmVy96Zz1cc29tZS1hcHAtZGF0YQ'
             };
 
-            Hawk.uri.authenticate(req, function (id, callback) { callback(null, { key: 'xxx', algorithm: 'xxx' }); }, {}, function (err, credentials, ext) {
+            Hawk.uri.authenticate(req, function (id, callback) { callback(null, { key: 'xxx', algorithm: 'xxx' }); }, {}, function (err, credentials, attributes) {
 
                 expect(err).to.exist;
                 expect(err.message).to.equal('Unknown algorithm');
@@ -360,7 +360,7 @@ describe('Hawk', function () {
                 url: '/resource/4?bewit=MTIzNDU2XDQ1MDk5OTE3MTlcTUE2eWkwRWRwR0pEcWRwb0JkYVdvVDJrL0hDSzA1T0Y3MkhuZlVmVy96Zz1cc29tZS1hcHAtZGF0YQ'
             };
 
-            Hawk.uri.authenticate(req, function (id, callback) { callback(null, { key: 'xxx', algorithm: 'hmac-sha-256' }); }, {}, function (err, credentials, ext) {
+            Hawk.uri.authenticate(req, function (id, callback) { callback(null, { key: 'xxx', algorithm: 'sha256' }); }, {}, function (err, credentials, attributes) {
 
                 expect(err).to.exist;
                 expect(err.toResponse().payload.message).to.equal('Bad mac');
@@ -376,11 +376,11 @@ describe('Hawk', function () {
             var credentials = {
                 id: '123456',
                 key: '2983d45yun89q',
-                algorithm: 'hmac-sha-256'
+                algorithm: 'sha256'
             };
 
             var bewit = Hawk.uri.getBewit(credentials, '/somewhere/over/the/rainbow', 'example.com', 443, 300, { localtimeOffsetMsec: 1356420407232 - Date.now(), ext: 'xandyandz' });
-            expect(bewit).to.equal('MTIzNDU2XDEzNTY0MjA3MDdcRjNEUDZSU0p6R1UyWDVsNkVTSEJHTjdlL0ExQ2lHSzZsSWZUQ0N1UjBMcz1ceGFuZHlhbmR6');
+            expect(bewit).to.equal('MTIzNDU2XDEzNTY0MjA3MDdca3NjeHdOUjJ0SnBQMVQxekRMTlBiQjVVaUtJVTl0T1NKWFRVZEc3WDloOD1ceGFuZHlhbmR6');
             done();
         });
 
@@ -388,7 +388,7 @@ describe('Hawk', function () {
 
             var credentials = {
                 key: '2983d45yun89q',
-                algorithm: 'hmac-sha-256'
+                algorithm: 'sha256'
             };
 
             var bewit = Hawk.uri.getBewit(credentials, '/somewhere/over/the/rainbow', 'example.com', 443, 300, { ext: 'xandyandz' });

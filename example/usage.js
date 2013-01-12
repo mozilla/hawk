@@ -2,7 +2,7 @@
 
 var Http = require('http');
 var Request = require('request');
-var Hawk = require('../lib/hawk');
+var Hawk = require('../lib');
 
 
 // Declare internals
@@ -12,7 +12,7 @@ var internals = {
         dh37fgj492je: {
             id: 'dh37fgj492je',                                             // Required by Hawk.getAuthorizationHeader 
             key: 'werxhqb98rpaxn39848xrunpaw3489ruxnpa98w4rxn',
-            algorithm: 'hmac-sha-256',
+            algorithm: 'sha256',
             user: 'Steve'
         }
     }
@@ -31,10 +31,10 @@ var credentialsFunc = function (id, callback) {
 
 var handler = function (req, res) {
 
-    Hawk.authenticate(req, credentialsFunc, function (err, isAuthenticated, credentials, ext) {
+    Hawk.authenticate(req, credentialsFunc, {}, function (err, credentials, attributes) {
 
-        res.writeHead(isAuthenticated ? 200 : 401, { 'Content-Type': 'text/plain' });
-        res.end(isAuthenticated ? 'Hello ' + credentials.user : 'Shoosh!');
+        res.writeHead(!err ? 200 : 401, { 'Content-Type': 'text/plain' });
+        res.end(!err ? 'Hello ' + credentials.user + ' ' + attributes.ext : 'Shoosh!');
     });
 };
 
@@ -55,7 +55,7 @@ var options = {
     uri: 'http://127.0.0.1:8000/resource/1?b=1&a=2',
     method: 'GET',
     headers: {
-        authorization: Hawk.getAuthorizationHeader(internals.credentials.dh37fgj492je, 'GET', '/resource/1?b=1&a=2', '127.0.0.1', 8000, { ext: 'some-app-data' })
+        authorization: Hawk.getAuthorizationHeader(internals.credentials.dh37fgj492je, 'GET', '/resource/1?b=1&a=2', '127.0.0.1', 8000, { ext: 'and welcome!' })
     }
 };
 

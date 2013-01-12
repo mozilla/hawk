@@ -20,7 +20,8 @@
   },
   "devDependencies": {
     "mocha": "1.x.x",
-    "chai": "1.x.x"
+    "chai": "1.x.x",
+    "request": "2.12.x"
   },
   "scripts": {
     "test": "make test && make unit"
