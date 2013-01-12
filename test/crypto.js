@@ -18,41 +18,21 @@ describe('Hawk', function () {
 
     describe('Crypto', function () {
 
-        describe('#calculateMAC', function () {
-
-            it('should return an empty value on unknown algorithm', function (done) {
-
-                expect(Hawk.crypto.calculateMAC({
-                    header: 'core',
-                    key: 'dasdfasdf',
-                    algorithm: 'hmac-sha-0',
-                    timestamp: Math.floor(Date.now() / 1000),
-                    nonce: 'k3k4j5',
-                    method: 'GET',
-                    uri: '/resource/something',
-                    host: 'example.com',
-                    port: 8080
-                })).to.equal('');
-
-                done();
-            });
-        });
-
         describe('#generateNormalizedString', function () {
 
             it('should return a valid normalized string', function (done) {
 
                 expect(Hawk.crypto.generateNormalizedString({
-                    header: 'core',
+                    type: 'header',
                     key: 'dasdfasdf',
-                    algorithm: 'hmac-sha-256',
+                    algorithm: 'sha256',
                     timestamp: 1357747017,
                     nonce: 'k3k4j5',
                     method: 'GET',
                     uri: '/resource/something',
                     host: 'example.com',
                     port: 8080
-                })).to.equal('core.1\n1357747017\nk3k4j5\nGET\n/resource/something\nexample.com\n8080\n\n');
+                })).to.equal('hawk.1.header\n1357747017\nk3k4j5\nGET\n/resource/something\nexample.com\n8080\n\n\n');
 
                 done();
             });
@@ -60,9 +40,9 @@ describe('Hawk', function () {
             it('should return a valid normalized string (ext)', function (done) {
 
                 expect(Hawk.crypto.generateNormalizedString({
-                    header: 'core',
+                    type: 'header',
                     key: 'dasdfasdf',
-                    algorithm: 'hmac-sha-256',
+                    algorithm: 'sha256',
                     timestamp: 1357747017,
                     nonce: 'k3k4j5',
                     method: 'GET',
@@ -70,7 +50,26 @@ describe('Hawk', function () {
                     host: 'example.com',
                     port: 8080,
                     ext: 'this is some app data'
-                })).to.equal('core.1\n1357747017\nk3k4j5\nGET\n/resource/something\nexample.com\n8080\nthis is some app data\n');
+                })).to.equal('hawk.1.header\n1357747017\nk3k4j5\nGET\n/resource/something\nexample.com\n8080\n\nthis is some app data\n');
+
+                done();
+            });
+
+            it('should return a valid normalized string (payload + ext)', function (done) {
+
+                expect(Hawk.crypto.generateNormalizedString({
+                    type: 'header',
+                    key: 'dasdfasdf',
+                    algorithm: 'sha256',
+                    timestamp: 1357747017,
+                    nonce: 'k3k4j5',
+                    method: 'GET',
+                    uri: '/resource/something',
+                    host: 'example.com',
+                    port: 8080,
+                    hash: 'U4MKKSmiVxk37JCCrAVIjV/OhB3y+NdwoCr6RShbVkE=',
+                    ext: 'this is some app data'
+                })).to.equal('hawk.1.header\n1357747017\nk3k4j5\nGET\n/resource/something\nexample.com\n8080\nU4MKKSmiVxk37JCCrAVIjV/OhB3y+NdwoCr6RShbVkE=\nthis is some app data\n');
 
                 done();
             });
