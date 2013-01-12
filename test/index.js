@@ -1,6 +1,5 @@
 // Load modules
 
-var Http = require('http');
 var Chai = require('chai');
 var Hawk = process.env.TEST_COV ? require('../lib-cov') : require('../lib');
 
@@ -252,7 +251,7 @@ describe('Hawk', function () {
 
                 expect(err).to.exist;
                 expect(err.toResponse().payload.message).to.equal('Stale timestamp');
-                var header = err.headers['WWW-Authenticate'];
+                var header = err.toResponse().headers['WWW-Authenticate'];
                 var ts = header.match(/^Hawk ts\=\"(\d+)\"\, ntp\=\"pool.ntp.org\"\, error=\"Stale timestamp\"$/);
                 var now = Date.now();
                 expect(parseInt(ts[1], 10)).to.be.within(now - 1, now + 1);
@@ -346,7 +345,7 @@ describe('Hawk', function () {
             Hawk.authenticate(req, credentialsFunc, {}, function (err, credentials, attributes) {
 
                 expect(err).to.exist;
-                var header = err.headers['WWW-Authenticate'];
+                var header = err.toResponse().headers['WWW-Authenticate'];
                 var ts = header.match(/^Hawk ts\=\"(\d+)\"\, ntp\=\"pool.ntp.org\"$/);
                 var now = Date.now();
                 expect(parseInt(ts[1], 10)).to.be.within(now - 1, now + 1);
