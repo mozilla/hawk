@@ -255,6 +255,19 @@ Host: example.com:8000
 Authorization: Hawk id="dh37fgj492je", ts="1353832234", nonce="j4h3g2", hash="CBbyqZ/H0rd6nKdg3O9FS5uiQZ5NmgcXUPLut9heuyo=", ext="some-app-ext-data", mac="D0pHf7mKEh55AxFZ+qyiJ/fVE8uL0YgkoJjOMcOhVQU="
 ```
 
+It is up to the server if and when it validates the payload for any given request.  For requests with a small payload full
+authentication, including server-side calculation of the payload hash, is viable.  In this case the server-side steps would be:
+- Calculate payload hash
+- Create normalized request string using server-calculated payload hash
+- Create the server-side MAC and ensure that it matches the client-provided MAC
+However if the payload is of significant size then the server might not want to access the full payload prior to an initial
+check regarding the rest of the authentication process.  In this case the server-side steps would be:
+- Create normalized request string using client-provided payload hash
+- Create the server-side MAC and ensure that it matches the client-provided MAC
+It is important to realize that in the second case although the client request has been authenticated the payload has **not**
+been validated, and it is incumbent on the server to validate the payload before the request completes.
+
+The conditions under which the server will follow the two paths laid out above are dependent on the specific implementation.
 
 # Single URI Authorization
 
