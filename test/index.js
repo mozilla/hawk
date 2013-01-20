@@ -310,7 +310,7 @@ describe('Hawk', function () {
             Hawk.authenticate(req, credentialsFunc, { localtimeOffsetMsec: 1353788437000 - Date.now() }, function (err, credentials, attributes) {
 
                 expect(err).to.exist;
-                expect(err.toResponse().payload.message).to.equal('');
+                expect(err.toResponse().payload.message).to.not.exist;
                 done();
             });
         });

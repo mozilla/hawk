@@ -109,6 +109,24 @@ describe('Hawk', function () {
             });
         });
 
+        it('should fail on multiple authentication', function (done) {
+
+            var req = {
+                method: 'GET',
+                url: '/resource/4?bewit=MTIzNDU2XDQ1MTE0ODQ2NDFcZm1CdkNWT3MvcElOTUUxSTIwbWhrejQ3UnBwTmo4Y1VrSHpQd3Q5OXJ1cz1cc29tZS1hcHAtZGF0YQ',
+                host: 'example.com',
+                port: 8080,
+                authorization: 'Basic asdasdasdasd'
+            };
+
+            Hawk.uri.authenticate(req, credentialsFunc, {}, function (err, credentials, attributes) {
+
+                expect(err).to.exist;
+                expect(err.toResponse().payload.message).to.equal('Multiple authentications');
+                done();
+            });
+        });
+
         it('should fail on method other than GET', function (done) {
 
             credentialsFunc('123456', function (err, credentials) {
@@ -178,7 +196,8 @@ describe('Hawk', function () {
             Hawk.uri.authenticate(req, credentialsFunc, {}, function (err, credentials, attributes) {
 
                 expect(err).to.exist;
-                expect(err.toResponse().payload.message).to.equal('Missing bewit');
+                expect(err.toResponse().payload.message).to.equal('Empty bewit');
+                expect(err.isMissing).to.not.exist;
                 done();
             });
         });
@@ -196,6 +215,7 @@ describe('Hawk', function () {
 
                 expect(err).to.exist;
                 expect(err.toResponse().payload.message).to.equal('Invalid bewit encoding');
+                expect(err.isMissing).to.not.exist;
                 done();
             });
         });
@@ -212,7 +232,8 @@ describe('Hawk', function () {
             Hawk.uri.authenticate(req, credentialsFunc, {}, function (err, credentials, attributes) {
 
                 expect(err).to.exist;
-                expect(err.toResponse().payload.message).to.equal('Missing bewit');
+                expect(err.toResponse().payload.message).to.not.exist;
+                expect(err.isMissing).to.equal(true);
                 done();
             });
         });
