@@ -252,7 +252,7 @@ describe('Hawk', function () {
                 expect(err).to.exist;
                 expect(err.toResponse().payload.message).to.equal('Stale timestamp');
                 var header = err.toResponse().headers['WWW-Authenticate'];
-                var ts = header.match(/^Hawk ts\=\"(\d+)\"\, ntp\=\"pool.ntp.org\"\, error=\"Stale timestamp\"$/);
+                var ts = header.match(/^Hawk ts\=\"(\d+)\"\, error=\"Stale timestamp\"$/);
                 var now = Date.now();
                 expect(parseInt(ts[1], 10)).to.be.within(now - 1, now + 1);
                 done();
@@ -345,8 +345,9 @@ describe('Hawk', function () {
             Hawk.authenticate(req, credentialsFunc, {}, function (err, credentials, attributes) {
 
                 expect(err).to.exist;
+                expect(err.isMissing).to.equal(true);
                 var header = err.toResponse().headers['WWW-Authenticate'];
-                var ts = header.match(/^Hawk ts\=\"(\d+)\"\, ntp\=\"pool.ntp.org\"$/);
+                var ts = header.match(/^Hawk ts\=\"(\d+)\"$/);
                 var now = Date.now();
                 expect(parseInt(ts[1], 10)).to.be.within(now - 1, now + 1);
                 done();
