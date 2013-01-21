@@ -76,6 +76,8 @@ key identifier combination.
 
 The timestamp enables the server to restrict the validity period of the credentials; requests occuring afterwards
 are rejected. It also removes the need for the server to retain an unbounded number of nonce values for future checks.
+By default, **Hawk** uses a time window of 1 minute to allow for time skew between the client and server (which in
+translates to a maximum of 2 minutes as the skew can be positive or negative).
 
 Using a timestamp requires the client's clock to be in sync with the server's clock. **Hawk** requires both the client
 clock and the server clock to use NTP to ensure synchronization. However, given the limitations of some client types
@@ -255,19 +257,20 @@ Host: example.com:8000
 Authorization: Hawk id="dh37fgj492je", ts="1353832234", nonce="j4h3g2", hash="CBbyqZ/H0rd6nKdg3O9FS5uiQZ5NmgcXUPLut9heuyo=", ext="some-app-ext-data", mac="D0pHf7mKEh55AxFZ+qyiJ/fVE8uL0YgkoJjOMcOhVQU="
 ```
 
-It is up to the server if and when it validates the payload for any given request.  For requests with a small payload full
-authentication, including server-side calculation of the payload hash, is viable.  In this case the server-side steps would be:
-- Calculate payload hash
-- Create normalized request string using server-calculated payload hash
-- Create the server-side MAC and ensure that it matches the client-provided MAC
-However if the payload is of significant size then the server might not want to access the full payload prior to an initial
-check regarding the rest of the authentication process.  In this case the server-side steps would be:
-- Create normalized request string using client-provided payload hash
-- Create the server-side MAC and ensure that it matches the client-provided MAC
-It is important to realize that in the second case although the client request has been authenticated the payload has **not**
-been validated, and it is incumbent on the server to validate the payload before the request completes.
+It is up to the server if and when it validates the payload for any given request, based solely on it's security policy
+and the nature of the data included.
 
-The conditions under which the server will follow the two paths laid out above are dependent on the specific implementation.
+If the payload is available at the time of authentication, the server uses the hash value provided by the client to construct
+the normalized string and validates the MAC. If the MAC is valid, the server calculates the payload hash and compares the value
+with the provided payload hash in the header. In many cases, checking the MAC first is faster than calculating the payload hash.
+
+However, if the payload is not available at authentication time (e.g. too large to fit in memory, streamed elsewhere, or processed
+at a different stage in the application), the server may choose to defer payload validation for later by retaining the hash value
+provided by the client after validating the MAC.
+
+It is important to note that MAC validation does not mean the hash value provided by the client is valid, only that the value
+included in the header was nor modified. Without calculating the payload hash on the server and comparing it to the value provided
+by the client, the payload may be modified by an attacker.
 
 # Single URI Authorization
 
