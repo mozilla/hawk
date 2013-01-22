@@ -138,7 +138,7 @@ describe('Hawk', function () {
                     port: 8080
                 };
 
-                var exp = Math.floor(Date.now() / 1000) + 60;
+                var exp = Math.floor(Hawk.utils.now() / 1000) + 60;
                 var ext = 'some-app-data';
                 var mac = Hawk.crypto.calculateMac({
                     type: 'bewit',
@@ -385,7 +385,7 @@ describe('Hawk', function () {
                 algorithm: 'sha256'
             };
 
-            var bewit = Hawk.uri.getBewit(credentials, '/somewhere/over/the/rainbow', 'example.com', 443, 300, { localtimeOffsetMsec: 1356420407232 - Date.now(), ext: 'xandyandz' });
+            var bewit = Hawk.uri.getBewit(credentials, '/somewhere/over/the/rainbow', 'example.com', 443, 300, { localtimeOffsetMsec: 1356420407232 - Hawk.utils.now(), ext: 'xandyandz' });
             expect(bewit).to.equal('MTIzNDU2XDEzNTY0MjA3MDdca3NjeHdOUjJ0SnBQMVQxekRMTlBiQjVVaUtJVTl0T1NKWFRVZEc3WDloOD1ceGFuZHlhbmR6');
             done();
         });
