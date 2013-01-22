@@ -3,7 +3,7 @@
 <img align="right" src="https://raw.github.com/hueniverse/hawk/master/images/logo.png" /> **Hawk** is an HTTP authentication scheme using a message authentication code (MAC) algorithm to provide partial
 HTTP request cryptographic verification. For more complex use cases such as access delegation, see [Oz](/hueniverse/oz).
 
-Current version: **0.5.3**
+Current version: **0.6.0**
 
 [![Build Status](https://secure.travis-ci.org/hueniverse/hawk.png)](http://travis-ci.org/hueniverse/hawk)
 
@@ -40,12 +40,12 @@ partial cryptographic verification of the request, covering the HTTP method, req
 the request payload.
 
 Similar to the HTTP [Digest access authentication schemes](http://www.ietf.org/rfc/rfc2617.txt), **Hawk** uses a set of
-client credentials which include a username (identifier) and password (key). Likewise, just as with the Digest scheme,
+client credentials which include a identifier (username) and key (password). Likewise, just as with the Digest scheme,
 the key is never included in authenticated requests; instead, it is used to calculate a request MAC value which is
 included in its place.
 
 However, **Hawk** has several differences from Digest. In particular, while both use a nonce to limit the possibility of
-replay attacks, the client generates the nonce in **Hawk** and uses it in combination with a timestamp, leading to less
+replay attacks, in **Hawk** the client generates the nonce and uses it in combination with a timestamp, leading to less
 interaction with the server ("chattiness").
 
 Also unlike Digest, this scheme is not intended to protect the key itself (called the password in Digest) because
@@ -76,16 +76,18 @@ key identifier combination.
 
 The timestamp enables the server to restrict the validity period of the credentials; requests occuring afterwards
 are rejected. It also removes the need for the server to retain an unbounded number of nonce values for future checks.
+By default, **Hawk** uses a time window of 1 minute to allow for time skew between the client and server (which in
+translates to a maximum of 2 minutes as the skew can be positive or negative).
 
-Using a timestamp requires the client's clock to be in sync with the server's clock. To accomplish this, the server 
-provides the client with its current time in response to a bad timestamp or as part of a challenge.
-
-In addition, to increase the protocol scalability for clients communicating with many different servers, the server
-provides the name of an NTP server which can be used as a time reference for clock sync with the server.
+Using a timestamp requires the client's clock to be in sync with the server's clock. **Hawk** requires both the client
+clock and the server clock to use NTP to ensure synchronization. However, given the limitations of some client types
+(e.g. browsers) to deploy NTP, the server provides the client with its current time in response to a bad timestamp or
+as part of an authentication challenge.
 
 There is no expectation that the client will adjust its system clock to match the server (in fact, this would be a
 potential attack vector). Instead, the client only uses the server's time to calculate an offset used only
-for communications with that particular server.
+for communications with that particular server. The protocol rewards clients with synchronized clocks by reducing
+the number of round trips required to authentication to a single request.
 
 
 ## Usage Example
@@ -155,6 +157,13 @@ Request(options, function (error, response, body) {
 });
 ```
 
+**Hawk** utilized the [**SNTP**](https://github.com/hueniverse/sntp) module for time sync management. By default, the local
+machine time is used. To automatically retrieve and synchronice the clock within the application, use the SNTP 'start()' method.
+
+```javascript
+Hawk.sntp.start();
+```
+
 
 ## Protocol Example
 
@@ -171,7 +180,7 @@ time and NTP server used for clock sync, which enable the client to offset its c
 
 ```
 HTTP/1.1 401 Unauthorized
-WWW-Authenticate: Hawk ts="1353832200", ntp="pool.ntp.org"
+WWW-Authenticate: Hawk ts="1353832200"
 ```
 
 The client has previously obtained a set of **Hawk** credentials for accessing resources on the "http://example.com/"
@@ -255,19 +264,20 @@ Host: example.com:8000
 Authorization: Hawk id="dh37fgj492je", ts="1353832234", nonce="j4h3g2", hash="CBbyqZ/H0rd6nKdg3O9FS5uiQZ5NmgcXUPLut9heuyo=", ext="some-app-ext-data", mac="D0pHf7mKEh55AxFZ+qyiJ/fVE8uL0YgkoJjOMcOhVQU="
 ```
 
-It is up to the server if and when it validates the payload for any given request.  For requests with a small payload full
-authentication, including server-side calculation of the payload hash, is viable.  In this case the server-side steps would be:
-- Calculate payload hash
-- Create normalized request string using server-calculated payload hash
-- Create the server-side MAC and ensure that it matches the client-provided MAC
-However if the payload is of significant size then the server might not want to access the full payload prior to an initial
-check regarding the rest of the authentication process.  In this case the server-side steps would be:
-- Create normalized request string using client-provided payload hash
-- Create the server-side MAC and ensure that it matches the client-provided MAC
-It is important to realize that in the second case although the client request has been authenticated the payload has **not**
-been validated, and it is incumbent on the server to validate the payload before the request completes.
+It is up to the server if and when it validates the payload for any given request, based solely on it's security policy
+and the nature of the data included.
 
-The conditions under which the server will follow the two paths laid out above are dependent on the specific implementation.
+If the payload is available at the time of authentication, the server uses the hash value provided by the client to construct
+the normalized string and validates the MAC. If the MAC is valid, the server calculates the payload hash and compares the value
+with the provided payload hash in the header. In many cases, checking the MAC first is faster than calculating the payload hash.
+
+However, if the payload is not available at authentication time (e.g. too large to fit in memory, streamed elsewhere, or processed
+at a different stage in the application), the server may choose to defer payload validation for later by retaining the hash value
+provided by the client after validating the MAC.
+
+It is important to note that MAC validation does not mean the hash value provided by the client is valid, only that the value
+included in the header was nor modified. Without calculating the payload hash on the server and comparing it to the value provided
+by the client, the payload may be modified by an attacker.
 
 # Single URI Authorization
 
@@ -416,13 +426,9 @@ has been verified.
 
 ### Client Clock Poisoning
 
-When receiving a request with a bad timestamp, the server provides the client with its current time as well as the name of an
-NTP server which can be used as a time reference. The client must never use the time received from the server to adjust its own
-clock, and must only use it to calculate an offset for communicating with that particular server.
-
-In addition, the client must not draw any correlation between the server's time provided via the 'ts' attribute and the current
-time at the NTP server indicated via the 'ntp' variable. In other works, the client must not make any conclusion about the NTP
-server indicated based on the server response.
+When receiving a request with a bad timestamp, the server provides the client with its current time. The client must never use
+the time received from the server to adjust its own clock, and must only use it to calculate an offset for communicating with
+that particular server.
 
 ### Bewit Limitations
 
@@ -497,13 +503,6 @@ In general, replay protection is a matter of application-specific threat model. 
 system where the clients are implemented using best practices and are under the control of the server. Instead of dropping
 replay protection, **Hawk** offers a required time window and an optional nonce verification. Together, it provides developers
 with the ability to decide how to enforce their security policy without impacting the client's implementation.
-
-### Is the NTP attribute really necessary?
-
-It's a good investment for the future. While clients can use the server time to calculate clock skew, large scale deployment
-of clients talking to many servers is going to make this very expensive. Such clients will need to maintain a large data set
-of clock offsets, and keep updating it. Instead, the NTP information allows them to keep track of much fewer clocks, especially
-when using the default 'pool.ntp.org' service.
 
 
 # Acknowledgements

@@ -109,6 +109,24 @@ describe('Hawk', function () {
             });
         });
 
+        it('should fail on multiple authentication', function (done) {
+
+            var req = {
+                method: 'GET',
+                url: '/resource/4?bewit=MTIzNDU2XDQ1MTE0ODQ2NDFcZm1CdkNWT3MvcElOTUUxSTIwbWhrejQ3UnBwTmo4Y1VrSHpQd3Q5OXJ1cz1cc29tZS1hcHAtZGF0YQ',
+                host: 'example.com',
+                port: 8080,
+                authorization: 'Basic asdasdasdasd'
+            };
+
+            Hawk.uri.authenticate(req, credentialsFunc, {}, function (err, credentials, attributes) {
+
+                expect(err).to.exist;
+                expect(err.toResponse().payload.message).to.equal('Multiple authentications');
+                done();
+            });
+        });
+
         it('should fail on method other than GET', function (done) {
 
             credentialsFunc('123456', function (err, credentials) {
@@ -120,7 +138,7 @@ describe('Hawk', function () {
                     port: 8080
                 };
 
-                var exp = Math.floor(Date.now() / 1000) + 60;
+                var exp = Math.floor(Hawk.utils.now() / 1000) + 60;
                 var ext = 'some-app-data';
                 var mac = Hawk.crypto.calculateMac({
                     type: 'bewit',
@@ -178,7 +196,8 @@ describe('Hawk', function () {
             Hawk.uri.authenticate(req, credentialsFunc, {}, function (err, credentials, attributes) {
 
                 expect(err).to.exist;
-                expect(err.toResponse().payload.message).to.equal('Missing bewit');
+                expect(err.toResponse().payload.message).to.equal('Empty bewit');
+                expect(err.isMissing).to.not.exist;
                 done();
             });
         });
@@ -196,6 +215,7 @@ describe('Hawk', function () {
 
                 expect(err).to.exist;
                 expect(err.toResponse().payload.message).to.equal('Invalid bewit encoding');
+                expect(err.isMissing).to.not.exist;
                 done();
             });
         });
@@ -212,7 +232,8 @@ describe('Hawk', function () {
             Hawk.uri.authenticate(req, credentialsFunc, {}, function (err, credentials, attributes) {
 
                 expect(err).to.exist;
-                expect(err.toResponse().payload.message).to.equal('Missing bewit');
+                expect(err.toResponse().payload.message).to.not.exist;
+                expect(err.isMissing).to.equal(true);
                 done();
             });
         });
@@ -364,7 +385,7 @@ describe('Hawk', function () {
                 algorithm: 'sha256'
             };
 
-            var bewit = Hawk.uri.getBewit(credentials, '/somewhere/over/the/rainbow', 'example.com', 443, 300, { localtimeOffsetMsec: 1356420407232 - Date.now(), ext: 'xandyandz' });
+            var bewit = Hawk.uri.getBewit(credentials, '/somewhere/over/the/rainbow', 'example.com', 443, 300, { localtimeOffsetMsec: 1356420407232 - Hawk.utils.now(), ext: 'xandyandz' });
             expect(bewit).to.equal('MTIzNDU2XDEzNTY0MjA3MDdca3NjeHdOUjJ0SnBQMVQxekRMTlBiQjVVaUtJVTl0T1NKWFRVZEc3WDloOD1ceGFuZHlhbmR6');
             done();
         });
