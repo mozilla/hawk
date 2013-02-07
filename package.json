@@ -1,7 +1,7 @@
 {
   "name": "hawk",
   "description": "HTTP Hawk Authentication Scheme",
-  "version": "0.6.0",
+  "version": "0.6.1",
   "author": "Eran Hammer <eran@hueniverse.com> (http://hueniverse.com)",
   "contributors": [],
   "repository": "git://github.com/hueniverse/hawk",
@@ -16,8 +16,8 @@
     "node": ">=0.8.0"
   },
   "dependencies": {
-    "hoek": "0.0.x",
-    "boom": "0.1.x",
+    "hoek": "0.4.x",
+    "boom": "0.2.x",
     "cryptiles": "0.0.x",
     "sntp": "0.1.x"
   },
