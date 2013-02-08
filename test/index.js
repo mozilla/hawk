@@ -659,7 +659,7 @@ describe('Hawk', function () {
             Hawk.authenticate(req, credentialsFunc, { localtimeOffsetMsec: 1353788437000 - Hawk.utils.now() }, function (err, credentials, attributes) {
 
                 expect(err).to.exist;
-                expect(err.response.message).to.equal('Invalid credentials');
+                expect(err.message).to.equal('Invalid credentials');
                 expect(err.response.payload.message).to.equal('An internal server error occurred');
                 done();
             });
@@ -689,7 +689,7 @@ describe('Hawk', function () {
             Hawk.authenticate(req, credentialsFunc, { localtimeOffsetMsec: 1353788437000 - Hawk.utils.now() }, function (err, credentials, attributes) {
 
                 expect(err).to.exist;
-                expect(err.response.message).to.equal('Unknown algorithm');
+                expect(err.message).to.equal('Unknown algorithm');
                 expect(err.response.payload.message).to.equal('An internal server error occurred');
                 done();
             });

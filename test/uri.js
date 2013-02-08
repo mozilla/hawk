@@ -335,7 +335,7 @@ describe('Hawk', function () {
             Hawk.uri.authenticate(req, function (id, callback) { callback(null, {}); }, {}, function (err, credentials, attributes) {
 
                 expect(err).to.exist;
-                expect(err.response.message).to.equal('Invalid credentials');
+                expect(err.message).to.equal('Invalid credentials');
                 done();
             });
         });
@@ -352,7 +352,7 @@ describe('Hawk', function () {
             Hawk.uri.authenticate(req, function (id, callback) { callback(null, { key: 'xxx', algorithm: 'xxx' }); }, {}, function (err, credentials, attributes) {
 
                 expect(err).to.exist;
-                expect(err.response.message).to.equal('Unknown algorithm');
+                expect(err.message).to.equal('Unknown algorithm');
                 done();
             });
         });
