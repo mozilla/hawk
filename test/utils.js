@@ -1,7 +1,7 @@
 // Load modules
 
 var Chai = require('chai');
-var Hawk = process.env.TEST_COV ? require('../lib-cov') : require('../lib');
+var Hawk = require('../lib');
 var Package = require('../package.json');
 
 

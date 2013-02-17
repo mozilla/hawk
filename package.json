@@ -1,7 +1,7 @@
 {
   "name": "hawk",
   "description": "HTTP Hawk Authentication Scheme",
-  "version": "0.7.0",
+  "version": "0.7.1",
   "author": "Eran Hammer <eran@hueniverse.com> (http://hueniverse.com)",
   "contributors": [],
   "repository": "git://github.com/hueniverse/hawk",
@@ -13,7 +13,7 @@
     "hawk"
   ],
   "engines": {
-    "node": ">=0.8.0"
+    "node": "0.8.x"
   },
   "dependencies": {
     "hoek": "0.4.x",
@@ -22,12 +22,16 @@
     "sntp": "0.1.x"
   },
   "devDependencies": {
+    "request": "2.12.x",
     "mocha": "1.x.x",
     "chai": "1.x.x",
-    "request": "2.12.x"
+    "blanket": "1.0.x",
+    "travis-cov": "0.2.x"
   },
   "scripts": {
-    "test": "make test && make unit"
+    "test": "make test && make test-cov",
+    "blanket": { "pattern": "//^((?!\/node_modules\/)(?!\/test\/).)*$/ig", "onlyCwd": true, "data-cover-flags": { "branchTracking": true } },
+    "travis-cov": { "threshold": 100 }
   },
   "licenses": [
     {

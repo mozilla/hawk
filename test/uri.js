@@ -2,7 +2,7 @@
 
 var Http = require('http');
 var Chai = require('chai');
-var Hawk = process.env.TEST_COV ? require('../lib-cov') : require('../lib');
+var Hawk = require('../lib');
 
 
 // Declare internals

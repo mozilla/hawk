@@ -2,7 +2,7 @@
 
 var Chai = require('chai');
 var Hoek = require('hoek');
-var Hawk = process.env.TEST_COV ? require('../lib-cov') : require('../lib');
+var Hawk = require('../lib');
 
 
 // Declare internals
