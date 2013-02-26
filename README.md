@@ -1,7 +1,7 @@
 ![hawk Logo](https://raw.github.com/hueniverse/hawk/master/images/hawk.png)
 
 <img align="right" src="https://raw.github.com/hueniverse/hawk/master/images/logo.png" /> **Hawk** is an HTTP authentication scheme using a message authentication code (MAC) algorithm to provide partial
-HTTP request cryptographic verification. For more complex use cases such as access delegation, see [Oz](/hueniverse/oz).
+HTTP request cryptographic verification. For more complex use cases such as access delegation, see [Oz](https://github.com/hueniverse/oz).
 
 Current version: **0.6.1**
 
@@ -504,6 +504,17 @@ system where the clients are implemented using best practices and are under the 
 replay protection, **Hawk** offers a required time window and an optional nonce verification. Together, it provides developers
 with the ability to decide how to enforce their security policy without impacting the client's implementation.
 
+### What are `app` and `dlg` in the authorization header and normalized mac string?
+
+The original motivation for **Hawk** was to replace the OAuth 1.0 use cases. This included both a simple client-server mode which
+this module is specifically designed for, and a delegated access mode which is being developed separately in
+[Oz](https://github.com/hueniverse/oz). In addition to the **Hawk** use cases, Oz requires another attribute: the application id `app`.
+This provides binding between the credentials and the application in a way that prevents an attacker from tricking an application
+to use credentials issued to someone else. It also has an optional 'delegated-by' attribute `dlg` which is the application id of the
+application the credentials were directly issued to.
+
+The goal of these two additions is to allow Oz to utilize **Hawk** directly, but with the additional security of delegated credentials.
+The additional support has been added without breaking or affecting **Hawk**-only use cases.
 
 # Acknowledgements
 

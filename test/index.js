@@ -119,6 +119,30 @@ describe('Hawk', function () {
         });
     });
 
+    it('should generate a header then successfully parse it (app, dlg)', function (done) {
+
+        var req = {
+            method: 'GET',
+            url: '/resource/4?filter=a',
+            host: 'example.com',
+            port: 8080
+        };
+
+        credentialsFunc('123456', function (err, credentials) {
+
+            req.authorization = Hawk.getAuthorizationHeader(credentials, req.method, req.url, req.host, req.port, { ext: 'some-app-data', app: 'asd23ased', dlg: '23434szr3q4d' });
+            Hawk.authenticate(req, credentialsFunc, {}, function (err, credentials, attributes) {
+
+                expect(err).to.not.exist;
+                expect(credentials.user).to.equal('steve');
+                expect(attributes.ext).to.equal('some-app-data');
+                expect(attributes.app).to.equal('asd23ased');
+                expect(attributes.dlg).to.equal('23434szr3q4d');
+                done();
+            });
+        });
+    });
+
     it('should generate a header then fail authentication due to bad hash', function (done) {
 
         var req = {
