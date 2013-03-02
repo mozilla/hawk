@@ -4,6 +4,7 @@
 HTTP request cryptographic verification. For more complex use cases such as access delegation, see [Oz](https://github.com/hueniverse/oz).
 
 Current version: **0.9.0**
+Last protocol change: **0.6.0** (Oz support added in **0.8.0**, backwards compatible)
 
 [![Build Status](https://secure.travis-ci.org/hueniverse/hawk.png)](http://travis-ci.org/hueniverse/hawk)
 
