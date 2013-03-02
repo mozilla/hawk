@@ -42,7 +42,7 @@ describe('Hawk', function () {
 
             credentialsFunc('123456', function (err, credentials) {
 
-                var bewit = Hawk.uri.getBewit(credentials, req.url, 'example.com', 8080, 60 * 60 * 24 * 365 * 100, { ext: 'some-app-data' });
+                var bewit = Hawk.uri.getBewit('http://example.com:8080/resource/4?a=1&b=2', { credentials: credentials, ttlSec: 60 * 60 * 24 * 365 * 100, ext: 'some-app-data' });
                 req.url += '&bewit=' + bewit;
 
                 Hawk.uri.authenticate(req, credentialsFunc, {}, function (err, credentials, attributes) {
@@ -57,20 +57,20 @@ describe('Hawk', function () {
 
         it('should successfully authenticate a request (last param)', function (done) {
 
-                var req = {
-                    method: 'GET',
-                    url: '/resource/4?a=1&b=2&bewit=MTIzNDU2XDQ1MTE0ODQ2MjFcMzFjMmNkbUJFd1NJRVZDOVkva1NFb2c3d3YrdEVNWjZ3RXNmOGNHU2FXQT1cc29tZS1hcHAtZGF0YQ',
-                    host: 'example.com',
-                    port: 8080
-                };
+            var req = {
+                method: 'GET',
+                url: '/resource/4?a=1&b=2&bewit=MTIzNDU2XDQ1MTE0ODQ2MjFcMzFjMmNkbUJFd1NJRVZDOVkva1NFb2c3d3YrdEVNWjZ3RXNmOGNHU2FXQT1cc29tZS1hcHAtZGF0YQ',
+                host: 'example.com',
+                port: 8080
+            };
 
-                Hawk.uri.authenticate(req, credentialsFunc, {}, function (err, credentials, attributes) {
+            Hawk.uri.authenticate(req, credentialsFunc, {}, function (err, credentials, attributes) {
 
-                    expect(err).to.not.exist;
-                    expect(credentials.user).to.equal('steve');
-                    expect(attributes.ext).to.equal('some-app-data');
-                    done();
-                });
+                expect(err).to.not.exist;
+                expect(credentials.user).to.equal('steve');
+                expect(attributes.ext).to.equal('some-app-data');
+                done();
+            });
         });
 
         it('should successfully authenticate a request (first param)', function (done) {
@@ -142,12 +142,11 @@ describe('Hawk', function () {
                 var ext = 'some-app-data';
                 var mac = Hawk.crypto.calculateMac({
                     type: 'bewit',
-                    key: credentials.key,
-                    algorithm: credentials.algorithm,
+                    credentials: credentials,
                     timestamp: exp,
                     nonce: '',
                     method: req.method,
-                    uri: req.url,
+                    resource: req.url,
                     host: req.host,
                     port: req.port,
                     ext: ext
@@ -385,7 +384,7 @@ describe('Hawk', function () {
                 algorithm: 'sha256'
             };
 
-            var bewit = Hawk.uri.getBewit(credentials, '/somewhere/over/the/rainbow', 'example.com', 443, 300, { localtimeOffsetMsec: 1356420407232 - Hawk.utils.now(), ext: 'xandyandz' });
+            var bewit = Hawk.uri.getBewit('https://example.com/somewhere/over/the/rainbow', { credentials: credentials, ttlSec: 300, localtimeOffsetMsec: 1356420407232 - Hawk.utils.now(), ext: 'xandyandz' });
             expect(bewit).to.equal('MTIzNDU2XDEzNTY0MjA3MDdca3NjeHdOUjJ0SnBQMVQxekRMTlBiQjVVaUtJVTl0T1NKWFRVZEc3WDloOD1ceGFuZHlhbmR6');
             done();
         });
@@ -397,7 +396,7 @@ describe('Hawk', function () {
                 algorithm: 'sha256'
             };
 
-            var bewit = Hawk.uri.getBewit(credentials, '/somewhere/over/the/rainbow', 'example.com', 443, 300, { ext: 'xandyandz' });
+            var bewit = Hawk.uri.getBewit('https://example.com/somewhere/over/the/rainbow', { credentials: credentials, ttlSec: 3000, ext: 'xandyandz' });
             expect(bewit).to.equal('');
             done();
         });
@@ -410,7 +409,20 @@ describe('Hawk', function () {
                 algorithm: 'hmac-sha-0'
             };
 
-            var bewit = Hawk.uri.getBewit(credentials, '/somewhere/over/the/rainbow', 'example.com', 443, 300, { ext: 'xandyandz' });
+            var bewit = Hawk.uri.getBewit('https://example.com/somewhere/over/the/rainbow', { credentials: credentials, ttlSec: 300, ext: 'xandyandz' });
+            expect(bewit).to.equal('');
+            done();
+        });
+
+        it('should return an empty bewit on missing options', function (done) {
+
+            var credentials = {
+                id: '123456',
+                key: '2983d45yun89q',
+                algorithm: 'hmac-sha-0'
+            };
+
+            var bewit = Hawk.uri.getBewit('https://example.com/somewhere/over/the/rainbow');
             expect(bewit).to.equal('');
             done();
         });

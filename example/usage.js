@@ -55,7 +55,7 @@ var options = {
     uri: 'http://127.0.0.1:8000/resource/1?b=1&a=2',
     method: 'GET',
     headers: {
-        authorization: Hawk.getAuthorizationHeader(internals.credentials.dh37fgj492je, 'GET', '/resource/1?b=1&a=2', '127.0.0.1', 8000, { ext: 'and welcome!' })
+        authorization: Hawk.getAuthorizationHeader('http://127.0.0.1:8000/resource/1?b=1&a=2', 'GET', { credentials: internals.credentials.dh37fgj492je, ext: 'and welcome!' })
     }
 };
 

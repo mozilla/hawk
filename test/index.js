@@ -1,5 +1,6 @@
 // Load modules
 
+var Url = require('url');
 var Chai = require('chai');
 var Hawk = require('../lib');
 
@@ -39,7 +40,9 @@ describe('Hawk', function () {
 
         credentialsFunc('123456', function (err, credentials) {
 
-            req.authorization = Hawk.getAuthorizationHeader(credentials, req.method, req.url, req.host, req.port, { ext: 'some-app-data' });
+            req.authorization = Hawk.getAuthorizationHeader(Url.parse('http://example.com:8080/resource/4?filter=a'), req.method, { credentials: credentials, ext: 'some-app-data' });
+            expect(req.authorization).to.exist;
+
             Hawk.authenticate(req, credentialsFunc, {}, function (err, credentials, attributes) {
 
                 expect(err).to.not.exist;
@@ -62,7 +65,7 @@ describe('Hawk', function () {
 
         credentialsFunc('123456', function (err, credentials) {
 
-            req.headers.authorization = Hawk.getAuthorizationHeader(credentials, req.method, req.url, 'example.com', 8080, { ext: 'some-app-data' });
+            req.headers.authorization = Hawk.getAuthorizationHeader('http://example.com:8080/resource/4?filter=a', req.method, { credentials: credentials, ext: 'some-app-data' });
             Hawk.authenticate(req, credentialsFunc, {}, function (err, credentials, attributes) {
 
                 expect(err).to.not.exist;
@@ -84,7 +87,7 @@ describe('Hawk', function () {
 
         credentialsFunc('123456', function (err, credentials) {
 
-            req.authorization = Hawk.getAuthorizationHeader(credentials, req.method, req.url, req.host, req.port, { payload: 'hola!', ext: 'some-app-data' });
+            req.authorization = Hawk.getAuthorizationHeader('http://example.com:8080/resource/4?filter=a', req.method, { credentials: credentials, payload: 'hola!', ext: 'some-app-data' });
             Hawk.authenticate(req, credentialsFunc, {}, function (err, credentials, attributes) {
 
                 expect(err).to.not.exist;
@@ -106,7 +109,7 @@ describe('Hawk', function () {
 
         credentialsFunc('123456', function (err, credentials) {
 
-            req.authorization = Hawk.getAuthorizationHeader(credentials, req.method, req.url, req.host, req.port, { payload: 'hola!', ext: 'some-app-data' });
+            req.authorization = Hawk.getAuthorizationHeader('http://example.com:8080/resource/4?filter=a', req.method, { credentials: credentials, payload: 'hola!', ext: 'some-app-data' });
             Hawk.authenticate(req, credentialsFunc, {}, function (err, credentials, attributes) {
 
                 expect(err).to.not.exist;
@@ -130,7 +133,7 @@ describe('Hawk', function () {
 
         credentialsFunc('123456', function (err, credentials) {
 
-            req.authorization = Hawk.getAuthorizationHeader(credentials, req.method, req.url, req.host, req.port, { ext: 'some-app-data', app: 'asd23ased', dlg: '23434szr3q4d' });
+            req.authorization = Hawk.getAuthorizationHeader('http://example.com:8080/resource/4?filter=a', req.method, { credentials: credentials, ext: 'some-app-data', app: 'asd23ased', dlg: '23434szr3q4d' });
             Hawk.authenticate(req, credentialsFunc, {}, function (err, credentials, attributes) {
 
                 expect(err).to.not.exist;
@@ -154,7 +157,7 @@ describe('Hawk', function () {
 
         credentialsFunc('123456', function (err, credentials) {
 
-            req.authorization = Hawk.getAuthorizationHeader(credentials, req.method, req.url, req.host, req.port, { payload: 'hola!', ext: 'some-app-data' });
+            req.authorization = Hawk.getAuthorizationHeader('http://example.com:8080/resource/4?filter=a', req.method, { credentials: credentials, payload: 'hola!', ext: 'some-app-data' });
             Hawk.authenticate(req, credentialsFunc, { payload: 'byebye!' }, function (err, credentials, attributes) {
 
                 expect(err).to.exist;
@@ -175,7 +178,7 @@ describe('Hawk', function () {
 
         credentialsFunc('123456', function (err, credentials) {
 
-            req.authorization = Hawk.getAuthorizationHeader(credentials, req.method, req.url, req.host, req.port, { ext: 'some-app-data' });
+            req.authorization = Hawk.getAuthorizationHeader('http://example.com:8080/resource/4?filter=a', req.method, { credentials: credentials, ext: 'some-app-data' });
             req.url = '/something/else';
 
             Hawk.authenticate(req, credentialsFunc, {}, function (err, credentials, attributes) {
@@ -759,7 +762,7 @@ describe('Hawk', function () {
                 algorithm: 'sha1'
             };
 
-            var header = Hawk.getAuthorizationHeader(credentials, 'POST', '/somewhere/over/the/rainbow', 'example.net', 443, { ext: 'Bazinga!', timestamp: 1353809207, nonce: 'Ygvqdz', payload: 'something to write about' });
+            var header = Hawk.getAuthorizationHeader('https://example.net/somewhere/over/the/rainbow', 'POST', { credentials: credentials, ext: 'Bazinga!', timestamp: 1353809207, nonce: 'Ygvqdz', payload: 'something to write about' });
             expect(header).to.equal('Hawk id="123456", ts="1353809207", nonce="Ygvqdz", hash="eQJ6qAuxoMrLdTMb5IJiv04W4F4=", ext="Bazinga!", mac="Ti2SMCBfDGp4DLoOw2OpFjOs+nI="');
             done();
         });
@@ -772,8 +775,15 @@ describe('Hawk', function () {
                 algorithm: 'sha256'
             };
 
-            var header = Hawk.getAuthorizationHeader(credentials, 'POST', '/somewhere/over/the/rainbow', 'example.net', 443, { ext: 'Bazinga!', timestamp: 1353809207, nonce: 'Ygvqdz', payload: 'something to write about' });
+            var header = Hawk.getAuthorizationHeader('https://example.net/somewhere/over/the/rainbow', 'POST', { credentials: credentials, ext: 'Bazinga!', timestamp: 1353809207, nonce: 'Ygvqdz', payload: 'something to write about' });
             expect(header).to.equal('Hawk id="123456", ts="1353809207", nonce="Ygvqdz", hash="Yz+K6hTiKD4IVEckK1yPIBdb/gh4LdtWwpXvM776Edg=", ext="Bazinga!", mac="Uk1EHe77nOiAo4Hgm8Qio21+MtU7jEcVSIaqw21Yy48="');
+            done();
+        });
+
+        it('should return an empty authorization header on missing options', function (done) {
+
+            var header = Hawk.getAuthorizationHeader('https://example.net/somewhere/over/the/rainbow', 'POST');
+            expect(header).to.equal('');
             done();
         });
 
@@ -784,7 +794,7 @@ describe('Hawk', function () {
                 algorithm: 'sha256'
             };
 
-            var header = Hawk.getAuthorizationHeader(credentials, 'POST', '/somewhere/over/the/rainbow', 'example.net', 443, { ext: 'Bazinga!', timestamp: 1353809207 });
+            var header = Hawk.getAuthorizationHeader('https://example.net/somewhere/over/the/rainbow', 'POST', { credentials: credentials, ext: 'Bazinga!', timestamp: 1353809207 });
             expect(header).to.equal('');
             done();
         });
@@ -797,7 +807,7 @@ describe('Hawk', function () {
                 algorithm: 'hmac-sha-0'
             };
 
-            var header = Hawk.getAuthorizationHeader(credentials, 'POST', '/somewhere/over/the/rainbow', 'example.net', 443, { payload: 'something, anything!', ext: 'Bazinga!', timestamp: 1353809207 });
+            var header = Hawk.getAuthorizationHeader('https://example.net/somewhere/over/the/rainbow', 'POST', { credentials: credentials, payload: 'something, anything!', ext: 'Bazinga!', timestamp: 1353809207 });
             expect(header).to.equal('');
             done();
         });

@@ -3,7 +3,7 @@
 <img align="right" src="https://raw.github.com/hueniverse/hawk/master/images/logo.png" /> **Hawk** is an HTTP authentication scheme using a message authentication code (MAC) algorithm to provide partial
 HTTP request cryptographic verification. For more complex use cases such as access delegation, see [Oz](https://github.com/hueniverse/oz).
 
-Current version: **0.6.1**
+Current version: **0.9.0**
 
 [![Build Status](https://secure.travis-ci.org/hueniverse/hawk.png)](http://travis-ci.org/hueniverse/hawk)
 
@@ -147,7 +147,7 @@ var options = {
     uri: 'http://example.com:8000/resource/1?b=1&a=2',
     method: 'GET',
     headers: {
-        authorization: Hawk.getAuthorizationHeader(credentials, 'GET', '/resource/1?b=1&a=2', 'example.com', 8000, { ext: 'some-app-data' })
+        authorization: Hawk.getAuthorizationHeader('http://example.com:8000/resource/1?b=1&a=2', 'GET', { credentials: credentials, ext: 'some-app-data' })
     }
 };
 
@@ -347,7 +347,7 @@ var credentials = {
 // Generate bewit
 
 var duration = 60 * 5;      // 5 Minutes
-var bewit = Hawk.uri.getBewit(credentials, '/resource/1?b=1&a=2', 'example.com', 8080, duration, { ext: 'some-app-data' });
+var bewit = Hawk.uri.getBewit('http://example.com:8080/resource/1?b=1&a=2', { credentials: credentials, ttlSec: duration, ext: 'some-app-data' });
 var uri = 'http://example.com:8000/resource/1?b=1&a=2' + '&bewit=' + bewit;
 ```
 

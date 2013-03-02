@@ -28,6 +28,7 @@ describe('Hawk', function () {
             };
 
             var options = {
+                credentials: credentials,
                 timestamp: 1353832234,
                 nonce: 'j4h3g2',
                 ext: 'some-app-ext-data'
@@ -35,7 +36,7 @@ describe('Hawk', function () {
 
             it('should generate a header protocol example', function (done) {
 
-                var header = Hawk.getAuthorizationHeader(credentials, 'GET', '/resource/1?b=1&a=2', 'example.com', 8000, options);
+                var header = Hawk.getAuthorizationHeader('http://example.com:8000/resource/1?b=1&a=2', 'GET', options);
 
                 expect(header).to.equal('Hawk id="dh37fgj492je", ts="1353832234", nonce="j4h3g2", ext="some-app-ext-data", mac="6R4rV5iE+NPoym+WwjeHzjAGXUtLNIxmo1vpMofpLAE="');
                 done();
@@ -45,12 +46,11 @@ describe('Hawk', function () {
 
                 var normalized = Hawk.crypto.generateNormalizedString({
                     type: 'header',
-                    key: credentials.key,
-                    algorithm: credentials.algorithm,
+                    credentials: credentials,
                     timestamp: options.timestamp,
                     nonce: options.nonce,
                     method: 'GET',
-                    uri: '/resource?a=1&b=2',
+                    resource: '/resource?a=1&b=2',
                     host: 'example.com',
                     port: 8000,
                     ext: options.ext
@@ -65,7 +65,7 @@ describe('Hawk', function () {
 
             it('should generate a header protocol example (with payload)', function (done) {
 
-                var header = Hawk.getAuthorizationHeader(credentials, 'POST', '/resource/1?b=1&a=2', 'example.com', 8000, payloadOptions);
+                var header = Hawk.getAuthorizationHeader('http://example.com:8000/resource/1?b=1&a=2', 'POST', payloadOptions);
 
                 expect(header).to.equal('Hawk id="dh37fgj492je", ts="1353832234", nonce="j4h3g2", hash="CBbyqZ/H0rd6nKdg3O9FS5uiQZ5NmgcXUPLut9heuyo=", ext="some-app-ext-data", mac="D0pHf7mKEh55AxFZ+qyiJ/fVE8uL0YgkoJjOMcOhVQU="');
                 done();
@@ -75,12 +75,11 @@ describe('Hawk', function () {
 
                 var normalized = Hawk.crypto.generateNormalizedString({
                     type: 'header',
-                    key: credentials.key,
-                    algorithm: credentials.algorithm,
+                    credentials: credentials,
                     timestamp: options.timestamp,
                     nonce: options.nonce,
                     method: 'POST',
-                    uri: '/resource?a=1&b=2',
+                    resource: '/resource?a=1&b=2',
                     host: 'example.com',
                     port: 8000,
                     hash: Hawk.crypto.calculateHash(payloadOptions.payload, credentials.algorithm),
