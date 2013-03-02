@@ -470,7 +470,7 @@ of delegating access to a third party. If you are looking for an OAuth alternati
 **Hawk** is only officially implemented in JavaScript as a node.js module. However, others are actively porting it to other
 platforms. There is already a [PHP](https://github.com/alexbilbie/PHP-Hawk),
 [.NET](https://github.com/pcibraro/hawknet), and [JAVA](https://github.com/wealdtech/hawk) libraries available. The full list
-is maintained [here](https://github.com/hueniverse/hawk/issues?labels=port). Please add an issue is you are working on another
+is maintained [here](https://github.com/hueniverse/hawk/issues?labels=port). Please add an issue if you are working on another
 port. A cross-platform test-suite is in the works.
 
 ### Why isn't the algorithm part of the challenge or dynamically negotiated?
