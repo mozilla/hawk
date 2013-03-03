@@ -825,5 +825,127 @@ describe('Hawk', function () {
             done();
         });
     });
-});
 
+    describe('#getAuthorizationResponseHeader', function () {
+
+        it('should return an empty authorization header on missing options', function (done) {
+
+            var header = Hawk.getAuthorizationResponseHeader();
+            expect(header).to.equal('');
+            done();
+        });
+
+        it('should return an empty authorization header on invalid credentials', function (done) {
+
+            var artifacts = {
+                credentials: {
+                    key: '2983d45yun89q'
+                }
+            };
+
+            var header = Hawk.getAuthorizationResponseHeader(artifacts);
+            expect(header).to.equal('');
+            done();
+        });
+
+        it('should return an empty authorization header on invalid algorithm', function (done) {
+
+            var artifacts = {
+                id: '123456',
+                credentials: {
+                    key: '2983d45yun89q',
+                    algorithm: 'hmac-sha-0'
+                }
+            };
+
+            var header = Hawk.getAuthorizationResponseHeader(artifacts);
+            expect(header).to.equal('');
+            done();
+        });
+    });
+
+    describe('#validateResponse', function () {
+
+        it('should return false on invalid header', function (done) {
+
+            var res = {
+                headers: {
+                    'authorization': 'Hawk mac="abc", bad="xyz"'
+                }
+            };
+
+            expect(Hawk.validateResponse(res, {})).to.equal(false);
+            done();
+        });
+
+        it('should return false on invalid mac', function (done) {
+
+            var res = {
+                headers: {
+                    'content-type': 'text/plain',
+                    'authorization': 'Hawk mac="XX8d6B+pNbCqw+vvSM6YTMtoStPfNm8N0MKPlOqH0Ug=", hash="cM1tKcrmjlzAieNR1M8F3cuWIwaushFAg7g2Q0zydF8=", ext="response-specific"'
+                }
+            };
+
+            var artifacts = {
+                method: 'POST',
+                host: 'example.com',
+                port: '8080',
+                resource: '/resource/4?filter=a',
+                ts: '1362300565',
+                nonce: 'IAByO2',
+                hash: '5v+7SQ2NkIOANC98r3w5W93e21+GPDgvoawn8gW1WdI=',
+                ext: 'some-app-data',
+                app: undefined,
+                dlg: undefined,
+                mac: 'uWfzoek2nwBUzFXGlbtcW73ZYdW/f+eDaS1YeETEvTA=',
+                id: '123456',
+                credentials:
+                {
+                    id: '123456',
+                    key: 'werxhqb98rpaxn39848xrunpaw3489ruxnpa98w4rxn',
+                    algorithm: 'sha256',
+                    user: 'steve'
+                }
+            };
+
+            expect(Hawk.validateResponse(res, artifacts)).to.equal(false);
+            done();
+        });
+
+        it('should return true on ignoring hash', function (done) {
+
+            var res = {
+                headers: {
+                    'content-type': 'text/plain',
+                    'authorization': 'Hawk mac="RX8d6B+pNbCqw+vvSM6YTMtoStPfNm8N0MKPlOqH0Ug=", hash="cM1tKcrmjlzAieNR1M8F3cuWIwaushFAg7g2Q0zydF8=", ext="response-specific"'
+                }
+            };
+
+            var artifacts = {
+                method: 'POST',
+                host: 'example.com',
+                port: '8080',
+                resource: '/resource/4?filter=a',
+                ts: '1362300565',
+                nonce: 'IAByO2',
+                hash: '5v+7SQ2NkIOANC98r3w5W93e21+GPDgvoawn8gW1WdI=',
+                ext: 'some-app-data',
+                app: undefined,
+                dlg: undefined,
+                mac: 'uWfzoek2nwBUzFXGlbtcW73ZYdW/f+eDaS1YeETEvTA=',
+                id: '123456',
+                credentials:
+                {
+                    id: '123456',
+                    key: 'werxhqb98rpaxn39848xrunpaw3489ruxnpa98w4rxn',
+                    algorithm: 'sha256',
+                    user: 'steve'
+                }
+            };
+
+            expect(Hawk.validateResponse(res, artifacts)).to.equal(true);
+            done();
+        });
+    });
+});
