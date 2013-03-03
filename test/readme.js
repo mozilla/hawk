@@ -62,12 +62,13 @@ describe('Hawk', function () {
 
             var payloadOptions = Hoek.clone(options);
             payloadOptions.payload = 'Thank you for flying Hawk';
+            payloadOptions.contentType = 'text/plain';
 
             it('should generate a header protocol example (with payload)', function (done) {
 
                 var header = Hawk.getAuthorizationHeader('http://example.com:8000/resource/1?b=1&a=2', 'POST', payloadOptions);
 
-                expect(header).to.equal('Hawk id="dh37fgj492je", ts="1353832234", nonce="j4h3g2", hash="CBbyqZ/H0rd6nKdg3O9FS5uiQZ5NmgcXUPLut9heuyo=", ext="some-app-ext-data", mac="D0pHf7mKEh55AxFZ+qyiJ/fVE8uL0YgkoJjOMcOhVQU="');
+                expect(header).to.equal('Hawk id="dh37fgj492je", ts="1353832234", nonce="j4h3g2", hash="HwYrzRGlqXXZAh+i3RXEGqnRa+DxUhnkXnj7ETiCgu8=", ext="some-app-ext-data", mac="PblPLLO+a9aT1rEqZIp3IrQPoCqktg5aXM98QJ1JXo8="');
                 done();
             });
 
@@ -82,11 +83,11 @@ describe('Hawk', function () {
                     resource: '/resource?a=1&b=2',
                     host: 'example.com',
                     port: 8000,
-                    hash: Hawk.crypto.calculateHash(payloadOptions.payload, credentials.algorithm),
+                    hash: Hawk.crypto.calculateHash(payloadOptions.payload, credentials.algorithm, payloadOptions.contentType),
                     ext: options.ext
                 });
 
-                expect(normalized).to.equal('hawk.1.header\n1353832234\nj4h3g2\nPOST\n/resource?a=1&b=2\nexample.com\n8000\nCBbyqZ/H0rd6nKdg3O9FS5uiQZ5NmgcXUPLut9heuyo=\nsome-app-ext-data\n');
+                expect(normalized).to.equal('hawk.1.header\n1353832234\nj4h3g2\nPOST\n/resource?a=1&b=2\nexample.com\n8000\nHwYrzRGlqXXZAh+i3RXEGqnRa+DxUhnkXnj7ETiCgu8=\nsome-app-ext-data\n');
                 done();
             });
         });

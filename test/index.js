@@ -56,21 +56,25 @@ describe('Hawk', function () {
     it('should generate a header then successfully parse it (node request)', function (done) {
 
         var req = {
-            method: 'GET',
+            method: 'POST',
             url: '/resource/4?filter=a',
             headers: {
-                host: 'example.com:8080'
+                host: 'example.com:8080',
+                'content-type': 'text/plain;x=y'
             }
         };
 
+        var payload = 'some not so random text';
+
         credentialsFunc('123456', function (err, credentials) {
 
-            req.headers.authorization = Hawk.getAuthorizationHeader('http://example.com:8080/resource/4?filter=a', req.method, { credentials: credentials, ext: 'some-app-data' });
+            req.headers.authorization = Hawk.getAuthorizationHeader('http://example.com:8080/resource/4?filter=a', req.method, { credentials: credentials, ext: 'some-app-data', payload: payload, contentType: req.headers['content-type'] });
             Hawk.authenticate(req, credentialsFunc, {}, function (err, credentials, attributes) {
 
                 expect(err).to.not.exist;
                 expect(credentials.user).to.equal('steve');
                 expect(attributes.ext).to.equal('some-app-data');
+                expect(Hawk.validatePayload(payload, credentials, attributes.hash, req.headers['content-type'])).to.equal(true);
                 done();
             });
         });
@@ -373,10 +377,6 @@ describe('Hawk', function () {
 
                 expect(err).to.exist;
                 expect(err.isMissing).to.equal(true);
-                var header = err.response.headers['WWW-Authenticate'];
-                var ts = header.match(/^Hawk ts\=\"(\d+)\"$/);
-                var now = Hawk.utils.now();
-                expect(parseInt(ts[1], 10)).to.be.within(now - 1, now + 1);
                 done();
             });
         });
@@ -763,7 +763,7 @@ describe('Hawk', function () {
             };
 
             var header = Hawk.getAuthorizationHeader('https://example.net/somewhere/over/the/rainbow', 'POST', { credentials: credentials, ext: 'Bazinga!', timestamp: 1353809207, nonce: 'Ygvqdz', payload: 'something to write about' });
-            expect(header).to.equal('Hawk id="123456", ts="1353809207", nonce="Ygvqdz", hash="eQJ6qAuxoMrLdTMb5IJiv04W4F4=", ext="Bazinga!", mac="Ti2SMCBfDGp4DLoOw2OpFjOs+nI="');
+            expect(header).to.equal('Hawk id="123456", ts="1353809207", nonce="Ygvqdz", hash="xyVoPehpYJiVZXOSedQLQwkMK6Q=", ext="Bazinga!", mac="tNgsvP/d2GWmFDfiQaqV23HJMRc="');
             done();
         });
 
@@ -775,8 +775,8 @@ describe('Hawk', function () {
                 algorithm: 'sha256'
             };
 
-            var header = Hawk.getAuthorizationHeader('https://example.net/somewhere/over/the/rainbow', 'POST', { credentials: credentials, ext: 'Bazinga!', timestamp: 1353809207, nonce: 'Ygvqdz', payload: 'something to write about' });
-            expect(header).to.equal('Hawk id="123456", ts="1353809207", nonce="Ygvqdz", hash="Yz+K6hTiKD4IVEckK1yPIBdb/gh4LdtWwpXvM776Edg=", ext="Bazinga!", mac="Uk1EHe77nOiAo4Hgm8Qio21+MtU7jEcVSIaqw21Yy48="');
+            var header = Hawk.getAuthorizationHeader('https://example.net/somewhere/over/the/rainbow', 'POST', { credentials: credentials, ext: 'Bazinga!', timestamp: 1353809207, nonce: 'Ygvqdz', payload: 'something to write about', contentType: 'text/plain' });
+            expect(header).to.equal('Hawk id="123456", ts="1353809207", nonce="Ygvqdz", hash="ZZYbEH1+Z+FfDTpsz6jStRM5JDcbYcY5bwF/yGNwt2g=", ext="Bazinga!", mac="R5+lAhJHowP/km1nZZBz+ORhZXwFYuVM77+yRC3wy+4="');
             done();
         });
 

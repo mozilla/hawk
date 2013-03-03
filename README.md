@@ -234,11 +234,30 @@ and scope of the **Hawk** credentials. If valid, the server responds with the re
 ### Payload Validation
 
 **Hawk** provides optional payload validation. When generating the authentication header, the client calculates a payload hash
-using the specified hash algorithm. The hash is calculated over the request payload prior to any content encoding (the exact
-representation requirements should be specified by the server for payloads other than simple single-part ascii to ensure interoperability):
+using the specified hash algorithm. The hash is calculated over the concatenated value of:
+* `hawk.1.payload`
+* the content-type in lowercase, without any parameters (e.g. `application/json`)
+* the request payload prior to any content encoding (the exact representation requirements should be specified by the server for payloads other than simple single-part ascii to ensure interoperability)
 
-Payload: `Thank you for flying Hawk`
-Hash (sha256): `CBbyqZ/H0rd6nKdg3O9FS5uiQZ5NmgcXUPLut9heuyo=`
+For example:
+
+* Payload: `Thank you for flying Hawk`
+* Content Type: `text/plain`
+* Hash (sha256): `HwYrzRGlqXXZAh+i3RXEGqnRa+DxUhnkXnj7ETiCgu8=`
+
+Results in the following input to the payload hash function (newline separated values):
+
+```
+hawk.1.payload
+text/plain
+Thank you for flying Hawk
+```
+
+Which produces the following hash value:
+
+```
+HwYrzRGlqXXZAh+i3RXEGqnRa+DxUhnkXnj7ETiCgu8=
+```
 
 The client constructs the normalized request string (newline separated values):
 
@@ -250,7 +269,7 @@ POST
 /resource?a=1&b=2
 example.com
 8000
-CBbyqZ/H0rd6nKdg3O9FS5uiQZ5NmgcXUPLut9heuyo=
+HwYrzRGlqXXZAh+i3RXEGqnRa+DxUhnkXnj7ETiCgu8=
 some-app-ext-data
 
 ```
@@ -261,7 +280,7 @@ and request MAC with the request using the HTTP "Authorization" request header f
 ```
 POST /resource/1 HTTP/1.1
 Host: example.com:8000
-Authorization: Hawk id="dh37fgj492je", ts="1353832234", nonce="j4h3g2", hash="CBbyqZ/H0rd6nKdg3O9FS5uiQZ5NmgcXUPLut9heuyo=", ext="some-app-ext-data", mac="D0pHf7mKEh55AxFZ+qyiJ/fVE8uL0YgkoJjOMcOhVQU="
+Authorization: Hawk id="dh37fgj492je", ts="1353832234", nonce="j4h3g2", hash="HwYrzRGlqXXZAh+i3RXEGqnRa+DxUhnkXnj7ETiCgu8=", ext="some-app-ext-data", mac="PblPLLO+a9aT1rEqZIp3IrQPoCqktg5aXM98QJ1JXo8="
 ```
 
 It is up to the server if and when it validates the payload for any given request, based solely on it's security policy
