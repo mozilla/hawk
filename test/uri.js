@@ -140,8 +140,7 @@ describe('Hawk', function () {
 
                 var exp = Math.floor(Hawk.utils.now() / 1000) + 60;
                 var ext = 'some-app-data';
-                var mac = Hawk.crypto.calculateMac({
-                    type: 'bewit',
+                var mac = Hawk.crypto.calculateMac('bewit', {
                     credentials: credentials,
                     timestamp: exp,
                     nonce: '',

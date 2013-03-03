@@ -43,11 +43,11 @@ describe('Hawk', function () {
             req.authorization = Hawk.getAuthorizationHeader(Url.parse('http://example.com:8080/resource/4?filter=a'), req.method, { credentials: credentials, ext: 'some-app-data' });
             expect(req.authorization).to.exist;
 
-            Hawk.authenticate(req, credentialsFunc, {}, function (err, credentials, attributes) {
+            Hawk.authenticate(req, credentialsFunc, {}, function (err, credentials, artifacts) {
 
                 expect(err).to.not.exist;
                 expect(credentials.user).to.equal('steve');
-                expect(attributes.ext).to.equal('some-app-data');
+                expect(artifacts.ext).to.equal('some-app-data');
                 done();
             });
         });
@@ -68,13 +68,26 @@ describe('Hawk', function () {
 
         credentialsFunc('123456', function (err, credentials) {
 
-            req.headers.authorization = Hawk.getAuthorizationHeader('http://example.com:8080/resource/4?filter=a', req.method, { credentials: credentials, ext: 'some-app-data', payload: payload, contentType: req.headers['content-type'] });
-            Hawk.authenticate(req, credentialsFunc, {}, function (err, credentials, attributes) {
+            var reqHeader = Hawk.getAuthorizationRequestHeader('http://example.com:8080/resource/4?filter=a', req.method, { credentials: credentials, ext: 'some-app-data', payload: payload, contentType: req.headers['content-type'] });
+            req.headers.authorization = reqHeader.header;
+
+            Hawk.authenticate(req, credentialsFunc, {}, function (err, credentials, artifacts) {
 
                 expect(err).to.not.exist;
                 expect(credentials.user).to.equal('steve');
-                expect(attributes.ext).to.equal('some-app-data');
-                expect(Hawk.validatePayload(payload, credentials, attributes.hash, req.headers['content-type'])).to.equal(true);
+                expect(artifacts.ext).to.equal('some-app-data');
+                expect(Hawk.validatePayload(payload, credentials, artifacts.hash, req.headers['content-type'])).to.equal(true);
+
+                var res = {
+                    headers: {
+                        'content-type': 'text/plain'
+                    }
+                };
+
+                res.headers.authorization = Hawk.getAuthorizationResponseHeader(artifacts, { payload: 'some reply', contentType: 'text/plain', ext: 'response-specific' });
+                expect(res.headers.authorization).to.exist;
+
+                expect(Hawk.validateResponse(res, artifacts, 'some reply')).to.equal(true);
                 done();
             });
         });
@@ -92,11 +105,11 @@ describe('Hawk', function () {
         credentialsFunc('123456', function (err, credentials) {
 
             req.authorization = Hawk.getAuthorizationHeader('http://example.com:8080/resource/4?filter=a', req.method, { credentials: credentials, payload: 'hola!', ext: 'some-app-data' });
-            Hawk.authenticate(req, credentialsFunc, {}, function (err, credentials, attributes) {
+            Hawk.authenticate(req, credentialsFunc, {}, function (err, credentials, artifacts) {
 
                 expect(err).to.not.exist;
                 expect(credentials.user).to.equal('steve');
-                expect(attributes.ext).to.equal('some-app-data');
+                expect(artifacts.ext).to.equal('some-app-data');
                 done();
             });
         });
@@ -114,13 +127,13 @@ describe('Hawk', function () {
         credentialsFunc('123456', function (err, credentials) {
 
             req.authorization = Hawk.getAuthorizationHeader('http://example.com:8080/resource/4?filter=a', req.method, { credentials: credentials, payload: 'hola!', ext: 'some-app-data' });
-            Hawk.authenticate(req, credentialsFunc, {}, function (err, credentials, attributes) {
+            Hawk.authenticate(req, credentialsFunc, {}, function (err, credentials, artifacts) {
 
                 expect(err).to.not.exist;
                 expect(credentials.user).to.equal('steve');
-                expect(attributes.ext).to.equal('some-app-data');
-                expect(Hawk.validatePayload('hola!', credentials, attributes.hash)).to.be.true;
-                expect(Hawk.validatePayload('hello!', credentials, attributes.hash)).to.be.false;
+                expect(artifacts.ext).to.equal('some-app-data');
+                expect(Hawk.validatePayload('hola!', credentials, artifacts.hash)).to.be.true;
+                expect(Hawk.validatePayload('hello!', credentials, artifacts.hash)).to.be.false;
                 done();
             });
         });
@@ -138,13 +151,13 @@ describe('Hawk', function () {
         credentialsFunc('123456', function (err, credentials) {
 
             req.authorization = Hawk.getAuthorizationHeader('http://example.com:8080/resource/4?filter=a', req.method, { credentials: credentials, ext: 'some-app-data', app: 'asd23ased', dlg: '23434szr3q4d' });
-            Hawk.authenticate(req, credentialsFunc, {}, function (err, credentials, attributes) {
+            Hawk.authenticate(req, credentialsFunc, {}, function (err, credentials, artifacts) {
 
                 expect(err).to.not.exist;
                 expect(credentials.user).to.equal('steve');
-                expect(attributes.ext).to.equal('some-app-data');
-                expect(attributes.app).to.equal('asd23ased');
-                expect(attributes.dlg).to.equal('23434szr3q4d');
+                expect(artifacts.ext).to.equal('some-app-data');
+                expect(artifacts.app).to.equal('asd23ased');
+                expect(artifacts.dlg).to.equal('23434szr3q4d');
                 done();
             });
         });
@@ -162,7 +175,7 @@ describe('Hawk', function () {
         credentialsFunc('123456', function (err, credentials) {
 
             req.authorization = Hawk.getAuthorizationHeader('http://example.com:8080/resource/4?filter=a', req.method, { credentials: credentials, payload: 'hola!', ext: 'some-app-data' });
-            Hawk.authenticate(req, credentialsFunc, { payload: 'byebye!' }, function (err, credentials, attributes) {
+            Hawk.authenticate(req, credentialsFunc, { payload: 'byebye!' }, function (err, credentials, artifacts) {
 
                 expect(err).to.exist;
                 expect(err.response.payload.message).to.equal('Bad payload hash');
@@ -185,7 +198,7 @@ describe('Hawk', function () {
             req.authorization = Hawk.getAuthorizationHeader('http://example.com:8080/resource/4?filter=a', req.method, { credentials: credentials, ext: 'some-app-data' });
             req.url = '/something/else';
 
-            Hawk.authenticate(req, credentialsFunc, {}, function (err, credentials, attributes) {
+            Hawk.authenticate(req, credentialsFunc, {}, function (err, credentials, artifacts) {
 
                 expect(err).to.exist;
                 expect(credentials).to.exist;
@@ -206,7 +219,7 @@ describe('Hawk', function () {
                 authorization: 'Hawk id="1", ts="1353788437", nonce="k3j4h2", mac="zy79QQ5/EYFmQqutVnYb73gAc/U=", ext="hello"',
             };
 
-            Hawk.authenticate(req, credentialsFunc, { localtimeOffsetMsec: 1353788437000 - Hawk.utils.now() }, function (err, credentials, attributes) {
+            Hawk.authenticate(req, credentialsFunc, { localtimeOffsetMsec: 1353788437000 - Hawk.utils.now() }, function (err, credentials, artifacts) {
 
                 expect(err).to.not.exist;
                 expect(credentials.user).to.equal('steve');
@@ -224,7 +237,7 @@ describe('Hawk', function () {
                 authorization: 'Hawk id="dh37fgj492je", ts="1353832234", nonce="j4h3g2", mac="m8r1rHbXN6NgO+KIIhjO7sFRyd78RNGVUwehe8Cp2dU=", ext="some-app-data"',
             };
 
-            Hawk.authenticate(req, credentialsFunc, { localtimeOffsetMsec: 1353832234000 - Hawk.utils.now() }, function (err, credentials, attributes) {
+            Hawk.authenticate(req, credentialsFunc, { localtimeOffsetMsec: 1353832234000 - Hawk.utils.now() }, function (err, credentials, artifacts) {
 
                 expect(err).to.not.exist;
                 expect(credentials.user).to.equal('steve');
@@ -242,7 +255,7 @@ describe('Hawk', function () {
                 authorization: 'Hawk id="123456", ts="1357926341", nonce="1AwuJD", hash="qAiXIVv+yjDATneWxZP2YCTa9aHRgQdnH9b3Wc+o3dg=", ext="some-app-data", mac="UeYcj5UoTVaAWXNvJfLVia7kU3VabxCqrccXP8sUGC4="',
             };
 
-            Hawk.authenticate(req, credentialsFunc, { localtimeOffsetMsec: 1357926341000 - Hawk.utils.now() }, function (err, credentials, attributes) {
+            Hawk.authenticate(req, credentialsFunc, { localtimeOffsetMsec: 1357926341000 - Hawk.utils.now() }, function (err, credentials, artifacts) {
 
                 expect(err).to.not.exist;
                 expect(credentials.user).to.equal('steve');
@@ -260,7 +273,7 @@ describe('Hawk', function () {
                 authorization: 'Hawk id="dh37fgj492je", ts="1353832234", nonce="j4h3g2", mac="m8r1rHbXN6NgO+KIIhjO7sFRyd78RNGVUwehe8Cp2dU=", ext="some-app-data"',
             };
 
-            Hawk.authenticate(req, credentialsFunc, { payload: 'body', localtimeOffsetMsec: 1353832234000 - Hawk.utils.now() }, function (err, credentials, attributes) {
+            Hawk.authenticate(req, credentialsFunc, { payload: 'body', localtimeOffsetMsec: 1353832234000 - Hawk.utils.now() }, function (err, credentials, artifacts) {
 
                 expect(err).to.exist;
                 expect(err.response.payload.message).to.equal('Missing required payload hash');
@@ -278,7 +291,7 @@ describe('Hawk', function () {
                 authorization: 'Hawk id="dh37fgj492je", ts="1353832234", nonce="j4h3g2", mac="m8r1rHbXN6NgO+KIIhjO7sFRyd78RNGVUwehe8Cp2dU=", ext="some-app-data"',
             };
 
-            Hawk.authenticate(req, credentialsFunc, {}, function (err, credentials, attributes) {
+            Hawk.authenticate(req, credentialsFunc, {}, function (err, credentials, artifacts) {
 
                 expect(err).to.exist;
                 expect(err.response.payload.message).to.equal('Stale timestamp');
@@ -314,12 +327,12 @@ describe('Hawk', function () {
                 }
             };
 
-            Hawk.authenticate(req, credentialsFunc, options, function (err, credentials, attributes) {
+            Hawk.authenticate(req, credentialsFunc, options, function (err, credentials, artifacts) {
 
                 expect(err).to.not.exist;
                 expect(credentials.user).to.equal('steve');
 
-                Hawk.authenticate(req, credentialsFunc, options, function (err, credentials, attributes) {
+                Hawk.authenticate(req, credentialsFunc, options, function (err, credentials, artifacts) {
 
                     expect(err).to.exist;
                     expect(err.response.payload.message).to.equal('Invalid nonce');
@@ -338,7 +351,7 @@ describe('Hawk', function () {
                 authorization: 'Basic asdasdasdasd'
             };
 
-            Hawk.authenticate(req, credentialsFunc, { localtimeOffsetMsec: 1353788437000 - Hawk.utils.now() }, function (err, credentials, attributes) {
+            Hawk.authenticate(req, credentialsFunc, { localtimeOffsetMsec: 1353788437000 - Hawk.utils.now() }, function (err, credentials, artifacts) {
 
                 expect(err).to.exist;
                 expect(err.response.payload.message).to.not.exist;
@@ -356,7 +369,7 @@ describe('Hawk', function () {
                 authorization: '!@#'
             };
 
-            Hawk.authenticate(req, credentialsFunc, { localtimeOffsetMsec: 1353788437000 - Hawk.utils.now() }, function (err, credentials, attributes) {
+            Hawk.authenticate(req, credentialsFunc, { localtimeOffsetMsec: 1353788437000 - Hawk.utils.now() }, function (err, credentials, artifacts) {
 
                 expect(err).to.exist;
                 expect(err.response.payload.message).to.equal('Invalid header syntax');
@@ -373,7 +386,7 @@ describe('Hawk', function () {
                 port: 8080
             };
 
-            Hawk.authenticate(req, credentialsFunc, {}, function (err, credentials, attributes) {
+            Hawk.authenticate(req, credentialsFunc, {}, function (err, credentials, artifacts) {
 
                 expect(err).to.exist;
                 expect(err.isMissing).to.equal(true);
@@ -391,7 +404,7 @@ describe('Hawk', function () {
                 }
             };
 
-            Hawk.authenticate(req, credentialsFunc, { localtimeOffsetMsec: 1353788437000 - Hawk.utils.now() }, function (err, credentials, attributes) {
+            Hawk.authenticate(req, credentialsFunc, { localtimeOffsetMsec: 1353788437000 - Hawk.utils.now() }, function (err, credentials, artifacts) {
 
                 expect(err).to.exist;
                 expect(err.response.payload.message).to.equal('Invalid Host header');
@@ -409,7 +422,7 @@ describe('Hawk', function () {
                 authorization: 'Hawk ts="1353788437", nonce="k3j4h2", mac="/qwS4UjfVWMcUyW6EEgUH4jlr7T/wuKe3dKijvTvSos=", ext="hello"'
             };
 
-            Hawk.authenticate(req, credentialsFunc, { localtimeOffsetMsec: 1353788437000 - Hawk.utils.now() }, function (err, credentials, attributes) {
+            Hawk.authenticate(req, credentialsFunc, { localtimeOffsetMsec: 1353788437000 - Hawk.utils.now() }, function (err, credentials, artifacts) {
 
                 expect(err).to.exist;
                 expect(err.response.payload.message).to.equal('Missing attributes');
@@ -427,7 +440,7 @@ describe('Hawk', function () {
                 authorization: 'Hawk id="123", nonce="k3j4h2", mac="/qwS4UjfVWMcUyW6EEgUH4jlr7T/wuKe3dKijvTvSos=", ext="hello"'
             };
 
-            Hawk.authenticate(req, credentialsFunc, { localtimeOffsetMsec: 1353788437000 - Hawk.utils.now() }, function (err, credentials, attributes) {
+            Hawk.authenticate(req, credentialsFunc, { localtimeOffsetMsec: 1353788437000 - Hawk.utils.now() }, function (err, credentials, artifacts) {
 
                 expect(err).to.exist;
                 expect(err.response.payload.message).to.equal('Missing attributes');
@@ -445,7 +458,7 @@ describe('Hawk', function () {
                 authorization: 'Hawk id="123", ts="1353788437", mac="/qwS4UjfVWMcUyW6EEgUH4jlr7T/wuKe3dKijvTvSos=", ext="hello"'
             };
 
-            Hawk.authenticate(req, credentialsFunc, { localtimeOffsetMsec: 1353788437000 - Hawk.utils.now() }, function (err, credentials, attributes) {
+            Hawk.authenticate(req, credentialsFunc, { localtimeOffsetMsec: 1353788437000 - Hawk.utils.now() }, function (err, credentials, artifacts) {
 
                 expect(err).to.exist;
                 expect(err.response.payload.message).to.equal('Missing attributes');
@@ -463,7 +476,7 @@ describe('Hawk', function () {
                 authorization: 'Hawk id="123", ts="1353788437", nonce="k3j4h2", ext="hello"'
             };
 
-            Hawk.authenticate(req, credentialsFunc, { localtimeOffsetMsec: 1353788437000 - Hawk.utils.now() }, function (err, credentials, attributes) {
+            Hawk.authenticate(req, credentialsFunc, { localtimeOffsetMsec: 1353788437000 - Hawk.utils.now() }, function (err, credentials, artifacts) {
 
                 expect(err).to.exist;
                 expect(err.response.payload.message).to.equal('Missing attributes');
@@ -481,7 +494,7 @@ describe('Hawk', function () {
                 authorization: 'Hawk id="123", ts="1353788437", nonce="k3j4h2", x="3", mac="/qwS4UjfVWMcUyW6EEgUH4jlr7T/wuKe3dKijvTvSos=", ext="hello"'
             };
 
-            Hawk.authenticate(req, credentialsFunc, { localtimeOffsetMsec: 1353788437000 - Hawk.utils.now() }, function (err, credentials, attributes) {
+            Hawk.authenticate(req, credentialsFunc, { localtimeOffsetMsec: 1353788437000 - Hawk.utils.now() }, function (err, credentials, artifacts) {
 
                 expect(err).to.exist;
                 expect(err.response.payload.message).to.equal('Unknown attribute: x');
@@ -499,7 +512,7 @@ describe('Hawk', function () {
                 authorization: 'Hawk id="123\\", ts="1353788437", nonce="k3j4h2", mac="/qwS4UjfVWMcUyW6EEgUH4jlr7T/wuKe3dKijvTvSos=", ext="hello"'
             };
 
-            Hawk.authenticate(req, credentialsFunc, { localtimeOffsetMsec: 1353788437000 - Hawk.utils.now() }, function (err, credentials, attributes) {
+            Hawk.authenticate(req, credentialsFunc, { localtimeOffsetMsec: 1353788437000 - Hawk.utils.now() }, function (err, credentials, artifacts) {
 
                 expect(err).to.exist;
                 expect(err.response.payload.message).to.equal('Bad header format');
@@ -517,7 +530,7 @@ describe('Hawk', function () {
                 authorization: 'Hawk id="\t", ts="1353788437", nonce="k3j4h2", mac="/qwS4UjfVWMcUyW6EEgUH4jlr7T/wuKe3dKijvTvSos=", ext="hello"'
             };
 
-            Hawk.authenticate(req, credentialsFunc, { localtimeOffsetMsec: 1353788437000 - Hawk.utils.now() }, function (err, credentials, attributes) {
+            Hawk.authenticate(req, credentialsFunc, { localtimeOffsetMsec: 1353788437000 - Hawk.utils.now() }, function (err, credentials, artifacts) {
 
                 expect(err).to.exist;
                 expect(err.response.payload.message).to.equal('Bad attribute value: id');
@@ -535,7 +548,7 @@ describe('Hawk', function () {
                 authorization: 'Hawk id="", ts="1353788437", nonce="k3j4h2", mac="/qwS4UjfVWMcUyW6EEgUH4jlr7T/wuKe3dKijvTvSos=", ext="hello"'
             };
 
-            Hawk.authenticate(req, credentialsFunc, { localtimeOffsetMsec: 1353788437000 - Hawk.utils.now() }, function (err, credentials, attributes) {
+            Hawk.authenticate(req, credentialsFunc, { localtimeOffsetMsec: 1353788437000 - Hawk.utils.now() }, function (err, credentials, artifacts) {
 
                 expect(err).to.exist;
                 expect(err.response.payload.message).to.equal('Bad attribute value: id');
@@ -553,7 +566,7 @@ describe('Hawk', function () {
                 authorization: 'Hawk id="123", id="456", ts="1353788437", nonce="k3j4h2", mac="/qwS4UjfVWMcUyW6EEgUH4jlr7T/wuKe3dKijvTvSos=", ext="hello"'
             };
 
-            Hawk.authenticate(req, credentialsFunc, { localtimeOffsetMsec: 1353788437000 - Hawk.utils.now() }, function (err, credentials, attributes) {
+            Hawk.authenticate(req, credentialsFunc, { localtimeOffsetMsec: 1353788437000 - Hawk.utils.now() }, function (err, credentials, artifacts) {
 
                 expect(err).to.exist;
                 expect(err.response.payload.message).to.equal('Duplicate attribute: id');
@@ -571,7 +584,7 @@ describe('Hawk', function () {
                 authorization: 'Hawk'
             };
 
-            Hawk.authenticate(req, credentialsFunc, { localtimeOffsetMsec: 1353788437000 - Hawk.utils.now() }, function (err, credentials, attributes) {
+            Hawk.authenticate(req, credentialsFunc, { localtimeOffsetMsec: 1353788437000 - Hawk.utils.now() }, function (err, credentials, artifacts) {
 
                 expect(err).to.exist;
                 expect(err.response.payload.message).to.equal('Invalid header syntax');
@@ -590,7 +603,7 @@ describe('Hawk', function () {
                 }
             };
 
-            Hawk.authenticate(req, credentialsFunc, { localtimeOffsetMsec: 1353788437000 - Hawk.utils.now() }, function (err, credentials, attributes) {
+            Hawk.authenticate(req, credentialsFunc, { localtimeOffsetMsec: 1353788437000 - Hawk.utils.now() }, function (err, credentials, artifacts) {
 
                 expect(err).to.exist;
                 expect(err.response.payload.message).to.equal('Invalid Host header');
@@ -609,7 +622,7 @@ describe('Hawk', function () {
                 }
             };
 
-            Hawk.authenticate(req, credentialsFunc, { localtimeOffsetMsec: 1353788437000 - Hawk.utils.now() }, function (err, credentials, attributes) {
+            Hawk.authenticate(req, credentialsFunc, { localtimeOffsetMsec: 1353788437000 - Hawk.utils.now() }, function (err, credentials, artifacts) {
 
                 expect(err).to.exist;
                 expect(err.response.payload.message).to.equal('Invalid Host header');
@@ -632,7 +645,7 @@ describe('Hawk', function () {
                 return callback(new Error('Unknown user'));
             };
 
-            Hawk.authenticate(req, credentialsFunc, { localtimeOffsetMsec: 1353788437000 - Hawk.utils.now() }, function (err, credentials, attributes) {
+            Hawk.authenticate(req, credentialsFunc, { localtimeOffsetMsec: 1353788437000 - Hawk.utils.now() }, function (err, credentials, artifacts) {
 
                 expect(err).to.exist;
                 expect(err.message).to.equal('Unknown user');
@@ -655,7 +668,7 @@ describe('Hawk', function () {
                 return callback(null, null);
             };
 
-            Hawk.authenticate(req, credentialsFunc, { localtimeOffsetMsec: 1353788437000 - Hawk.utils.now() }, function (err, credentials, attributes) {
+            Hawk.authenticate(req, credentialsFunc, { localtimeOffsetMsec: 1353788437000 - Hawk.utils.now() }, function (err, credentials, artifacts) {
 
                 expect(err).to.exist;
                 expect(err.response.payload.message).to.equal('Unknown credentials');
@@ -683,7 +696,7 @@ describe('Hawk', function () {
                 return callback(null, credentials);
             };
 
-            Hawk.authenticate(req, credentialsFunc, { localtimeOffsetMsec: 1353788437000 - Hawk.utils.now() }, function (err, credentials, attributes) {
+            Hawk.authenticate(req, credentialsFunc, { localtimeOffsetMsec: 1353788437000 - Hawk.utils.now() }, function (err, credentials, artifacts) {
 
                 expect(err).to.exist;
                 expect(err.message).to.equal('Invalid credentials');
@@ -713,7 +726,7 @@ describe('Hawk', function () {
                 return callback(null, credentials);
             };
 
-            Hawk.authenticate(req, credentialsFunc, { localtimeOffsetMsec: 1353788437000 - Hawk.utils.now() }, function (err, credentials, attributes) {
+            Hawk.authenticate(req, credentialsFunc, { localtimeOffsetMsec: 1353788437000 - Hawk.utils.now() }, function (err, credentials, artifacts) {
 
                 expect(err).to.exist;
                 expect(err.message).to.equal('Unknown algorithm');
@@ -743,7 +756,7 @@ describe('Hawk', function () {
                 return callback(null, credentials);
             };
 
-            Hawk.authenticate(req, credentialsFunc, { localtimeOffsetMsec: 1353788437000 - Hawk.utils.now() }, function (err, credentials, attributes) {
+            Hawk.authenticate(req, credentialsFunc, { localtimeOffsetMsec: 1353788437000 - Hawk.utils.now() }, function (err, credentials, artifacts) {
 
                 expect(err).to.exist;
                 expect(err.response.payload.message).to.equal('Bad mac');

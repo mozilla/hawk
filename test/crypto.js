@@ -22,13 +22,12 @@ describe('Hawk', function () {
 
             it('should return a valid normalized string', function (done) {
 
-                expect(Hawk.crypto.generateNormalizedString({
-                    type: 'header',
+                expect(Hawk.crypto.generateNormalizedString('header', {
                     credentials: {
                         key: 'dasdfasdf',
                         algorithm: 'sha256'
                     },
-                    timestamp: 1357747017,
+                    ts: 1357747017,
                     nonce: 'k3k4j5',
                     method: 'GET',
                     resource: '/resource/something',
@@ -41,13 +40,12 @@ describe('Hawk', function () {
 
             it('should return a valid normalized string (ext)', function (done) {
 
-                expect(Hawk.crypto.generateNormalizedString({
-                    type: 'header',
+                expect(Hawk.crypto.generateNormalizedString('header', {
                     credentials: {
                         key: 'dasdfasdf',
                         algorithm: 'sha256'
                     },
-                    timestamp: 1357747017,
+                    ts: 1357747017,
                     nonce: 'k3k4j5',
                     method: 'GET',
                     resource: '/resource/something',
@@ -61,13 +59,12 @@ describe('Hawk', function () {
 
             it('should return a valid normalized string (payload + ext)', function (done) {
 
-                expect(Hawk.crypto.generateNormalizedString({
-                    type: 'header',
+                expect(Hawk.crypto.generateNormalizedString('header', {
                     credentials: {
                         key: 'dasdfasdf',
                         algorithm: 'sha256'
                     },
-                    timestamp: 1357747017,
+                    ts: 1357747017,
                     nonce: 'k3k4j5',
                     method: 'GET',
                     resource: '/resource/something',

@@ -44,10 +44,9 @@ describe('Hawk', function () {
 
             it('should generate a normalized string protocol example', function (done) {
 
-                var normalized = Hawk.crypto.generateNormalizedString({
-                    type: 'header',
+                var normalized = Hawk.crypto.generateNormalizedString('header', {
                     credentials: credentials,
-                    timestamp: options.timestamp,
+                    ts: options.timestamp,
                     nonce: options.nonce,
                     method: 'GET',
                     resource: '/resource?a=1&b=2',
@@ -74,10 +73,9 @@ describe('Hawk', function () {
 
             it('should generate a normalized string protocol example (with payload)', function (done) {
 
-                var normalized = Hawk.crypto.generateNormalizedString({
-                    type: 'header',
+                var normalized = Hawk.crypto.generateNormalizedString('header', {
                     credentials: credentials,
-                    timestamp: options.timestamp,
+                    ts: options.timestamp,
                     nonce: options.nonce,
                     method: 'POST',
                     resource: '/resource?a=1&b=2',
