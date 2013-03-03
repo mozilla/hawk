@@ -245,7 +245,7 @@ For example:
 
 * Payload: `Thank you for flying Hawk`
 * Content Type: `text/plain`
-* Hash (sha256): `HwYrzRGlqXXZAh+i3RXEGqnRa+DxUhnkXnj7ETiCgu8=`
+* Hash (sha256): `Yi9LfIIFRtBEPt74PVmbTF/xVAwPn7ub15ePICfgnuY=`
 
 Results in the following input to the payload hash function (newline separated values):
 
@@ -253,12 +253,13 @@ Results in the following input to the payload hash function (newline separated v
 hawk.1.payload
 text/plain
 Thank you for flying Hawk
+
 ```
 
 Which produces the following hash value:
 
 ```
-HwYrzRGlqXXZAh+i3RXEGqnRa+DxUhnkXnj7ETiCgu8=
+Yi9LfIIFRtBEPt74PVmbTF/xVAwPn7ub15ePICfgnuY=
 ```
 
 The client constructs the normalized request string (newline separated values):
@@ -271,7 +272,7 @@ POST
 /resource?a=1&b=2
 example.com
 8000
-HwYrzRGlqXXZAh+i3RXEGqnRa+DxUhnkXnj7ETiCgu8=
+Yi9LfIIFRtBEPt74PVmbTF/xVAwPn7ub15ePICfgnuY=
 some-app-ext-data
 
 ```
@@ -282,7 +283,7 @@ and request MAC with the request using the HTTP "Authorization" request header f
 ```
 POST /resource/1 HTTP/1.1
 Host: example.com:8000
-Authorization: Hawk id="dh37fgj492je", ts="1353832234", nonce="j4h3g2", hash="HwYrzRGlqXXZAh+i3RXEGqnRa+DxUhnkXnj7ETiCgu8=", ext="some-app-ext-data", mac="PblPLLO+a9aT1rEqZIp3IrQPoCqktg5aXM98QJ1JXo8="
+Authorization: Hawk id="dh37fgj492je", ts="1353832234", nonce="j4h3g2", hash="Yi9LfIIFRtBEPt74PVmbTF/xVAwPn7ub15ePICfgnuY=", ext="some-app-ext-data", mac="aSe1DERmZuRl3pI36/9BdZmnErTw3sNzOOAUlfeKjVw="
 ```
 
 It is up to the server if and when it validates the payload for any given request, based solely on it's security policy

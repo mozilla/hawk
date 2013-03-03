@@ -285,10 +285,10 @@ describe('Hawk', function () {
 
             var req = {
                 method: 'GET',
-                url: '/resource/1?b=1&a=2',
+                url: '/resource/4?filter=a',
                 host: 'example.com',
-                port: 8000,
-                authorization: 'Hawk id="dh37fgj492je", ts="1353832234", nonce="j4h3g2", mac="m8r1rHbXN6NgO+KIIhjO7sFRyd78RNGVUwehe8Cp2dU=", ext="some-app-data"',
+                port: 8080,
+                authorization: 'Hawk id="123456", ts="1362337299", nonce="UzmxSs", ext="some-app-data", mac="wnNUxchvvryMH2RxckTdZ/gY3ijzvccx4keVvELC61w="',
             };
 
             Hawk.authenticate(req, credentialsFunc, {}, function (err, credentials, artifacts) {
@@ -296,9 +296,17 @@ describe('Hawk', function () {
                 expect(err).to.exist;
                 expect(err.response.payload.message).to.equal('Stale timestamp');
                 var header = err.response.headers['WWW-Authenticate'];
-                var ts = header.match(/^Hawk ts\=\"(\d+)\"\, error=\"Stale timestamp\"$/);
+                var ts = header.match(/^Hawk ts\=\"(\d+)\"\, tsm\=\"([^\"]+)\"\, error=\"Stale timestamp\"$/);
                 var now = Hawk.utils.now();
                 expect(parseInt(ts[1], 10)).to.be.within(now - 1, now + 1);
+
+                var res = {
+                    headers: {
+                        'www-authenticate': header
+                    }
+                };
+
+                expect(Hawk.validateTimestamp(res, credentials)).to.equal(true);
                 done();
             });
         });
@@ -776,7 +784,7 @@ describe('Hawk', function () {
             };
 
             var header = Hawk.getAuthorizationHeader('https://example.net/somewhere/over/the/rainbow', 'POST', { credentials: credentials, ext: 'Bazinga!', timestamp: 1353809207, nonce: 'Ygvqdz', payload: 'something to write about' });
-            expect(header).to.equal('Hawk id="123456", ts="1353809207", nonce="Ygvqdz", hash="xyVoPehpYJiVZXOSedQLQwkMK6Q=", ext="Bazinga!", mac="tNgsvP/d2GWmFDfiQaqV23HJMRc="');
+            expect(header).to.equal('Hawk id="123456", ts="1353809207", nonce="Ygvqdz", hash="bsvY3IfUllw6V5rvk4tStEvpBhE=", ext="Bazinga!", mac="7C9FoI+X70bBQQiL2E6eYm8b4zE="');
             done();
         });
 
@@ -789,7 +797,7 @@ describe('Hawk', function () {
             };
 
             var header = Hawk.getAuthorizationHeader('https://example.net/somewhere/over/the/rainbow', 'POST', { credentials: credentials, ext: 'Bazinga!', timestamp: 1353809207, nonce: 'Ygvqdz', payload: 'something to write about', contentType: 'text/plain' });
-            expect(header).to.equal('Hawk id="123456", ts="1353809207", nonce="Ygvqdz", hash="ZZYbEH1+Z+FfDTpsz6jStRM5JDcbYcY5bwF/yGNwt2g=", ext="Bazinga!", mac="R5+lAhJHowP/km1nZZBz+ORhZXwFYuVM77+yRC3wy+4="');
+            expect(header).to.equal('Hawk id="123456", ts="1353809207", nonce="Ygvqdz", hash="2QfCt3GuY9HQnHWyWD3wX68ZOKbynqlfYmuO2ZBRqtY=", ext="Bazinga!", mac="q1CwFoSHzPZSkbIvl0oYlD+91rBUEvFk763nMjMndj8="');
             done();
         });
 
@@ -883,7 +891,7 @@ describe('Hawk', function () {
             var res = {
                 headers: {
                     'content-type': 'text/plain',
-                    'authorization': 'Hawk mac="XX8d6B+pNbCqw+vvSM6YTMtoStPfNm8N0MKPlOqH0Ug=", hash="cM1tKcrmjlzAieNR1M8F3cuWIwaushFAg7g2Q0zydF8=", ext="response-specific"'
+                    'authorization': 'Hawk mac="_IJRsMl/4oL+nn+vKoeVZPdCHXB4yJkNnBbTbHFZUYE=", hash="f9cDF/TDm7TkYRLnGwRMfeDzT6LixQVLvrIKhh0vgmM=", ext="response-specific"'
                 }
             };
 
@@ -892,13 +900,13 @@ describe('Hawk', function () {
                 host: 'example.com',
                 port: '8080',
                 resource: '/resource/4?filter=a',
-                ts: '1362300565',
-                nonce: 'IAByO2',
-                hash: '5v+7SQ2NkIOANC98r3w5W93e21+GPDgvoawn8gW1WdI=',
+                ts: '1362336900',
+                nonce: 'eb5S_L',
+                hash: 'nJjkVtBE5Y/Bk38Aiokwn0jiJxt/0S2WRSUwWLCf5xk=',
                 ext: 'some-app-data',
                 app: undefined,
                 dlg: undefined,
-                mac: 'uWfzoek2nwBUzFXGlbtcW73ZYdW/f+eDaS1YeETEvTA=',
+                mac: 'BlmSe8K+pbKIb6YsZCnt4E1GrYvY1AaYayNR82dGpIk=',
                 id: '123456',
                 credentials:
                 {
@@ -918,7 +926,7 @@ describe('Hawk', function () {
             var res = {
                 headers: {
                     'content-type': 'text/plain',
-                    'authorization': 'Hawk mac="RX8d6B+pNbCqw+vvSM6YTMtoStPfNm8N0MKPlOqH0Ug=", hash="cM1tKcrmjlzAieNR1M8F3cuWIwaushFAg7g2Q0zydF8=", ext="response-specific"'
+                    'authorization': 'Hawk mac="XIJRsMl/4oL+nn+vKoeVZPdCHXB4yJkNnBbTbHFZUYE=", hash="f9cDF/TDm7TkYRLnGwRMfeDzT6LixQVLvrIKhh0vgmM=", ext="response-specific"'
                 }
             };
 
@@ -927,13 +935,13 @@ describe('Hawk', function () {
                 host: 'example.com',
                 port: '8080',
                 resource: '/resource/4?filter=a',
-                ts: '1362300565',
-                nonce: 'IAByO2',
-                hash: '5v+7SQ2NkIOANC98r3w5W93e21+GPDgvoawn8gW1WdI=',
+                ts: '1362336900',
+                nonce: 'eb5S_L',
+                hash: 'nJjkVtBE5Y/Bk38Aiokwn0jiJxt/0S2WRSUwWLCf5xk=',
                 ext: 'some-app-data',
                 app: undefined,
                 dlg: undefined,
-                mac: 'uWfzoek2nwBUzFXGlbtcW73ZYdW/f+eDaS1YeETEvTA=',
+                mac: 'BlmSe8K+pbKIb6YsZCnt4E1GrYvY1AaYayNR82dGpIk=',
                 id: '123456',
                 credentials:
                 {
@@ -945,6 +953,16 @@ describe('Hawk', function () {
             };
 
             expect(Hawk.validateResponse(res, artifacts)).to.equal(true);
+            done();
+        });
+    });
+
+    describe('#validateTimestamp', function () {
+
+        it('should fail on invalid WWW-Authenticate header format', function (done) {
+
+            var header = 'Hawk ts="1362346425875", tsm="PhwayS28vtnn3qbv0mqRBYSXebN/zggEtucfeZ620Zo=", x="Stale timestamp"';
+            expect(Hawk.validateTimestamp({ headers: { 'www-authenticate': header }}, {})).to.equal(false);
             done();
         });
     });

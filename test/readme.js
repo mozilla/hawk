@@ -67,7 +67,7 @@ describe('Hawk', function () {
 
                 var header = Hawk.getAuthorizationHeader('http://example.com:8000/resource/1?b=1&a=2', 'POST', payloadOptions);
 
-                expect(header).to.equal('Hawk id="dh37fgj492je", ts="1353832234", nonce="j4h3g2", hash="HwYrzRGlqXXZAh+i3RXEGqnRa+DxUhnkXnj7ETiCgu8=", ext="some-app-ext-data", mac="PblPLLO+a9aT1rEqZIp3IrQPoCqktg5aXM98QJ1JXo8="');
+                expect(header).to.equal('Hawk id="dh37fgj492je", ts="1353832234", nonce="j4h3g2", hash="Yi9LfIIFRtBEPt74PVmbTF/xVAwPn7ub15ePICfgnuY=", ext="some-app-ext-data", mac="aSe1DERmZuRl3pI36/9BdZmnErTw3sNzOOAUlfeKjVw="');
                 done();
             });
 
@@ -85,7 +85,7 @@ describe('Hawk', function () {
                     ext: options.ext
                 });
 
-                expect(normalized).to.equal('hawk.1.header\n1353832234\nj4h3g2\nPOST\n/resource?a=1&b=2\nexample.com\n8000\nHwYrzRGlqXXZAh+i3RXEGqnRa+DxUhnkXnj7ETiCgu8=\nsome-app-ext-data\n');
+                expect(normalized).to.equal('hawk.1.header\n1353832234\nj4h3g2\nPOST\n/resource?a=1&b=2\nexample.com\n8000\nYi9LfIIFRtBEPt74PVmbTF/xVAwPn7ub15ePICfgnuY=\nsome-app-ext-data\n');
                 done();
             });
         });
