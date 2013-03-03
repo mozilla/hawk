@@ -5,6 +5,8 @@ HTTP request cryptographic verification. For more complex use cases such as acce
 
 Current version: **0.9.0**
 
+Last protocol change: **0.6.0** (Oz support added in **0.8.0**, backwards compatible)
+
 [![Build Status](https://secure.travis-ci.org/hueniverse/hawk.png)](http://travis-ci.org/hueniverse/hawk)
 
 # Table of Content
@@ -487,7 +489,7 @@ of delegating access to a third party. If you are looking for an OAuth alternati
 **Hawk** is only officially implemented in JavaScript as a node.js module. However, others are actively porting it to other
 platforms. There is already a [PHP](https://github.com/alexbilbie/PHP-Hawk),
 [.NET](https://github.com/pcibraro/hawknet), and [JAVA](https://github.com/wealdtech/hawk) libraries available. The full list
-is maintained [here](https://github.com/hueniverse/hawk/issues?labels=port). Please add an issue is you are working on another
+is maintained [here](https://github.com/hueniverse/hawk/issues?labels=port). Please add an issue if you are working on another
 port. A cross-platform test-suite is in the works.
 
 ### Why isn't the algorithm part of the challenge or dynamically negotiated?
