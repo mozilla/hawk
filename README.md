@@ -118,7 +118,7 @@ var credentialsFunc = function (id, callback) {
 
 var handler = function (req, res) {
 
-    Hawk.authenticate(req, credentialsFunc, {}, function (err, credentials, attributes) {
+    Hawk.server.authenticate(req, credentialsFunc, {}, function (err, credentials, attributes) {
 
         res.writeHead(!err ? 200 : 401, { 'Content-Type': 'text/plain' });
         res.end(!err ? 'Hello ' + credentials.user : 'Shoosh!');
@@ -149,7 +149,7 @@ var options = {
     uri: 'http://example.com:8000/resource/1?b=1&a=2',
     method: 'GET',
     headers: {
-        authorization: Hawk.getAuthorizationHeader('http://example.com:8000/resource/1?b=1&a=2', 'GET', { credentials: credentials, ext: 'some-app-data' })
+        authorization: Hawk.client.header('http://example.com:8000/resource/1?b=1&a=2', 'GET', { credentials: credentials, ext: 'some-app-data' }).header
     }
 };
 

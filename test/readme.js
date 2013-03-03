@@ -36,7 +36,7 @@ describe('Hawk', function () {
 
             it('should generate a header protocol example', function (done) {
 
-                var header = Hawk.getAuthorizationHeader('http://example.com:8000/resource/1?b=1&a=2', 'GET', options);
+                var header = Hawk.client.header('http://example.com:8000/resource/1?b=1&a=2', 'GET', options).header;
 
                 expect(header).to.equal('Hawk id="dh37fgj492je", ts="1353832234", nonce="j4h3g2", ext="some-app-ext-data", mac="6R4rV5iE+NPoym+WwjeHzjAGXUtLNIxmo1vpMofpLAE="');
                 done();
@@ -65,7 +65,7 @@ describe('Hawk', function () {
 
             it('should generate a header protocol example (with payload)', function (done) {
 
-                var header = Hawk.getAuthorizationHeader('http://example.com:8000/resource/1?b=1&a=2', 'POST', payloadOptions);
+                var header = Hawk.client.header('http://example.com:8000/resource/1?b=1&a=2', 'POST', payloadOptions).header;
 
                 expect(header).to.equal('Hawk id="dh37fgj492je", ts="1353832234", nonce="j4h3g2", hash="Yi9LfIIFRtBEPt74PVmbTF/xVAwPn7ub15ePICfgnuY=", ext="some-app-ext-data", mac="aSe1DERmZuRl3pI36/9BdZmnErTw3sNzOOAUlfeKjVw="');
                 done();
