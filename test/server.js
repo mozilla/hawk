@@ -130,7 +130,7 @@ describe('Hawk', function () {
                         }
                     };
 
-                    expect(Hawk.client.validateTimestamp(res, credentials)).to.equal(true);
+                    expect(Hawk.client.authenticate(res, artifacts)).to.equal(true);
                     done();
                 });
             });
