@@ -5,8 +5,6 @@ HTTP request cryptographic verification. For more complex use cases such as acce
 
 Current version: **0.10.0**
 
-Last protocol change: **0.10.0** (changed payload hash method)
-
 [![Build Status](https://secure.travis-ci.org/hueniverse/hawk.png)](http://travis-ci.org/hueniverse/hawk)
 
 # Table of Content
