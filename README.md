@@ -326,7 +326,19 @@ by the client, the payload may be modified by an attacker.
 
 ## Response Payload Validation
 
-[todo]
+**Hawk** provides partial response payload validation. The server includes the Authorization response header which enables the
+client to authenticate the response and ensure it is talking to the right server. **Hawk** uses the HTTP Authorization header
+as a response header (it is defined by HTTP as a request header only) using the exact same syntax.
+
+The header is contructed using the same process as the client's request header. The server uses the same credentials and other
+artifacts provided by the client to constructs the normalized request string. The `ext` and `hash` values are replaced with
+new values based on the server response. The rest as identical to those used by the client.
+
+The result MAC digest is included with the optional `hash` and `ext` values:
+
+```
+Authorization: Hawk mac="XIJRsMl/4oL+nn+vKoeVZPdCHXB4yJkNnBbTbHFZUYE=", hash="f9cDF/TDm7TkYRLnGwRMfeDzT6LixQVLvrIKhh0vgmM=", ext="response-specific"
+```
 
 
 # Single URI Authorization
