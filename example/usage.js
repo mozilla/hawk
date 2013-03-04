@@ -31,10 +31,16 @@ var credentialsFunc = function (id, callback) {
 
 var handler = function (req, res) {
 
-    Hawk.server.authenticate(req, credentialsFunc, {}, function (err, credentials, attributes) {
+    Hawk.server.authenticate(req, credentialsFunc, {}, function (err, credentials, artifacts) {
 
-        res.writeHead(!err ? 200 : 401, { 'Content-Type': 'text/plain' });
-        res.end(!err ? 'Hello ' + credentials.user + ' ' + attributes.ext : 'Shoosh!');
+        var payload = (!err ? 'Hello ' + credentials.user + ' ' + artifacts.ext : 'Shoosh!');
+        var headers = {
+            'Content-Type': 'text/plain',
+            'Authorization': Hawk.server.header(artifacts, { payload: payload, contentType: 'text/plain' })
+        };
+
+        res.writeHead(!err ? 200 : 401, headers);
+        res.end(payload);
     });
 };
 
@@ -51,11 +57,12 @@ Request('http://127.0.0.1:8000/resource/1?b=1&a=2', function (error, response, b
 
 // Send authenticated request
 
+var header = Hawk.client.header('http://127.0.0.1:8000/resource/1?b=1&a=2', 'GET', { credentials: internals.credentials.dh37fgj492je, ext: 'and welcome!' });
 var options = {
     uri: 'http://127.0.0.1:8000/resource/1?b=1&a=2',
     method: 'GET',
     headers: {
-        authorization: Hawk.client.header('http://127.0.0.1:8000/resource/1?b=1&a=2', 'GET', { credentials: internals.credentials.dh37fgj492je, ext: 'and welcome!' }).header
+        authorization: header.field
     }
 };
 
@@ -63,7 +70,8 @@ console.log(options.headers.authorization);
 
 Request(options, function (error, response, body) {
 
-    console.log(response.statusCode + ': ' + body);
+    var isValid = Hawk.client.authenticate(response, header.artifacts, { payload: body });
+    console.log(response.statusCode + ': ' + body + (isValid ? ' (valid)' : ' (invalid)'));
     process.exit(0);
 });
 

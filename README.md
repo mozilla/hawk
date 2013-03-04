@@ -118,12 +118,28 @@ var credentialsFunc = function (id, callback) {
 
 var handler = function (req, res) {
 
-    Hawk.server.authenticate(req, credentialsFunc, {}, function (err, credentials, attributes) {
+    // Authenticate incoming request
 
-        res.writeHead(!err ? 200 : 401, { 'Content-Type': 'text/plain' });
-        res.end(!err ? 'Hello ' + credentials.user : 'Shoosh!');
+    Hawk.server.authenticate(req, credentialsFunc, {}, function (err, credentials, artifacts) {
+
+        // Prepare response
+
+        var payload = (!err ? 'Hello ' + credentials.user + ' ' + artifacts.ext : 'Shoosh!');
+        var headers = { 'Content-Type': 'text/plain' };
+
+        // Generate Authorization response header
+
+        var header = Hawk.server.header(artifacts, { payload: payload, contentType: headers['Content-Type'] });
+        headers.Authorization = header;
+
+        // Send the response back
+
+        res.writeHead(!err ? 200 : 401, headers);
+        res.end(payload);
     });
 };
+
+// Start server
 
 Http.createServer(handler).listen(8000, 'example.com');
 ```
@@ -143,19 +159,30 @@ var credentials = {
     algorithm: 'sha256'
 }
 
-// Send authenticated request
+// Request options
 
-var options = {
+var requestOptions = {
     uri: 'http://example.com:8000/resource/1?b=1&a=2',
     method: 'GET',
-    headers: {
-        authorization: Hawk.client.header('http://example.com:8000/resource/1?b=1&a=2', 'GET', { credentials: credentials, ext: 'some-app-data' }).header
-    }
+    headers: {}
 };
 
-Request(options, function (error, response, body) {
+// Generate Authorization request header
 
-    console.log(response.statusCode + ': ' + body);
+var header = Hawk.client.header('http://example.com:8000/resource/1?b=1&a=2', 'GET', { credentials: credentials, ext: 'some-app-data' });
+requestOptions.headers.Authorization = header.field;
+
+// Send authenticated request
+
+Request(requestOptions, function (error, response, body) {
+
+    // Authenticate the server's response
+
+    var isValid = Hawk.client.authenticate(response, header.artifacts, { payload: body });
+
+    // Output results
+
+    console.log(response.statusCode + ': ' + body + (isValid ? ' (valid)' : ' (invalid)'));
 });
 ```
 
