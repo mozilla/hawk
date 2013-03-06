@@ -36,7 +36,7 @@ var handler = function (req, res) {
         var payload = (!err ? 'Hello ' + credentials.user + ' ' + artifacts.ext : 'Shoosh!');
         var headers = {
             'Content-Type': 'text/plain',
-            'Authorization': Hawk.server.header(artifacts, { payload: payload, contentType: 'text/plain' })
+            'Server-Authorization': Hawk.server.header(artifacts, { payload: payload, contentType: 'text/plain' })
         };
 
         res.writeHead(!err ? 200 : 401, headers);
@@ -66,7 +66,6 @@ var options = {
     }
 };
 
-console.log(options.headers.authorization);
 
 Request(options, function (error, response, body) {
 

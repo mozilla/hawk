@@ -84,8 +84,8 @@ describe('Hawk', function () {
                     }
                 };
 
-                res.headers.authorization = Hawk.server.header(artifacts, { payload: 'some reply', contentType: 'text/plain', ext: 'response-specific' });
-                expect(res.headers.authorization).to.exist;
+                res.headers['server-authorization'] = Hawk.server.header(artifacts, { payload: 'some reply', contentType: 'text/plain', ext: 'response-specific' });
+                expect(res.headers['server-authorization']).to.exist;
 
                 expect(Hawk.client.authenticate(res, artifacts, { payload: 'some reply' })).to.equal(true);
                 done();

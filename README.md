@@ -127,10 +127,10 @@ var handler = function (req, res) {
         var payload = (!err ? 'Hello ' + credentials.user + ' ' + artifacts.ext : 'Shoosh!');
         var headers = { 'Content-Type': 'text/plain' };
 
-        // Generate Authorization response header
+        // Generate Server-Authorization response header
 
         var header = Hawk.server.header(artifacts, { payload: payload, contentType: headers['Content-Type'] });
-        headers.Authorization = header;
+        headers['Server-Authorization'] = header;
 
         // Send the response back
 
@@ -243,7 +243,7 @@ The result is base64-encoded to produce the request MAC:
 ```
 
 The client includes the **Hawk** key identifier, timestamp, nonce, application specific data, and request MAC with the request using
-the HTTP "Authorization" request header field:
+the HTTP `Authorization` request header field:
 
 ```
 GET /resource/1?b=1&a=2 HTTP/1.1
@@ -300,7 +300,7 @@ some-app-ext-data
 ```
 
 Then calculates the request MAC and includes the **Hawk** key identifier, timestamp, nonce, payload hash, application specific data,
-and request MAC, with the request using the HTTP "Authorization" request header field:
+and request MAC, with the request using the HTTP `Authorization` request header field:
 
 ```
 POST /resource/1 HTTP/1.1
@@ -326,9 +326,9 @@ by the client, the payload may be modified by an attacker.
 
 ## Response Payload Validation
 
-**Hawk** provides partial response payload validation. The server includes the Authorization response header which enables the
-client to authenticate the response and ensure it is talking to the right server. **Hawk** uses the HTTP Authorization header
-as a response header (it is defined by HTTP as a request header only) using the exact same syntax.
+**Hawk** provides partial response payload validation. The server includes the `Server-Authorization` response header which enables the
+client to authenticate the response and ensure it is talking to the right server. **Hawk** defines the HTTP `Server-Authorization` header
+as a response header using the exact same syntax as the `Authorization` request header field.
 
 The header is contructed using the same process as the client's request header. The server uses the same credentials and other
 artifacts provided by the client to constructs the normalized request string. The `ext` and `hash` values are replaced with
@@ -337,7 +337,7 @@ new values based on the server response. The rest as identical to those used by 
 The result MAC digest is included with the optional `hash` and `ext` values:
 
 ```
-Authorization: Hawk mac="XIJRsMl/4oL+nn+vKoeVZPdCHXB4yJkNnBbTbHFZUYE=", hash="f9cDF/TDm7TkYRLnGwRMfeDzT6LixQVLvrIKhh0vgmM=", ext="response-specific"
+Server-Authorization: Hawk mac="XIJRsMl/4oL+nn+vKoeVZPdCHXB4yJkNnBbTbHFZUYE=", hash="f9cDF/TDm7TkYRLnGwRMfeDzT6LixQVLvrIKhh0vgmM=", ext="response-specific"
 ```
 
 
@@ -436,7 +436,7 @@ to protect sensitive resources.
 ### Spoofing by Counterfeit Servers
 
 **Hawk** provides limited verification of the server authenticity. When receiving a response back from the server, the server
-may choose to include a response `Authorization` header which the client can use to verify the response. However, it is up to
+may choose to include a response `Server-Authorization` header which the client can use to verify the response. However, it is up to
 the server to determine when such measure is included, to up to the client to enforce that policy.
 
 A hostile party could take advantage of this by intercepting the client's requests and returning misleading or otherwise
@@ -474,7 +474,7 @@ cryptographically secure PRNGs to avoid these problems.
 The request MAC only covers the HTTP `Host` header and optionally the `Content-Type` header. It does not cover any other headers
 which can often affect how the request body is interpreted by the server. If the server behavior is influenced by the presence
 or value of such headers, an attacker can manipulate the request headers without being detected. Implementers should use the
-`ext` feature to pass application-specific information via the Authorization header which is protected by the request MAC.
+`ext` feature to pass application-specific information via the `Authorization` header which is protected by the request MAC.
 
 The response authentication, when performed, only covers the response payload, content-type, and the request information 
 provided by the client in it's request (method, resource, timestamp, nonce, etc.). It does not cover the HTTP status code or

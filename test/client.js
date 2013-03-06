@@ -86,7 +86,7 @@ describe('Hawk', function () {
 
                 var res = {
                     headers: {
-                        'authorization': 'Hawk mac="abc", bad="xyz"'
+                        'server-authorization': 'Hawk mac="abc", bad="xyz"'
                     }
                 };
 
@@ -99,7 +99,7 @@ describe('Hawk', function () {
                 var res = {
                     headers: {
                         'content-type': 'text/plain',
-                        'authorization': 'Hawk mac="_IJRsMl/4oL+nn+vKoeVZPdCHXB4yJkNnBbTbHFZUYE=", hash="f9cDF/TDm7TkYRLnGwRMfeDzT6LixQVLvrIKhh0vgmM=", ext="response-specific"'
+                        'server-authorization': 'Hawk mac="_IJRsMl/4oL+nn+vKoeVZPdCHXB4yJkNnBbTbHFZUYE=", hash="f9cDF/TDm7TkYRLnGwRMfeDzT6LixQVLvrIKhh0vgmM=", ext="response-specific"'
                     }
                 };
 
@@ -134,7 +134,7 @@ describe('Hawk', function () {
                 var res = {
                     headers: {
                         'content-type': 'text/plain',
-                        'authorization': 'Hawk mac="XIJRsMl/4oL+nn+vKoeVZPdCHXB4yJkNnBbTbHFZUYE=", hash="f9cDF/TDm7TkYRLnGwRMfeDzT6LixQVLvrIKhh0vgmM=", ext="response-specific"'
+                        'server-authorization': 'Hawk mac="XIJRsMl/4oL+nn+vKoeVZPdCHXB4yJkNnBbTbHFZUYE=", hash="f9cDF/TDm7TkYRLnGwRMfeDzT6LixQVLvrIKhh0vgmM=", ext="response-specific"'
                     }
                 };
 
