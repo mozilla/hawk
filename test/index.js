@@ -1,7 +1,7 @@
 // Load modules
 
 var Url = require('url');
-var Chai = require('chai');
+var Lab = require('lab');
 var Hawk = require('../lib');
 
 
@@ -12,7 +12,11 @@ var internals = {};
 
 // Test shortcuts
 
-var expect = Chai.expect;
+var expect = Lab.expect;
+var before = Lab.before;
+var after = Lab.after;
+var describe = Lab.experiment;
+var it = Lab.test;
 
 
 describe('Hawk', function () {
@@ -93,6 +97,86 @@ describe('Hawk', function () {
         });
     });
 
+    it('should generate a header then successfully parse it (no server header options)', function (done) {
+
+        var req = {
+            method: 'POST',
+            url: '/resource/4?filter=a',
+            headers: {
+                host: 'example.com:8080',
+                'content-type': 'text/plain;x=y'
+            }
+        };
+
+        var payload = 'some not so random text';
+
+        credentialsFunc('123456', function (err, credentials) {
+
+            var reqHeader = Hawk.client.header('http://example.com:8080/resource/4?filter=a', req.method, { credentials: credentials, ext: 'some-app-data', payload: payload, contentType: req.headers['content-type'] });
+            req.headers.authorization = reqHeader.field;
+
+            Hawk.server.authenticate(req, credentialsFunc, {}, function (err, credentials, artifacts) {
+
+                expect(err).to.not.exist;
+                expect(credentials.user).to.equal('steve');
+                expect(artifacts.ext).to.equal('some-app-data');
+                expect(Hawk.server.authenticatePayload(payload, credentials, artifacts.hash, req.headers['content-type'])).to.equal(true);
+
+                var res = {
+                    headers: {
+                        'content-type': 'text/plain'
+                    }
+                };
+
+                res.headers['server-authorization'] = Hawk.server.header(artifacts);
+                expect(res.headers['server-authorization']).to.exist;
+
+                expect(Hawk.client.authenticate(res, artifacts)).to.equal(true);
+                done();
+            });
+        });
+    });
+
+    it('should generate a header then fails to parse it (missing server header hash)', function (done) {
+
+        var req = {
+            method: 'POST',
+            url: '/resource/4?filter=a',
+            headers: {
+                host: 'example.com:8080',
+                'content-type': 'text/plain;x=y'
+            }
+        };
+
+        var payload = 'some not so random text';
+
+        credentialsFunc('123456', function (err, credentials) {
+
+            var reqHeader = Hawk.client.header('http://example.com:8080/resource/4?filter=a', req.method, { credentials: credentials, ext: 'some-app-data', payload: payload, contentType: req.headers['content-type'] });
+            req.headers.authorization = reqHeader.field;
+
+            Hawk.server.authenticate(req, credentialsFunc, {}, function (err, credentials, artifacts) {
+
+                expect(err).to.not.exist;
+                expect(credentials.user).to.equal('steve');
+                expect(artifacts.ext).to.equal('some-app-data');
+                expect(Hawk.server.authenticatePayload(payload, credentials, artifacts.hash, req.headers['content-type'])).to.equal(true);
+
+                var res = {
+                    headers: {
+                        'content-type': 'text/plain'
+                    }
+                };
+
+                res.headers['server-authorization'] = Hawk.server.header(artifacts);
+                expect(res.headers['server-authorization']).to.exist;
+
+                expect(Hawk.client.authenticate(res, artifacts, { payload: 'some reply' })).to.equal(false);
+                done();
+            });
+        });
+    });
+
     it('should generate a header then successfully parse it (with hash)', function (done) {
 
         var req = {
@@ -134,6 +218,29 @@ describe('Hawk', function () {
                 expect(artifacts.ext).to.equal('some-app-data');
                 expect(Hawk.server.authenticatePayload('hola!', credentials, artifacts.hash)).to.be.true;
                 expect(Hawk.server.authenticatePayload('hello!', credentials, artifacts.hash)).to.be.false;
+                done();
+            });
+        });
+    });
+
+    it('should generate a header then successfully parse it (app)', function (done) {
+
+        var req = {
+            method: 'GET',
+            url: '/resource/4?filter=a',
+            host: 'example.com',
+            port: 8080
+        };
+
+        credentialsFunc('123456', function (err, credentials) {
+
+            req.authorization = Hawk.client.header('http://example.com:8080/resource/4?filter=a', req.method, { credentials: credentials, ext: 'some-app-data', app: 'asd23ased' }).field;
+            Hawk.server.authenticate(req, credentialsFunc, {}, function (err, credentials, artifacts) {
+
+                expect(err).to.not.exist;
+                expect(credentials.user).to.equal('steve');
+                expect(artifacts.ext).to.equal('some-app-data');
+                expect(artifacts.app).to.equal('asd23ased');
                 done();
             });
         });
