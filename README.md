@@ -591,7 +591,7 @@ to authenticate simple client-server transactions (i.e. two-legged). As you can 
 at work to produce more garbage.
 
 **Hawk** provides a simple HTTP authentication scheme for making client-server requests. It does not address the OAuth use case
-of delegating access to a third party. If you are looking for an OAuth alternative, check out [Oz](/hueniverse/oz).
+of delegating access to a third party. If you are looking for an OAuth alternative, check out [Oz](https://github.com/hueniverse/oz).
 
 
 # Acknowledgements
