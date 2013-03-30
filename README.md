@@ -3,7 +3,7 @@
 <img align="right" src="https://raw.github.com/hueniverse/hawk/master/images/logo.png" /> **Hawk** is an HTTP authentication scheme using a message authentication code (MAC) algorithm to provide partial
 HTTP request cryptographic verification. For more complex use cases such as access delegation, see [Oz](https://github.com/hueniverse/oz).
 
-Current version: **0.10.2**
+Current version: **0.11.0**
 
 [![Build Status](https://secure.travis-ci.org/hueniverse/hawk.png)](http://travis-ci.org/hueniverse/hawk)
 
@@ -129,7 +129,7 @@ var handler = function (req, res) {
 
         // Generate Server-Authorization response header
 
-        var header = Hawk.server.header(artifacts, { payload: payload, contentType: headers['Content-Type'] });
+        var header = Hawk.server.header(credentials, artifacts, { payload: payload, contentType: headers['Content-Type'] });
         headers['Server-Authorization'] = header;
 
         // Send the response back
@@ -178,7 +178,7 @@ Request(requestOptions, function (error, response, body) {
 
     // Authenticate the server's response
 
-    var isValid = Hawk.client.authenticate(response, header.artifacts, { payload: body });
+    var isValid = Hawk.client.authenticate(response, credentials, header.artifacts, { payload: body });
 
     // Output results
 

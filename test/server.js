@@ -134,7 +134,7 @@ describe('Hawk', function () {
                         }
                     };
 
-                    expect(Hawk.client.authenticate(res, artifacts)).to.equal(true);
+                    expect(Hawk.client.authenticate(res, credentials, artifacts)).to.equal(true);
                     done();
                 });
             });
@@ -610,15 +610,20 @@ describe('Hawk', function () {
                 done();
             });
 
+            it('should return an empty authorization header on missing credentials', function (done) {
+
+                var header = Hawk.server.header(null, {});
+                expect(header).to.equal('');
+                done();
+            });
+
             it('should return an empty authorization header on invalid credentials', function (done) {
 
-                var artifacts = {
-                    credentials: {
-                        key: '2983d45yun89q'
-                    }
+                var credentials = {
+                    key: '2983d45yun89q'
                 };
 
-                var header = Hawk.server.header(artifacts);
+                var header = Hawk.server.header(credentials);
                 expect(header).to.equal('');
                 done();
             });
@@ -626,14 +631,15 @@ describe('Hawk', function () {
             it('should return an empty authorization header on invalid algorithm', function (done) {
 
                 var artifacts = {
-                    id: '123456',
-                    credentials: {
-                        key: '2983d45yun89q',
-                        algorithm: 'hmac-sha-0'
-                    }
+                    id: '123456'
                 };
 
-                var header = Hawk.server.header(artifacts);
+                var credentials = {
+                    key: '2983d45yun89q',
+                    algorithm: 'hmac-sha-0'
+                };
+
+                var header = Hawk.server.header(credentials, artifacts);
                 expect(header).to.equal('');
                 done();
             });
