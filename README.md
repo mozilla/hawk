@@ -3,7 +3,7 @@
 <img align="right" src="https://raw.github.com/hueniverse/hawk/master/images/logo.png" /> **Hawk** is an HTTP authentication scheme using a message authentication code (MAC) algorithm to provide partial
 HTTP request cryptographic verification. For more complex use cases such as access delegation, see [Oz](https://github.com/hueniverse/oz).
 
-Current version: **0.11.0**
+Current version: **0.11.1**
 
 [![Build Status](https://secure.travis-ci.org/hueniverse/hawk.png)](http://travis-ci.org/hueniverse/hawk)
 
@@ -15,6 +15,7 @@ Current version: **0.11.0**
   - [Protocol Example](#protocol-example)
     - [Payload Validation](#payload-validation)
     - [Response Payload Validation](#response-payload-validation)
+  - [Browser Support](#browser-support)
 <p></p>
 - [**Single URI Authorization**](#single-uri-authorization)
   - [Usage Example](#bewit-usage-example)
@@ -339,6 +340,11 @@ The result MAC digest is included with the optional `hash` and `ext` values:
 ```
 Server-Authorization: Hawk mac="XIJRsMl/4oL+nn+vKoeVZPdCHXB4yJkNnBbTbHFZUYE=", hash="f9cDF/TDm7TkYRLnGwRMfeDzT6LixQVLvrIKhh0vgmM=", ext="response-specific"
 ```
+
+
+## Browser Support
+
+An experimental browser script is provided for including using a `<script>` tag in [lib/browser.js](/lib/browser.js).
 
 
 # Single URI Authorization
