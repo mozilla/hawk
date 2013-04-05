@@ -3,7 +3,7 @@
 <img align="right" src="https://raw.github.com/hueniverse/hawk/master/images/logo.png" /> **Hawk** is an HTTP authentication scheme using a message authentication code (MAC) algorithm to provide partial
 HTTP request cryptographic verification. For more complex use cases such as access delegation, see [Oz](https://github.com/hueniverse/oz).
 
-Current version: **0.11.1**
+Current version: **0.12.0**
 
 [![Build Status](https://secure.travis-ci.org/hueniverse/hawk.png)](http://travis-ci.org/hueniverse/hawk)
 
@@ -85,7 +85,8 @@ practice translates to a maximum of 2 minutes as the skew can be positive or neg
 
 Using a timestamp requires the client's clock to be in sync with the server's clock. **Hawk** requires both the client
 clock and the server clock to use NTP to ensure synchronization. However, given the limitations of some client types
-(e.g. browsers) to deploy NTP, the server provides the client with its current time in response to a bad timestamp.
+(e.g. browsers) to deploy NTP, the server provides the client with its current time (in seconds precision) in response
+to a bad timestamp.
 
 There is no expectation that the client will adjust its system clock to match the server (in fact, this would be a
 potential attack vector). Instead, the client only uses the server's time to calculate an offset used only

@@ -186,6 +186,55 @@ describe('Browser', function () {
         });
     });
 
+    it('should generate a header with stale ts and successfully authenticate on second call', function (done) {
+
+        var req = {
+            method: 'GET',
+            url: '/resource/4?filter=a',
+            host: 'example.com',
+            port: 8080
+        };
+
+        credentialsFunc('123456', function (err, credentials) {
+
+            Browser.utils.ntpOffset = 60 * 60 * 1000;
+            var header = Browser.client.header('http://example.com:8080/resource/4?filter=a', req.method, { credentials: credentials, ext: 'some-app-data' });
+            req.authorization = header.field;
+            expect(req.authorization).to.exist;
+
+            Hawk.server.authenticate(req, credentialsFunc, {}, function (err, credentials, artifacts) {
+
+                expect(err).to.exist;
+                expect(err.message).to.equal('Stale timestamp');
+
+                var res = {
+                    headers: {
+                        'www-authenticate': err.response.headers['WWW-Authenticate']
+                    },
+                    getResponseHeader: function (header) {
+
+                        return res.headers[header.toLowerCase()];
+                    }
+                };
+
+                expect(Browser.utils.ntpOffset).to.equal(60 * 60 * 1000);
+                expect(Browser.client.authenticate(res, credentials, header.artifacts)).to.equal(true);
+                expect(Browser.utils.ntpOffset).to.equal(0);
+
+                req.authorization = Browser.client.header('http://example.com:8080/resource/4?filter=a', req.method, { credentials: credentials, ext: 'some-app-data' }).field;
+                expect(req.authorization).to.exist;
+
+                Hawk.server.authenticate(req, credentialsFunc, {}, function (err, credentials, artifacts) {
+
+                    expect(err).to.not.exist;
+                    expect(credentials.user).to.equal('steve');
+                    expect(artifacts.ext).to.equal('some-app-data');
+                    done();
+                });
+            });
+        });
+    });
+
     it('should generate a header then fails to parse it (missing server header hash)', function (done) {
 
         var req = {

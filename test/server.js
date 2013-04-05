@@ -126,7 +126,7 @@ describe('Hawk', function () {
                     var header = err.response.headers['WWW-Authenticate'];
                     var ts = header.match(/^Hawk ts\=\"(\d+)\"\, tsm\=\"([^\"]+)\"\, error=\"Stale timestamp\"$/);
                     var now = Hawk.utils.now();
-                    expect(parseInt(ts[1], 10)).to.be.within(now - 1, now + 1);
+                    expect(parseInt(ts[1], 10) * 1000).to.be.within(now - 1000, now + 1000);
 
                     var res = {
                         headers: {
