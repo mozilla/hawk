@@ -23,7 +23,8 @@
   },
   "devDependencies": {
     "lab": "0.1.x",
-    "complexity-report": "0.x.x"
+    "complexity-report": "0.x.x",
+    "localStorage": "1.0.x"
   },
   "scripts": {
     "test": "make test-cov"

@@ -3,6 +3,7 @@
 var Lab = require('lab');
 var Hawk = require('../lib');
 var Browser = require('../lib/browser');
+var LocalStorage = require('localStorage')
 
 
 // Declare internals
@@ -197,7 +198,7 @@ describe('Browser', function () {
 
         credentialsFunc('123456', function (err, credentials) {
 
-            Browser.utils.ntpOffset = 60 * 60 * 1000;
+            Browser.utils.setNtpOffset(60 * 60 * 1000);
             var header = Browser.client.header('http://example.com:8080/resource/4?filter=a', req.method, { credentials: credentials, ext: 'some-app-data' });
             req.authorization = header.field;
             expect(req.authorization).to.exist;
@@ -217,9 +218,11 @@ describe('Browser', function () {
                     }
                 };
 
+                expect(parseInt(LocalStorage.getItem('hawk_ntp_offset'))).to.equal(60 * 60 * 1000);
                 expect(Browser.utils.ntpOffset).to.equal(60 * 60 * 1000);
                 expect(Browser.client.authenticate(res, credentials, header.artifacts)).to.equal(true);
                 expect(Browser.utils.ntpOffset).to.equal(0);
+                expect(parseInt(LocalStorage.getItem('hawk_ntp_offset'))).to.equal(0);
 
                 req.authorization = Browser.client.header('http://example.com:8080/resource/4?filter=a', req.method, { credentials: credentials, ext: 'some-app-data' }).field;
                 expect(req.authorization).to.exist;
