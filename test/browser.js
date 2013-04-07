@@ -3,7 +3,7 @@
 var Lab = require('lab');
 var Hawk = require('../lib');
 var Browser = require('../lib/browser');
-var LocalStorage = require('localStorage')
+var LocalStorage = require('localStorage');
 
 
 // Declare internals
@@ -32,6 +32,16 @@ describe('Browser', function () {
         };
 
         return callback(null, credentials);
+    };
+
+    Browser.utils.setLocalNtpOffset = function (offset) {
+
+        LocalStorage.setItem('hawk_ntp_offset', offset);
+    };
+
+    Browser.utils.getLocalNtpOffset = function () {
+
+        return parseInt(LocalStorage.getItem('hawk_ntp_offset')) || 0;
     };
 
     it('should generate a header then successfully parse it (configuration)', function (done) {
@@ -218,11 +228,11 @@ describe('Browser', function () {
                     }
                 };
 
-                expect(parseInt(LocalStorage.getItem('hawk_ntp_offset'))).to.equal(60 * 60 * 1000);
+                expect(Browser.utils.getLocalNtpOffset()).to.equal(60 * 60 * 1000);
                 expect(Browser.utils.ntpOffset).to.equal(60 * 60 * 1000);
                 expect(Browser.client.authenticate(res, credentials, header.artifacts)).to.equal(true);
                 expect(Browser.utils.ntpOffset).to.equal(0);
-                expect(parseInt(LocalStorage.getItem('hawk_ntp_offset'))).to.equal(0);
+                expect(Browser.utils.getLocalNtpOffset()).to.equal(0);
 
                 req.authorization = Browser.client.header('http://example.com:8080/resource/4?filter=a', req.method, { credentials: credentials, ext: 'some-app-data' }).field;
                 expect(req.authorization).to.exist;
