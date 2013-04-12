@@ -3,7 +3,7 @@
 <img align="right" src="https://raw.github.com/hueniverse/hawk/master/images/logo.png" /> **Hawk** is an HTTP authentication scheme using a message authentication code (MAC) algorithm to provide partial
 HTTP request cryptographic verification. For more complex use cases such as access delegation, see [Oz](https://github.com/hueniverse/oz).
 
-Current version: **0.12**
+Current version: **0.13**
 
 [![Build Status](https://secure.travis-ci.org/hueniverse/hawk.png)](http://travis-ci.org/hueniverse/hawk)
 
@@ -345,10 +345,16 @@ Server-Authorization: Hawk mac="XIJRsMl/4oL+nn+vKoeVZPdCHXB4yJkNnBbTbHFZUYE=", h
 
 ## Browser Support and Considerations
 
-An experimental browser script is provided for including using a `<script>` tag in [lib/browser.js](/lib/browser.js).
+A browser script is provided for including using a `<script>` tag in [lib/browser.js](/lib/browser.js).
 
-**Hawk** relies on the _Server-Authorization_ and _WWW-Authenticate_ headers in its response to communicate with the client. Therefore, in case of CORS requests, it is important to consider sending _Access-Control-Expose-Headers_ with the value _"WWW-Authenticate, Server-Authorization"_ on each response from your server. As explained in the [specifications](http://www.w3.org/TR/cors/#access-control-expose-headers-response-header), it will indicate that these headers can safely be accessed by the client (using getResponseHeader() on the XmlHttpRequest object). Otherwise you will be met with a ["simple response header"](http://www.w3.org/TR/cors/#simple-response-header) which excludes these fields and would prevent the Hawk client from authenticating the requests.
-You can read more about the why and how in this [article](http://www.html5rocks.com/en/tutorials/cors/#toc-adding-cors-support-to-the-server)
+**Hawk** relies on the _Server-Authorization_ and _WWW-Authenticate_ headers in its response to communicate with the client.
+Therefore, in case of CORS requests, it is important to consider sending _Access-Control-Expose-Headers_ with the value
+_"WWW-Authenticate, Server-Authorization"_ on each response from your server. As explained in the
+[specifications](http://www.w3.org/TR/cors/#access-control-expose-headers-response-header), it will indicate that these headers
+can safely be accessed by the client (using getResponseHeader() on the XmlHttpRequest object). Otherwise you will be met with a
+["simple response header"](http://www.w3.org/TR/cors/#simple-response-header) which excludes these fields and would prevent the
+Hawk client from authenticating the requests.You can read more about the why and how in this
+[article](http://www.html5rocks.com/en/tutorials/cors/#toc-adding-cors-support-to-the-server)
 
 
 # Single URI Authorization

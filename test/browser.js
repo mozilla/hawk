@@ -197,7 +197,56 @@ describe('Browser', function () {
         };
 
         credentialsFunc('123456', function (err, credentials) {
-            Browser.utils.useLocalStorage(LocalStorage)
+
+            Browser.utils.setNtpOffset(60 * 60 * 1000);
+            var header = Browser.client.header('http://example.com:8080/resource/4?filter=a', req.method, { credentials: credentials, ext: 'some-app-data' });
+            req.authorization = header.field;
+            expect(req.authorization).to.exist;
+
+            Hawk.server.authenticate(req, credentialsFunc, {}, function (err, credentials, artifacts) {
+
+                expect(err).to.exist;
+                expect(err.message).to.equal('Stale timestamp');
+
+                var res = {
+                    headers: {
+                        'www-authenticate': err.response.headers['WWW-Authenticate']
+                    },
+                    getResponseHeader: function (header) {
+
+                        return res.headers[header.toLowerCase()];
+                    }
+                };
+
+                expect(Browser.utils.getNtpOffset()).to.equal(60 * 60 * 1000);
+                expect(Browser.client.authenticate(res, credentials, header.artifacts)).to.equal(true);
+                expect(Browser.utils.getNtpOffset()).to.equal(0);
+
+                req.authorization = Browser.client.header('http://example.com:8080/resource/4?filter=a', req.method, { credentials: credentials, ext: 'some-app-data' }).field;
+                expect(req.authorization).to.exist;
+
+                Hawk.server.authenticate(req, credentialsFunc, {}, function (err, credentials, artifacts) {
+
+                    expect(err).to.not.exist;
+                    expect(credentials.user).to.equal('steve');
+                    expect(artifacts.ext).to.equal('some-app-data');
+                    done();
+                });
+            });
+        });
+    });
+
+    it('should generate a header with stale ts and successfully authenticate on second call (manual localStorage)', function (done) {
+
+        var req = {
+            method: 'GET',
+            url: '/resource/4?filter=a',
+            host: 'example.com',
+            port: 8080
+        };
+
+        credentialsFunc('123456', function (err, credentials) {
+            Browser.utils.setStorage(LocalStorage)
 
             Browser.utils.setNtpOffset(60 * 60 * 1000);
             var header = Browser.client.header('http://example.com:8080/resource/4?filter=a', req.method, { credentials: credentials, ext: 'some-app-data' });
@@ -220,9 +269,9 @@ describe('Browser', function () {
                 };
 
                 expect(parseInt(LocalStorage.getItem('hawk_ntp_offset'))).to.equal(60 * 60 * 1000);
-                expect(Browser.utils.ntpOffset).to.equal(60 * 60 * 1000);
+                expect(Browser.utils.getNtpOffset()).to.equal(60 * 60 * 1000);
                 expect(Browser.client.authenticate(res, credentials, header.artifacts)).to.equal(true);
-                expect(Browser.utils.ntpOffset).to.equal(0);
+                expect(Browser.utils.getNtpOffset()).to.equal(0);
                 expect(parseInt(LocalStorage.getItem('hawk_ntp_offset'))).to.equal(0);
 
                 req.authorization = Browser.client.header('http://example.com:8080/resource/4?filter=a', req.method, { credentials: credentials, ext: 'some-app-data' }).field;
