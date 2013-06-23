@@ -30,6 +30,7 @@ Current version: **0.15**
   - [Future Time Manipulation](#future-time-manipulation)
   - [Client Clock Poisoning](#client-clock-poisoning)
   - [Bewit Limitations](#bewit-limitations)
+  - [Host Header Forgery](#host-header-forgery)
 <p></p>
 - [**Frequently Asked Questions**](#frequently-asked-questions)
 <p></p>
@@ -524,6 +525,12 @@ access to the bewit credentials which act as bearer credentials for that particu
 requests only and therefore cannot be used to perform transactions or change server state, it can still be used to expose private
 and sensitive information.
 
+### Host Header Forgery
+
+Hawk validates the incoming request MAC against the incoming HTTP Host header. However, unless the optional `host` and `port`
+options are used with `server.authenticate()`, a malicous client can mint new host names pointing to the server's IP address and
+use that to craft an attack by sending a valid request that's meant for another hostname than the one used by the server. Server
+implementors must manually verify that the host header received matches their expectation (or use the options mentioned above).
 
 # Frequently Asked Questions
 
