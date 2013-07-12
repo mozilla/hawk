@@ -728,6 +728,30 @@ describe('Browser', function () {
                 });
             });
         });
+
+        describe('#authenticateTimestamp', function (done) {
+
+            it('should validate a timestamp', function (done) {
+
+                credentialsFunc('123456', function (err, credentials) {
+
+                    var tsm = Hawk.crypto.timestampMessage(credentials);
+                    expect(Browser.client.authenticateTimestamp(tsm, credentials)).to.equal(true);
+                    done();
+                });
+            });
+
+            it('should detect a bad timestamp', function (done) {
+
+                credentialsFunc('123456', function (err, credentials) {
+
+                    var tsm = Hawk.crypto.timestampMessage(credentials);
+                    tsm.ts = 4;
+                    expect(Browser.client.authenticateTimestamp(tsm, credentials)).to.equal(false);
+                    done();
+                });
+            });
+        });
     });
 
     describe('#parseAuthorizationHeader', function (done) {
