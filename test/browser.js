@@ -792,4 +792,26 @@ describe('Browser', function () {
             done();
         });
     });
+
+    describe('#setNtpOffset', function (done) {
+
+        it('catches localStorage errors', function (done) {
+
+            var orig = Browser.utils.storage.setItem;
+            var error = console.error;
+            var count = 0;
+            console.error = function () { if (count++ === 2) { console.error.error; } };
+            Browser.utils.storage.setItem = function () {
+
+                Browser.utils.storage.setItem = orig;
+                throw new Error()
+            };
+
+            expect(function () {
+                Browser.utils.setNtpOffset(100);
+            }).not.to.throw();
+
+            done();
+        });
+    });
 });
