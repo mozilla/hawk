@@ -16,10 +16,10 @@
     "node": ">=0.8.0"
   },
   "dependencies": {
-    "hoek": "1.0.x",
-    "boom": "1.0.x",
-    "cryptiles": "1.0.x",
-    "sntp": "1.0.x"
+    "hoek": "1.x.x",
+    "boom": "1.x.x",
+    "cryptiles": "1.x.x",
+    "sntp": "1.x.x"
   },
   "devDependencies": {
     "lab": "1.x.x",
