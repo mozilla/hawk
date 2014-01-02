@@ -211,7 +211,7 @@ describe('Browser', function () {
 
                 var res = {
                     headers: {
-                        'www-authenticate': err.response.headers['WWW-Authenticate']
+                        'www-authenticate': err.output.headers['WWW-Authenticate']
                     },
                     getResponseHeader: function (header) {
 
@@ -261,7 +261,7 @@ describe('Browser', function () {
 
                 var res = {
                     headers: {
-                        'www-authenticate': err.response.headers['WWW-Authenticate']
+                        'www-authenticate': err.output.headers['WWW-Authenticate']
                     },
                     getResponseHeader: function (header) {
 
@@ -441,7 +441,7 @@ describe('Browser', function () {
             Hawk.server.authenticate(req, credentialsFunc, { payload: 'byebye!' }, function (err, credentials, artifacts) {
 
                 expect(err).to.exist;
-                expect(err.response.payload.message).to.equal('Bad payload hash');
+                expect(err.output.payload.message).to.equal('Bad payload hash');
                 done();
             });
         });

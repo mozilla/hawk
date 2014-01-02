@@ -110,7 +110,7 @@ describe('Hawk', function () {
 
             it('returns a hawk 401', function (done) {
 
-                expect(Hawk.utils.unauthorized('kaboom').response.headers['WWW-Authenticate']).to.equal('Hawk error="kaboom"');
+                expect(Hawk.utils.unauthorized('kaboom').output.headers['WWW-Authenticate']).to.equal('Hawk error="kaboom"');
                 done();
             });
         });
