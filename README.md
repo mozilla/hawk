@@ -545,7 +545,7 @@ something? Open an issue!
 
 ### Is it done?
 
-At if version 0.10.0, **Hawk** is feature-complete. However, until this module reaches version 1.0.0 it is considered experimental
+As of version 0.10.0, **Hawk** is feature-complete. However, until this module reaches version 1.0.0 it is considered experimental
 and is likely to change. This also means your feedback and contribution are very welcome. Feel free to open issues with questions
 and suggestions.
 
