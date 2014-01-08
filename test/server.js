@@ -682,5 +682,15 @@ describe('Hawk', function () {
                 done();
             });
         });
+
+        describe('#authenticatePayloadHash', function () {
+
+            it('checks payload hash', function (done) {
+
+                expect(Hawk.server.authenticatePayloadHash('abcdefg', { hash: 'abcdefg' })).to.equal(true);
+                expect(Hawk.server.authenticatePayloadHash('1234567', { hash: 'abcdefg' })).to.equal(false);
+                done();
+            });
+        });
     });
 });
