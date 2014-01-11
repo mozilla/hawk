@@ -5,7 +5,7 @@ HTTP request cryptographic verification. For more complex use cases such as acce
 
 Current version: **2.0**
 
-Note: 2.0 is the same exact protocol as 1.1. The version increment refelects a change in the internal error format
+Note: 2.0 is the same exact protocol as 1.1. The version increment reflects a change in the internal error format
 used by the module and used by the node API.
 
 [![Build Status](https://secure.travis-ci.org/hueniverse/hawk.png)](http://travis-ci.org/hueniverse/hawk)
