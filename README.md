@@ -3,7 +3,10 @@
 <img align="right" src="https://raw.github.com/hueniverse/hawk/master/images/logo.png" /> **Hawk** is an HTTP authentication scheme using a message authentication code (MAC) algorithm to provide partial
 HTTP request cryptographic verification. For more complex use cases such as access delegation, see [Oz](https://github.com/hueniverse/oz).
 
-Current version: **0.15**
+Current version: **2.0**
+
+Note: 2.0 is the same exact protocol as 1.1. The version increment reflects a change in the internal error format
+used by the module and used by the node API.
 
 [![Build Status](https://secure.travis-ci.org/hueniverse/hawk.png)](http://travis-ci.org/hueniverse/hawk)
 
@@ -30,6 +33,7 @@ Current version: **0.15**
   - [Future Time Manipulation](#future-time-manipulation)
   - [Client Clock Poisoning](#client-clock-poisoning)
   - [Bewit Limitations](#bewit-limitations)
+  - [Host Header Forgery](#host-header-forgery)
 <p></p>
 - [**Frequently Asked Questions**](#frequently-asked-questions)
 <p></p>
@@ -229,7 +233,7 @@ hawk.1.header
 1353832234
 j4h3g2
 GET
-/resource?a=1&b=2
+/resource/1?b=1&a=2
 example.com
 8000
 
@@ -293,7 +297,7 @@ hawk.1.header
 1353832234
 j4h3g2
 POST
-/resource?a=1&b=2
+/resource/1?a=1&b=2
 example.com
 8000
 Yi9LfIIFRtBEPt74PVmbTF/xVAwPn7ub15ePICfgnuY=
@@ -305,7 +309,7 @@ Then calculates the request MAC and includes the **Hawk** key identifier, timest
 and request MAC, with the request using the HTTP `Authorization` request header field:
 
 ```
-POST /resource/1 HTTP/1.1
+POST /resource/1?a=1&b=2 HTTP/1.1
 Host: example.com:8000
 Authorization: Hawk id="dh37fgj492je", ts="1353832234", nonce="j4h3g2", hash="Yi9LfIIFRtBEPt74PVmbTF/xVAwPn7ub15ePICfgnuY=", ext="some-app-ext-data", mac="aSe1DERmZuRl3pI36/9BdZmnErTw3sNzOOAUlfeKjVw="
 ```
@@ -345,7 +349,7 @@ Server-Authorization: Hawk mac="XIJRsMl/4oL+nn+vKoeVZPdCHXB4yJkNnBbTbHFZUYE=", h
 
 ## Browser Support and Considerations
 
-A browser script is provided for including using a `<script>` tag in [lib/browser.js](/lib/browser.js).
+A browser script is provided for including using a `<script>` tag in [lib/browser.js](/lib/browser.js). It's also a [component](http://component.io/hueniverse/hawk).
 
 **Hawk** relies on the _Server-Authorization_ and _WWW-Authenticate_ headers in its response to communicate with the client.
 Therefore, in case of CORS requests, it is important to consider sending _Access-Control-Expose-Headers_ with the value
@@ -524,6 +528,12 @@ access to the bewit credentials which act as bearer credentials for that particu
 requests only and therefore cannot be used to perform transactions or change server state, it can still be used to expose private
 and sensitive information.
 
+### Host Header Forgery
+
+Hawk validates the incoming request MAC against the incoming HTTP Host header. However, unless the optional `host` and `port`
+options are used with `server.authenticate()`, a malicous client can mint new host names pointing to the server's IP address and
+use that to craft an attack by sending a valid request that's meant for another hostname than the one used by the server. Server
+implementors must manually verify that the host header received matches their expectation (or use the options mentioned above).
 
 # Frequently Asked Questions
 
@@ -535,17 +545,15 @@ something? Open an issue!
 
 ### Is it done?
 
-At if version 0.10.0, **Hawk** is feature-complete. However, until this module reaches version 1.0.0 it is considered experimental
+As of version 0.10.0, **Hawk** is feature-complete. However, until this module reaches version 1.0.0 it is considered experimental
 and is likely to change. This also means your feedback and contribution are very welcome. Feel free to open issues with questions
 and suggestions.
 
 ### Where can I find **Hawk** implementations in other languages?
 
-**Hawk**'s only reference implementation is provided in JavaScript as a node.js module. However, others are actively porting it to other
-platforms. There is already a [PHP](https://github.com/alexbilbie/PHP-Hawk),
-[.NET](https://github.com/pcibraro/hawknet), and [JAVA](https://github.com/wealdtech/hawk) libraries available. The full list
-is maintained [here](https://github.com/hueniverse/hawk/issues?labels=port). Please add an issue if you are working on another
-port. A cross-platform test-suite is in the works.
+**Hawk**'s only reference implementation is provided in JavaScript as a node.js module. However, it has been ported to other languages.
+The full list is maintained [here](https://github.com/hueniverse/hawk/issues?labels=port&state=closed). Please add an issue if you are
+working on another port. A cross-platform test-suite is in the works.
 
 ### Why isn't the algorithm part of the challenge or dynamically negotiated?
 
