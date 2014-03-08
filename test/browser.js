@@ -824,4 +824,25 @@ describe('Browser', function () {
             done();
         });
     });
+
+    describe('CryptoJS', function () {
+
+        it('fills in coverage', function (done) {
+
+            Browser.crypto.internals.lib.WordArray.random(1);
+            var hmac = Browser.crypto.internals.HmacSHA1('a', 'b');
+            hmac.toString(Browser.crypto.internals.enc.Hex);
+            hmac.toString(Browser.crypto.internals.enc.Latin1);
+            Browser.crypto.internals.enc.Hex.parse('00');
+            Browser.crypto.internals.enc.Utf8.stringify('00');
+
+            var hash = Browser.crypto.internals.algo.SHA1.create();
+            hash.update('x');
+            hash.finalize();
+            Browser.crypto.internals.lib.BufferedBlockAlgorithm.clone.call(hash);
+            Browser.crypto.internals.lib.BufferedBlockAlgorithm._process.call(hash, 1);
+
+            done();
+        })
+    });
 });
