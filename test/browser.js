@@ -814,4 +814,14 @@ describe('Browser', function () {
             done();
         });
     });
+
+    describe('#parseUri', function () {
+
+        it('returns empty port when unknown scheme', function (done) {
+
+            var uri = Browser.utils.parseUri('ftp://domain');
+            expect(uri.port).to.equal('');
+            done();
+        });
+    });
 });
