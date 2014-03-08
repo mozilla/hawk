@@ -800,7 +800,7 @@ describe('Browser', function () {
             var orig = Browser.utils.storage.setItem;
             var error = console.error;
             var count = 0;
-            console.error = function () { if (count++ === 2) { console.error.error; } };
+            console.error = function () { if (count++ === 2) { console.error = error; } };
             Browser.utils.storage.setItem = function () {
 
                 Browser.utils.storage.setItem = orig;
