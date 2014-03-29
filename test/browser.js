@@ -103,6 +103,50 @@ describe('Browser', function () {
         });
     });
 
+    it('should generate a header then successfully parse it (browserify)', function (done) {
+
+        var req = {
+            method: 'POST',
+            url: '/resource/4?filter=a',
+            headers: {
+                host: 'example.com:8080',
+                'content-type': 'text/plain;x=y'
+            }
+        };
+
+        var payload = 'some not so random text';
+
+        credentialsFunc('123456', function (err, credentials) {
+
+            var reqHeader = Browser.client.header('http://example.com:8080/resource/4?filter=a', req.method, { credentials: credentials, ext: 'some-app-data', payload: payload, contentType: req.headers['content-type'] });
+            req.headers.authorization = reqHeader.field;
+
+            Hawk.server.authenticate(req, credentialsFunc, {}, function (err, credentials, artifacts) {
+
+                expect(err).to.not.exist;
+                expect(credentials.user).to.equal('steve');
+                expect(artifacts.ext).to.equal('some-app-data');
+                expect(Hawk.server.authenticatePayload(payload, credentials, artifacts, req.headers['content-type'])).to.equal(true);
+
+                var res = {
+                    headers: {
+                        'content-type': 'text/plain'
+                    },
+                    getHeader: function (header) {
+
+                        return res.headers[header.toLowerCase()];
+                    }
+                };
+
+                res.headers['server-authorization'] = Hawk.server.header(credentials, artifacts, { payload: 'some reply', contentType: 'text/plain', ext: 'response-specific' });
+                expect(res.headers['server-authorization']).to.exist;
+
+                expect(Browser.client.authenticate(res, credentials, artifacts, { payload: 'some reply' })).to.equal(true);
+                done();
+            });
+        });
+    });
+
     it('should generate a header then successfully parse it (no server header options)', function (done) {
 
         var req = {
