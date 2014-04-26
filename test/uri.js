@@ -1,6 +1,7 @@
 // Load modules
 
 var Http = require('http');
+var Hoek = require('hoek');
 var Lab = require('lab');
 var Hawk = require('../lib');
 
@@ -179,7 +180,7 @@ describe('Hawk', function () {
 
                 var bewit = credentials.id + '\\' + exp + '\\' + mac + '\\' + ext;
 
-                req.url += '&bewit=' + Hawk.utils.base64urlEncode(bewit);
+                req.url += '&bewit=' + Hoek.base64urlEncode(bewit);
 
                 Hawk.uri.authenticate(req, credentialsFunc, {}, function (err, credentials, attributes) {
 
