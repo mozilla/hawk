@@ -82,6 +82,21 @@ describe('Hawk', function () {
         });
     });
 
+    it('overrides timestampSkewSec', function (done) {
+
+        credentialsFunc('123456', function (err, credentials) {
+
+            var auth = Hawk.client.message('example.com', 8080, 'some message', { credentials: credentials, localtimeOffsetMsec: 100000 });
+            expect(auth).to.exist;
+
+            Hawk.server.authenticateMessage('example.com', 8080, 'some message', auth, credentialsFunc, { timestampSkewSec: 500 }, function (err, credentials) {
+
+                expect(err).to.not.exist;
+                done();
+            });
+        });
+    });
+
     it('should fail authorization on invalid authorization', function (done) {
 
         credentialsFunc('123456', function (err, credentials) {

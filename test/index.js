@@ -33,7 +33,7 @@ describe('Hawk', function () {
         return callback(null, credentials);
     };
 
-    it('should generate a header then successfully parse it (configuration)', function (done) {
+    it('generates a header then successfully parse it (configuration)', function (done) {
 
         var req = {
             method: 'GET',
@@ -57,7 +57,7 @@ describe('Hawk', function () {
         });
     });
 
-    it('should generate a header then successfully parse it (node request)', function (done) {
+    it('generates a header then successfully parse it (node request)', function (done) {
 
         var req = {
             method: 'POST',
@@ -97,7 +97,7 @@ describe('Hawk', function () {
         });
     });
 
-    it('should generate a header then successfully parse it (no server header options)', function (done) {
+    it('generates a header then successfully parse it (no server header options)', function (done) {
 
         var req = {
             method: 'POST',
@@ -137,7 +137,7 @@ describe('Hawk', function () {
         });
     });
 
-    it('should generate a header then fails to parse it (missing server header hash)', function (done) {
+    it('generates a header then fails to parse it (missing server header hash)', function (done) {
 
         var req = {
             method: 'POST',
@@ -177,7 +177,7 @@ describe('Hawk', function () {
         });
     });
 
-    it('should generate a header then successfully parse it (with hash)', function (done) {
+    it('generates a header then successfully parse it (with hash)', function (done) {
 
         var req = {
             method: 'GET',
@@ -199,7 +199,7 @@ describe('Hawk', function () {
         });
     });
 
-    it('should generate a header then successfully parse it then validate payload', function (done) {
+    it('generates a header then successfully parse it then validate payload', function (done) {
 
         var req = {
             method: 'GET',
@@ -223,7 +223,29 @@ describe('Hawk', function () {
         });
     });
 
-    it('should generate a header then successfully parse it (app)', function (done) {
+    it('generates a header then successfully parses and validates payload', function (done) {
+
+        var req = {
+            method: 'GET',
+            url: '/resource/4?filter=a',
+            host: 'example.com',
+            port: 8080
+        };
+
+        credentialsFunc('123456', function (err, credentials) {
+
+            req.authorization = Hawk.client.header('http://example.com:8080/resource/4?filter=a', req.method, { credentials: credentials, payload: 'hola!', ext: 'some-app-data' }).field;
+            Hawk.server.authenticate(req, credentialsFunc, { payload: 'hola!' }, function (err, credentials, artifacts) {
+
+                expect(err).to.not.exist;
+                expect(credentials.user).to.equal('steve');
+                expect(artifacts.ext).to.equal('some-app-data');
+                done();
+            });
+        });
+    });
+
+    it('generates a header then successfully parse it (app)', function (done) {
 
         var req = {
             method: 'GET',
@@ -246,7 +268,7 @@ describe('Hawk', function () {
         });
     });
 
-    it('should generate a header then successfully parse it (app, dlg)', function (done) {
+    it('generates a header then successfully parse it (app, dlg)', function (done) {
 
         var req = {
             method: 'GET',
@@ -270,7 +292,7 @@ describe('Hawk', function () {
         });
     });
 
-    it('should generate a header then fail authentication due to bad hash', function (done) {
+    it('generates a header then fail authentication due to bad hash', function (done) {
 
         var req = {
             method: 'GET',
@@ -291,7 +313,7 @@ describe('Hawk', function () {
         });
     });
 
-    it('should generate a header for one resource then fail to authenticate another', function (done) {
+    it('generates a header for one resource then fail to authenticate another', function (done) {
 
         var req = {
             method: 'GET',

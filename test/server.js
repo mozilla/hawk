@@ -37,7 +37,7 @@ describe('Hawk', function () {
 
         describe('#authenticate', function () {
 
-            it('should parse a valid authentication header (sha1)', function (done) {
+            it('parses a valid authentication header (sha1)', function (done) {
 
                 var req = {
                     method: 'GET',
@@ -55,7 +55,7 @@ describe('Hawk', function () {
                 });
             });
 
-            it('should parse a valid authentication header (sha256)', function (done) {
+            it('parses a valid authentication header (sha256)', function (done) {
 
                 var req = {
                     method: 'GET',
@@ -73,7 +73,7 @@ describe('Hawk', function () {
                 });
             });
 
-            it('should parse a valid authentication header (host override)', function (done) {
+            it('parses a valid authentication header (host override)', function (done) {
 
                 var req = {
                     method: 'GET',
@@ -92,7 +92,7 @@ describe('Hawk', function () {
                 });
             });
 
-            it('should parse a valid authentication header (host port override)', function (done) {
+            it('parses a valid authentication header (host port override)', function (done) {
 
                 var req = {
                     method: 'GET',
@@ -111,7 +111,7 @@ describe('Hawk', function () {
                 });
             });
 
-            it('should parse a valid authentication header (POST with payload)', function (done) {
+            it('parses a valid authentication header (POST with payload)', function (done) {
 
                 var req = {
                     method: 'POST',
@@ -129,7 +129,7 @@ describe('Hawk', function () {
                 });
             });
 
-            it('should fail on missing hash', function (done) {
+            it('errors on missing hash', function (done) {
 
                 var req = {
                     method: 'GET',
@@ -147,7 +147,7 @@ describe('Hawk', function () {
                 });
             });
 
-            it('should fail on a stale timestamp', function (done) {
+            it('errors on a stale timestamp', function (done) {
 
                 var req = {
                     method: 'GET',
@@ -177,7 +177,7 @@ describe('Hawk', function () {
                 });
             });
 
-            it('should fail on a replay', function (done) {
+            it('errors on a replay', function (done) {
 
                 var req = {
                     method: 'GET',
@@ -215,7 +215,7 @@ describe('Hawk', function () {
                 });
             });
 
-            it('should fail on an invalid authentication header: wrong scheme', function (done) {
+            it('errors on an invalid authentication header: wrong scheme', function (done) {
 
                 var req = {
                     method: 'GET',
@@ -233,7 +233,7 @@ describe('Hawk', function () {
                 });
             });
 
-            it('should fail on an invalid authentication header: no scheme', function (done) {
+            it('errors on an invalid authentication header: no scheme', function (done) {
 
                 var req = {
                     method: 'GET',
@@ -251,7 +251,7 @@ describe('Hawk', function () {
                 });
             });
 
-            it('should fail on an missing authorization header', function (done) {
+            it('errors on an missing authorization header', function (done) {
 
                 var req = {
                     method: 'GET',
@@ -268,7 +268,7 @@ describe('Hawk', function () {
                 });
             });
 
-            it('should fail on an missing host header', function (done) {
+            it('errors on an missing host header', function (done) {
 
                 var req = {
                     method: 'GET',
@@ -286,7 +286,7 @@ describe('Hawk', function () {
                 });
             });
 
-            it('should fail on an missing authorization attribute (id)', function (done) {
+            it('errors on an missing authorization attribute (id)', function (done) {
 
                 var req = {
                     method: 'GET',
@@ -304,7 +304,7 @@ describe('Hawk', function () {
                 });
             });
 
-            it('should fail on an missing authorization attribute (ts)', function (done) {
+            it('errors on an missing authorization attribute (ts)', function (done) {
 
                 var req = {
                     method: 'GET',
@@ -322,7 +322,7 @@ describe('Hawk', function () {
                 });
             });
 
-            it('should fail on an missing authorization attribute (nonce)', function (done) {
+            it('errors on an missing authorization attribute (nonce)', function (done) {
 
                 var req = {
                     method: 'GET',
@@ -340,7 +340,7 @@ describe('Hawk', function () {
                 });
             });
 
-            it('should fail on an missing authorization attribute (mac)', function (done) {
+            it('errors on an missing authorization attribute (mac)', function (done) {
 
                 var req = {
                     method: 'GET',
@@ -358,7 +358,7 @@ describe('Hawk', function () {
                 });
             });
 
-            it('should fail on an unknown authorization attribute', function (done) {
+            it('errors on an unknown authorization attribute', function (done) {
 
                 var req = {
                     method: 'GET',
@@ -376,7 +376,7 @@ describe('Hawk', function () {
                 });
             });
 
-            it('should fail on an bad authorization header format', function (done) {
+            it('errors on an bad authorization header format', function (done) {
 
                 var req = {
                     method: 'GET',
@@ -394,7 +394,7 @@ describe('Hawk', function () {
                 });
             });
 
-            it('should fail on an bad authorization attribute value', function (done) {
+            it('errors on an bad authorization attribute value', function (done) {
 
                 var req = {
                     method: 'GET',
@@ -412,7 +412,7 @@ describe('Hawk', function () {
                 });
             });
 
-            it('should fail on an empty authorization attribute value', function (done) {
+            it('errors on an empty authorization attribute value', function (done) {
 
                 var req = {
                     method: 'GET',
@@ -430,7 +430,7 @@ describe('Hawk', function () {
                 });
             });
 
-            it('should fail on duplicated authorization attribute key', function (done) {
+            it('errors on duplicated authorization attribute key', function (done) {
 
                 var req = {
                     method: 'GET',
@@ -448,7 +448,7 @@ describe('Hawk', function () {
                 });
             });
 
-            it('should fail on an invalid authorization header format', function (done) {
+            it('errors on an invalid authorization header format', function (done) {
 
                 var req = {
                     method: 'GET',
@@ -466,7 +466,7 @@ describe('Hawk', function () {
                 });
             });
 
-            it('should fail on an bad host header (missing host)', function (done) {
+            it('errors on an bad host header (missing host)', function (done) {
 
                 var req = {
                     method: 'GET',
@@ -485,7 +485,7 @@ describe('Hawk', function () {
                 });
             });
 
-            it('should fail on an bad host header (pad port)', function (done) {
+            it('errors on an bad host header (pad port)', function (done) {
 
                 var req = {
                     method: 'GET',
@@ -504,7 +504,7 @@ describe('Hawk', function () {
                 });
             });
 
-            it('should fail on credentialsFunc error', function (done) {
+            it('errors on credentialsFunc error', function (done) {
 
                 var req = {
                     method: 'GET',
@@ -527,7 +527,31 @@ describe('Hawk', function () {
                 });
             });
 
-            it('should fail on missing credentials', function (done) {
+            it('errors on credentialsFunc error (with credentials)', function (done) {
+
+                var req = {
+                    method: 'GET',
+                    url: '/resource/4?filter=a',
+                    host: 'example.com',
+                    port: 8080,
+                    authorization: 'Hawk id="123", ts="1353788437", nonce="k3j4h2", mac="/qwS4UjfVWMcUyW6EEgUH4jlr7T/wuKe3dKijvTvSos=", ext="hello"'
+                };
+
+                var credentialsFunc = function (id, callback) {
+
+                    return callback(new Error('Unknown user'), { some: 'value' });
+                };
+
+                Hawk.server.authenticate(req, credentialsFunc, { localtimeOffsetMsec: 1353788437000 - Hawk.utils.now() }, function (err, credentials, artifacts) {
+
+                    expect(err).to.exist;
+                    expect(err.message).to.equal('Unknown user');
+                    expect(credentials.some).to.equal('value');
+                    done();
+                });
+            });
+
+            it('errors on missing credentials', function (done) {
 
                 var req = {
                     method: 'GET',
@@ -550,7 +574,7 @@ describe('Hawk', function () {
                 });
             });
 
-            it('should fail on invalid credentials', function (done) {
+            it('errors on invalid credentials (id)', function (done) {
 
                 var req = {
                     method: 'GET',
@@ -579,7 +603,36 @@ describe('Hawk', function () {
                 });
             });
 
-            it('should fail on unknown credentials algorithm', function (done) {
+            it('errors on invalid credentials (key)', function (done) {
+
+                var req = {
+                    method: 'GET',
+                    url: '/resource/4?filter=a',
+                    host: 'example.com',
+                    port: 8080,
+                    authorization: 'Hawk id="123", ts="1353788437", nonce="k3j4h2", mac="/qwS4UjfVWMcUyW6EEgUH4jlr7T/wuKe3dKijvTvSos=", ext="hello"'
+                };
+
+                var credentialsFunc = function (id, callback) {
+
+                    var credentials = {
+                        id: '23434d3q4d5345d',
+                        user: 'steve'
+                    };
+
+                    return callback(null, credentials);
+                };
+
+                Hawk.server.authenticate(req, credentialsFunc, { localtimeOffsetMsec: 1353788437000 - Hawk.utils.now() }, function (err, credentials, artifacts) {
+
+                    expect(err).to.exist;
+                    expect(err.message).to.equal('Invalid credentials');
+                    expect(err.output.payload.message).to.equal('An internal server error occurred');
+                    done();
+                });
+            });
+
+            it('errors on unknown credentials algorithm', function (done) {
 
                 var req = {
                     method: 'GET',
@@ -609,7 +662,7 @@ describe('Hawk', function () {
                 });
             });
 
-            it('should fail on unknown bad mac', function (done) {
+            it('errors on unknown bad mac', function (done) {
 
                 var req = {
                     method: 'GET',
@@ -641,45 +694,281 @@ describe('Hawk', function () {
 
         describe('#header', function () {
 
-            it('should return an empty authorization header on missing options', function (done) {
-
-                var header = Hawk.server.header();
-                expect(header).to.equal('');
-                done();
-            });
-
-            it('should return an empty authorization header on missing credentials', function (done) {
-
-                var header = Hawk.server.header(null, {});
-                expect(header).to.equal('');
-                done();
-            });
-
-            it('should return an empty authorization header on invalid credentials', function (done) {
+            it('generates header', function (done) {
 
                 var credentials = {
-                    key: '2983d45yun89q'
+                    id: '123456',
+                    key: 'werxhqb98rpaxn39848xrunpaw3489ruxnpa98w4rxn',
+                    algorithm: 'sha256',
+                    user: 'steve'
                 };
 
-                var header = Hawk.server.header(credentials);
-                expect(header).to.equal('');
-                done();
-            });
-
-            it('should return an empty authorization header on invalid algorithm', function (done) {
-
                 var artifacts = {
+                    method: 'POST',
+                    host: 'example.com',
+                    port: '8080',
+                    resource: '/resource/4?filter=a',
+                    ts: '1398546787',
+                    nonce: 'xUwusx',
+                    hash: 'nJjkVtBE5Y/Bk38Aiokwn0jiJxt/0S2WRSUwWLCf5xk=',
+                    ext: 'some-app-data',
+                    mac: 'dvIvMThwi28J61Jc3P0ryAhuKpanU63GXdx6hkmQkJA=',
                     id: '123456'
                 };
 
+                var header = Hawk.server.header(credentials, artifacts, { payload: 'some reply', contentType: 'text/plain', ext: 'response-specific' });
+                expect(header).to.equal('Hawk mac=\"n14wVJK4cOxAytPUMc5bPezQzuJGl5n7MYXhFQgEKsE=\", hash=\"f9cDF/TDm7TkYRLnGwRMfeDzT6LixQVLvrIKhh0vgmM=\", ext=\"response-specific\"');
+                done();
+            });
+
+            it('generates header (empty payload)', function (done) {
+
                 var credentials = {
-                    key: '2983d45yun89q',
-                    algorithm: 'hmac-sha-0'
+                    id: '123456',
+                    key: 'werxhqb98rpaxn39848xrunpaw3489ruxnpa98w4rxn',
+                    algorithm: 'sha256',
+                    user: 'steve'
                 };
 
-                var header = Hawk.server.header(credentials, artifacts);
+                var artifacts = {
+                    method: 'POST',
+                    host: 'example.com',
+                    port: '8080',
+                    resource: '/resource/4?filter=a',
+                    ts: '1398546787',
+                    nonce: 'xUwusx',
+                    hash: 'nJjkVtBE5Y/Bk38Aiokwn0jiJxt/0S2WRSUwWLCf5xk=',
+                    ext: 'some-app-data',
+                    mac: 'dvIvMThwi28J61Jc3P0ryAhuKpanU63GXdx6hkmQkJA=',
+                    id: '123456'
+                };
+
+                var header = Hawk.server.header(credentials, artifacts, { payload: '', contentType: 'text/plain', ext: 'response-specific' });
+                expect(header).to.equal('Hawk mac=\"i8/kUBDx0QF+PpCtW860kkV/fa9dbwEoe/FpGUXowf0=\", hash=\"q/t+NNAkQZNlq/aAD6PlexImwQTxwgT2MahfTa9XRLA=\", ext=\"response-specific\"');
+                done();
+            });
+
+            it('generates header (pre calculated hash)', function (done) {
+
+                var credentials = {
+                    id: '123456',
+                    key: 'werxhqb98rpaxn39848xrunpaw3489ruxnpa98w4rxn',
+                    algorithm: 'sha256',
+                    user: 'steve'
+                };
+
+                var artifacts = {
+                    method: 'POST',
+                    host: 'example.com',
+                    port: '8080',
+                    resource: '/resource/4?filter=a',
+                    ts: '1398546787',
+                    nonce: 'xUwusx',
+                    hash: 'nJjkVtBE5Y/Bk38Aiokwn0jiJxt/0S2WRSUwWLCf5xk=',
+                    ext: 'some-app-data',
+                    mac: 'dvIvMThwi28J61Jc3P0ryAhuKpanU63GXdx6hkmQkJA=',
+                    id: '123456'
+                };
+
+                var options = { payload: 'some reply', contentType: 'text/plain', ext: 'response-specific' };
+                options.hash = Hawk.crypto.calculatePayloadHash(options.payload, credentials.algorithm, options.contentType);
+                var header = Hawk.server.header(credentials, artifacts, options);
+                expect(header).to.equal('Hawk mac=\"n14wVJK4cOxAytPUMc5bPezQzuJGl5n7MYXhFQgEKsE=\", hash=\"f9cDF/TDm7TkYRLnGwRMfeDzT6LixQVLvrIKhh0vgmM=\", ext=\"response-specific\"');
+                done();
+            });
+
+            it('generates header (null ext)', function (done) {
+
+                var credentials = {
+                    id: '123456',
+                    key: 'werxhqb98rpaxn39848xrunpaw3489ruxnpa98w4rxn',
+                    algorithm: 'sha256',
+                    user: 'steve'
+                };
+
+                var artifacts = {
+                    method: 'POST',
+                    host: 'example.com',
+                    port: '8080',
+                    resource: '/resource/4?filter=a',
+                    ts: '1398546787',
+                    nonce: 'xUwusx',
+                    hash: 'nJjkVtBE5Y/Bk38Aiokwn0jiJxt/0S2WRSUwWLCf5xk=',
+                    mac: 'dvIvMThwi28J61Jc3P0ryAhuKpanU63GXdx6hkmQkJA=',
+                    id: '123456'
+                };
+
+                var header = Hawk.server.header(credentials, artifacts, { payload: 'some reply', contentType: 'text/plain', ext: null });
+                expect(header).to.equal('Hawk mac=\"6PrybJTJs20jsgBw5eilXpcytD8kUbaIKNYXL+6g0ns=\", hash=\"f9cDF/TDm7TkYRLnGwRMfeDzT6LixQVLvrIKhh0vgmM=\"');
+                done();
+            });
+
+            it('errors on missing artifacts', function (done) {
+
+                var credentials = {
+                    id: '123456',
+                    key: 'werxhqb98rpaxn39848xrunpaw3489ruxnpa98w4rxn',
+                    algorithm: 'sha256',
+                    user: 'steve'
+                };
+
+                var header = Hawk.server.header(credentials, null, { payload: 'some reply', contentType: 'text/plain', ext: 'response-specific' });
                 expect(header).to.equal('');
                 done();
+            });
+
+            it('errors on invalid artifacts', function (done) {
+
+                var credentials = {
+                    id: '123456',
+                    key: 'werxhqb98rpaxn39848xrunpaw3489ruxnpa98w4rxn',
+                    algorithm: 'sha256',
+                    user: 'steve'
+                };
+
+                var header = Hawk.server.header(credentials, 5, { payload: 'some reply', contentType: 'text/plain', ext: 'response-specific' });
+                expect(header).to.equal('');
+                done();
+            });
+
+            it('errors on missing credentials', function (done) {
+
+                var artifacts = {
+                    method: 'POST',
+                    host: 'example.com',
+                    port: '8080',
+                    resource: '/resource/4?filter=a',
+                    ts: '1398546787',
+                    nonce: 'xUwusx',
+                    hash: 'nJjkVtBE5Y/Bk38Aiokwn0jiJxt/0S2WRSUwWLCf5xk=',
+                    ext: 'some-app-data',
+                    mac: 'dvIvMThwi28J61Jc3P0ryAhuKpanU63GXdx6hkmQkJA=',
+                    id: '123456'
+                };
+
+                var header = Hawk.server.header(null, artifacts, { payload: 'some reply', contentType: 'text/plain', ext: 'response-specific' });
+                expect(header).to.equal('');
+                done();
+            });
+
+            it('errors on invalid credentials (key)', function (done) {
+
+                var credentials = {
+                    id: '123456',
+                    algorithm: 'sha256',
+                    user: 'steve'
+                };
+
+                var artifacts = {
+                    method: 'POST',
+                    host: 'example.com',
+                    port: '8080',
+                    resource: '/resource/4?filter=a',
+                    ts: '1398546787',
+                    nonce: 'xUwusx',
+                    hash: 'nJjkVtBE5Y/Bk38Aiokwn0jiJxt/0S2WRSUwWLCf5xk=',
+                    ext: 'some-app-data',
+                    mac: 'dvIvMThwi28J61Jc3P0ryAhuKpanU63GXdx6hkmQkJA=',
+                    id: '123456'
+                };
+
+                var header = Hawk.server.header(credentials, artifacts, { payload: 'some reply', contentType: 'text/plain', ext: 'response-specific' });
+                expect(header).to.equal('');
+                done();
+            });
+
+            it('errors on invalid algorithm', function (done) {
+
+                var credentials = {
+                    id: '123456',
+                    key: 'werxhqb98rpaxn39848xrunpaw3489ruxnpa98w4rxn',
+                    algorithm: 'x',
+                    user: 'steve'
+                };
+
+                var artifacts = {
+                    method: 'POST',
+                    host: 'example.com',
+                    port: '8080',
+                    resource: '/resource/4?filter=a',
+                    ts: '1398546787',
+                    nonce: 'xUwusx',
+                    hash: 'nJjkVtBE5Y/Bk38Aiokwn0jiJxt/0S2WRSUwWLCf5xk=',
+                    ext: 'some-app-data',
+                    mac: 'dvIvMThwi28J61Jc3P0ryAhuKpanU63GXdx6hkmQkJA=',
+                    id: '123456'
+                };
+
+                var header = Hawk.server.header(credentials, artifacts, { payload: 'some reply', contentType: 'text/plain', ext: 'response-specific' });
+                expect(header).to.equal('');
+                done();
+            });
+        });
+
+        describe('#authenticateMessage', function () {
+
+            it('errors on invalid authorization (ts)', function (done) {
+
+                credentialsFunc('123456', function (err, credentials) {
+
+                    var auth = Hawk.client.message('example.com', 8080, 'some message', { credentials: credentials });
+                    delete auth.ts;
+
+                    Hawk.server.authenticateMessage('example.com', 8080, 'some message', auth, credentialsFunc, {}, function (err, credentials) {
+
+                        expect(err).to.exist;
+                        expect(err.message).to.equal('Invalid authorization');
+                        done();
+                    });
+                });
+            });
+
+            it('errors on invalid authorization (nonce)', function (done) {
+
+                credentialsFunc('123456', function (err, credentials) {
+
+                    var auth = Hawk.client.message('example.com', 8080, 'some message', { credentials: credentials });
+                    delete auth.nonce;
+
+                    Hawk.server.authenticateMessage('example.com', 8080, 'some message', auth, credentialsFunc, {}, function (err, credentials) {
+
+                        expect(err).to.exist;
+                        expect(err.message).to.equal('Invalid authorization');
+                        done();
+                    });
+                });
+            });
+
+            it('errors on invalid authorization (hash)', function (done) {
+
+                credentialsFunc('123456', function (err, credentials) {
+
+                    var auth = Hawk.client.message('example.com', 8080, 'some message', { credentials: credentials });
+                    delete auth.hash;
+
+                    Hawk.server.authenticateMessage('example.com', 8080, 'some message', auth, credentialsFunc, {}, function (err, credentials) {
+
+                        expect(err).to.exist;
+                        expect(err.message).to.equal('Invalid authorization');
+                        done();
+                    });
+                });
+            });
+
+            it('errors with credentials', function (done) {
+
+                credentialsFunc('123456', function (err, credentials) {
+
+                    var auth = Hawk.client.message('example.com', 8080, 'some message', { credentials: credentials });
+
+                    Hawk.server.authenticateMessage('example.com', 8080, 'some message', auth, function (id, callback) { callback(new Error('something'), { some: 'value' }); }, {}, function (err, credentials) {
+
+                        expect(err).to.exist;
+                        expect(err.message).to.equal('something');
+                        expect(credentials.some).to.equal('value');
+                        done();
+                    });
+                });
             });
         });
 
