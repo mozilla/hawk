@@ -558,6 +558,19 @@ describe('Browser', function () {
                 done();
             });
 
+            it('returns a valid authorization header (null ext)', function (done) {
+
+                var credentials = {
+                    id: '123456',
+                    key: '2983d45yun89q',
+                    algorithm: 'sha256'
+                };
+
+                var header = Browser.client.header('https://example.net/somewhere/over/the/rainbow', 'POST', { credentials: credentials, timestamp: 1353809207, nonce: 'Ygvqdz', payload: 'something to write about', contentType: 'text/plain', ext: null }).field;
+                expect(header).to.equal('Hawk id="123456", ts="1353809207", nonce="Ygvqdz", hash="2QfCt3GuY9HQnHWyWD3wX68ZOKbynqlfYmuO2ZBRqtY=", mac="HTgtd0jPI6E4izx8e4OHdO36q00xFCU0FolNq3RiCYs="');
+                done();
+            });
+
             it('returns a valid authorization header (uri object)', function (done) {
 
                 var credentials = {
@@ -683,9 +696,57 @@ describe('Browser', function () {
                 expect(header.err).to.equal('Unknown algorithm');
                 done();
             });
+
+            it('uses a pre-calculated payload hash', function (done) {
+
+                var credentials = {
+                    id: '123456',
+                    key: '2983d45yun89q',
+                    algorithm: 'sha256'
+                };
+
+                var options = { credentials: credentials, ext: 'Bazinga!', timestamp: 1353809207, nonce: 'Ygvqdz', payload: 'something to write about', contentType: 'text/plain' };
+                options.hash = Browser.crypto.calculatePayloadHash(options.payload, credentials.algorithm, options.contentType);
+                var header = Browser.client.header('https://example.net/somewhere/over/the/rainbow', 'POST', options).field;
+                expect(header).to.equal('Hawk id="123456", ts="1353809207", nonce="Ygvqdz", hash="2QfCt3GuY9HQnHWyWD3wX68ZOKbynqlfYmuO2ZBRqtY=", ext="Bazinga!", mac="q1CwFoSHzPZSkbIvl0oYlD+91rBUEvFk763nMjMndj8="');
+                done();
+            });
         });
 
         describe('#authenticate', function () {
+
+            it('skips tsm validation when missing ts', function (done) {
+
+                var res = {
+                    headers: {
+                        'www-authenticate': 'Hawk error="Stale timestamp"'
+                    },
+                    getResponseHeader: function (header) {
+
+                        return res.headers[header.toLowerCase()];
+                    }
+                };
+
+                var credentials = {
+                    id: '123456',
+                    key: 'werxhqb98rpaxn39848xrunpaw3489ruxnpa98w4rxn',
+                    algorithm: 'sha256',
+                    user: 'steve'
+                };
+
+                var artifacts = {
+                    ts: 1402135580,
+                    nonce: 'iBRB6t',
+                    method: 'GET',
+                    resource: '/resource/4?filter=a',
+                    host: 'example.com',
+                    port: '8080',
+                    ext: 'some-app-data'
+                };
+
+                expect(Browser.client.authenticate(res, credentials, artifacts)).to.equal(true);
+                done();
+            });
 
             it('returns false on invalid header', function (done) {
 
@@ -781,7 +842,7 @@ describe('Browser', function () {
                 done();
             });
 
-            it('should fail on invalid WWW-Authenticate header format', function (done) {
+            it('errors on invalid WWW-Authenticate header format', function (done) {
 
                 var res = {
                     headers: {
@@ -797,7 +858,7 @@ describe('Browser', function () {
                 done();
             });
 
-            it('should fail on invalid WWW-Authenticate header format', function (done) {
+            it('errors on invalid WWW-Authenticate header format', function (done) {
 
                 var credentials = {
                     id: '123456',
@@ -822,6 +883,7 @@ describe('Browser', function () {
         });
 
         describe('#message', function () {
+
             it('generates an authorization then successfully parse it', function (done) {
 
                 credentialsFunc('123456', function (err, credentials) {
@@ -838,7 +900,19 @@ describe('Browser', function () {
                 });
             });
 
-            it('should fail on missing host', function (done) {
+            it('generates an authorization using custom nonce/timestamp', function (done) {
+
+                credentialsFunc('123456', function (err, credentials) {
+
+                    var auth = Browser.client.message('example.com', 8080, 'some message', { credentials: credentials, nonce: 'abc123', timestamp: 1398536270957 });
+                    expect(auth).to.exist;
+                    expect(auth.nonce).to.equal('abc123');
+                    expect(auth.ts).to.equal(1398536270957);
+                    done();
+                });
+            });
+
+            it('errors on missing host', function (done) {
 
                 credentialsFunc('123456', function (err, credentials) {
 
@@ -848,14 +922,105 @@ describe('Browser', function () {
                 });
             });
 
-            it('should fail on missing credentials', function (done) {
+            it('errors on invalid host', function (done) {
+
+                credentialsFunc('123456', function (err, credentials) {
+
+                    var auth = Browser.client.message(5, 8080, 'some message', { credentials: credentials });
+                    expect(auth).to.not.exist;
+                    done();
+                });
+            });
+
+            it('errors on missing port', function (done) {
+
+                credentialsFunc('123456', function (err, credentials) {
+
+                    var auth = Browser.client.message('example.com', 0, 'some message', { credentials: credentials });
+                    expect(auth).to.not.exist;
+                    done();
+                });
+            });
+
+            it('errors on invalid port', function (done) {
+
+                credentialsFunc('123456', function (err, credentials) {
+
+                    var auth = Browser.client.message('example.com', 'a', 'some message', { credentials: credentials });
+                    expect(auth).to.not.exist;
+                    done();
+                });
+            });
+
+            it('errors on missing message', function (done) {
+
+                credentialsFunc('123456', function (err, credentials) {
+
+                    var auth = Browser.client.message('example.com', 8080, undefined, { credentials: credentials });
+                    expect(auth).to.not.exist;
+                    done();
+                });
+            });
+
+            it('errors on null message', function (done) {
+
+                credentialsFunc('123456', function (err, credentials) {
+
+                    var auth = Browser.client.message('example.com', 8080, null, { credentials: credentials });
+                    expect(auth).to.not.exist;
+                    done();
+                });
+            });
+
+            it('errors on invalid message', function (done) {
+
+                credentialsFunc('123456', function (err, credentials) {
+
+                    var auth = Browser.client.message('example.com', 8080, 5, { credentials: credentials });
+                    expect(auth).to.not.exist;
+                    done();
+                });
+            });
+
+            it('errors on missing credentials', function (done) {
 
                 var auth = Browser.client.message('example.com', 8080, 'some message', {});
                 expect(auth).to.not.exist;
                 done();
             });
 
-            it('should fail on invalid algorithm', function (done) {
+            it('errors on missing options', function (done) {
+
+                var auth = Browser.client.message('example.com', 8080, 'some message');
+                expect(auth).to.not.exist;
+                done();
+            });
+
+            it('errors on invalid credentials (id)', function (done) {
+
+                credentialsFunc('123456', function (err, credentials) {
+
+                    var creds = Hoek.clone(credentials);
+                    delete creds.id;
+                    var auth = Browser.client.message('example.com', 8080, 'some message', { credentials: creds });
+                    expect(auth).to.not.exist;
+                    done();
+                });
+            });
+
+            it('errors on invalid credentials (key)', function (done) {
+
+                credentialsFunc('123456', function (err, credentials) {
+
+                    var creds = Hoek.clone(credentials);
+                    delete creds.key;
+                    var auth = Browser.client.message('example.com', 8080, 'some message', { credentials: creds });
+                    expect(auth).to.not.exist;
+                    done();
+                });
+            });
+
+            it('errors on invalid algorithm', function (done) {
 
                 credentialsFunc('123456', function (err, credentials) {
 
@@ -870,7 +1035,7 @@ describe('Browser', function () {
 
         describe('#authenticateTimestamp', function (done) {
 
-            it('should validate a timestamp', function (done) {
+            it('validates a timestamp', function (done) {
 
                 credentialsFunc('123456', function (err, credentials) {
 
@@ -880,7 +1045,19 @@ describe('Browser', function () {
                 });
             });
 
-            it('should detect a bad timestamp', function (done) {
+            it('validates a timestamp without updating local time', function (done) {
+
+                credentialsFunc('123456', function (err, credentials) {
+
+                    var offset = Browser.utils.getNtpOffset();
+                    var tsm = Hawk.crypto.timestampMessage(credentials, 10000);
+                    expect(Browser.client.authenticateTimestamp(tsm, credentials, false)).to.equal(true);
+                    expect(offset).to.equal(Browser.utils.getNtpOffset());
+                    done();
+                });
+            });
+
+            it('detects a bad timestamp', function (done) {
 
                 credentialsFunc('123456', function (err, credentials) {
 
