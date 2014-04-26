@@ -1,5 +1,6 @@
 // Load modules
 
+var Url = require('url');
 var Lab = require('lab');
 var Hoek = require('hoek');
 var Hawk = require('../lib');
@@ -35,7 +36,7 @@ describe('Browser', function () {
         return callback(null, credentials);
     };
 
-    it('should generate a header then successfully parse it (configuration)', function (done) {
+    it('generates a header then successfully parse it (configuration)', function (done) {
 
         var req = {
             method: 'GET',
@@ -59,7 +60,7 @@ describe('Browser', function () {
         });
     });
 
-    it('should generate a header then successfully parse it (node request)', function (done) {
+    it('generates a header then successfully parse it (node request)', function (done) {
 
         var req = {
             method: 'POST',
@@ -103,7 +104,7 @@ describe('Browser', function () {
         });
     });
 
-    it('should generate a header then successfully parse it (browserify)', function (done) {
+    it('generates a header then successfully parse it (browserify)', function (done) {
 
         var req = {
             method: 'POST',
@@ -147,7 +148,7 @@ describe('Browser', function () {
         });
     });
 
-    it('should generate a header then successfully parse it (no server header options)', function (done) {
+    it('generates a header then successfully parse it (no server header options)', function (done) {
 
         var req = {
             method: 'POST',
@@ -191,7 +192,7 @@ describe('Browser', function () {
         });
     });
 
-    it('should generate a header then successfully parse it (no server header)', function (done) {
+    it('generates a header then successfully parse it (no server header)', function (done) {
 
         var req = {
             method: 'POST',
@@ -232,7 +233,7 @@ describe('Browser', function () {
         });
     });
 
-    it('should generate a header with stale ts and successfully authenticate on second call', function (done) {
+    it('generates a header with stale ts and successfully authenticate on second call', function (done) {
 
         var req = {
             method: 'GET',
@@ -281,7 +282,7 @@ describe('Browser', function () {
         });
     });
 
-    it('should generate a header with stale ts and successfully authenticate on second call (manual localStorage)', function (done) {
+    it('generates a header with stale ts and successfully authenticate on second call (manual localStorage)', function (done) {
 
         var req = {
             method: 'GET',
@@ -333,7 +334,7 @@ describe('Browser', function () {
         });
     });
 
-    it('should generate a header then fails to parse it (missing server header hash)', function (done) {
+    it('generates a header then fails to parse it (missing server header hash)', function (done) {
 
         var req = {
             method: 'POST',
@@ -377,7 +378,7 @@ describe('Browser', function () {
         });
     });
 
-    it('should generate a header then successfully parse it (with hash)', function (done) {
+    it('generates a header then successfully parse it (with hash)', function (done) {
 
         var req = {
             method: 'GET',
@@ -399,7 +400,7 @@ describe('Browser', function () {
         });
     });
 
-    it('should generate a header then successfully parse it then validate payload', function (done) {
+    it('generates a header then successfully parse it then validate payload', function (done) {
 
         var req = {
             method: 'GET',
@@ -423,7 +424,7 @@ describe('Browser', function () {
         });
     });
 
-    it('should generate a header then successfully parse it (app)', function (done) {
+    it('generates a header then successfully parse it (app)', function (done) {
 
         var req = {
             method: 'GET',
@@ -446,7 +447,7 @@ describe('Browser', function () {
         });
     });
 
-    it('should generate a header then successfully parse it (app, dlg)', function (done) {
+    it('generates a header then successfully parse it (app, dlg)', function (done) {
 
         var req = {
             method: 'GET',
@@ -470,7 +471,7 @@ describe('Browser', function () {
         });
     });
 
-    it('should generate a header then fail authentication due to bad hash', function (done) {
+    it('generates a header then fail authentication due to bad hash', function (done) {
 
         var req = {
             method: 'GET',
@@ -491,7 +492,7 @@ describe('Browser', function () {
         });
     });
 
-    it('should generate a header for one resource then fail to authenticate another', function (done) {
+    it('generates a header for one resource then fail to authenticate another', function (done) {
 
         var req = {
             method: 'GET',
@@ -518,7 +519,7 @@ describe('Browser', function () {
 
         describe('#header', function () {
 
-            it('should return a valid authorization header (sha1)', function (done) {
+            it('returns a valid authorization header (sha1)', function (done) {
 
                 var credentials = {
                     id: '123456',
@@ -531,7 +532,7 @@ describe('Browser', function () {
                 done();
             });
 
-            it('should return a valid authorization header (sha256)', function (done) {
+            it('returns a valid authorization header (sha256)', function (done) {
 
                 var credentials = {
                     id: '123456',
@@ -544,7 +545,7 @@ describe('Browser', function () {
                 done();
             });
 
-            it('should return a valid authorization header (no ext)', function (done) {
+            it('returns a valid authorization header (no ext)', function (done) {
 
                 var credentials = {
                     id: '123456',
@@ -557,26 +558,119 @@ describe('Browser', function () {
                 done();
             });
 
-            it('should return an empty authorization header on missing options', function (done) {
+            it('returns a valid authorization header (uri object)', function (done) {
 
-                var header = Browser.client.header('https://example.net/somewhere/over/the/rainbow', 'POST').field;
-                expect(header).to.equal('');
+                var credentials = {
+                    id: '123456',
+                    key: '2983d45yun89q',
+                    algorithm: 'sha256'
+                };
+
+                var uri = Browser.utils.parseUri('https://example.net/somewhere/over/the/rainbow');
+                var header = Browser.client.header(uri, 'POST', { credentials: credentials, timestamp: 1353809207, nonce: 'Ygvqdz', payload: 'something to write about', contentType: 'text/plain' }).field;
+                expect(header).to.equal('Hawk id="123456", ts="1353809207", nonce="Ygvqdz", hash="2QfCt3GuY9HQnHWyWD3wX68ZOKbynqlfYmuO2ZBRqtY=", mac="HTgtd0jPI6E4izx8e4OHdO36q00xFCU0FolNq3RiCYs="');
                 done();
             });
 
-            it('should return an empty authorization header on invalid credentials', function (done) {
+            it('errors on missing options', function (done) {
+
+                var header = Browser.client.header('https://example.net/somewhere/over/the/rainbow', 'POST');
+                expect(header.field).to.equal('');
+                expect(header.err).to.equal('Invalid argument type');
+                done();
+            });
+
+            it('errors on empty uri', function (done) {
+
+                var credentials = {
+                    id: '123456',
+                    key: '2983d45yun89q',
+                    algorithm: 'sha256'
+                };
+
+                var header = Browser.client.header('', 'POST', { credentials: credentials, timestamp: 1353809207, nonce: 'Ygvqdz', payload: 'something to write about', contentType: 'text/plain' });
+                expect(header.field).to.equal('');
+                expect(header.err).to.equal('Invalid argument type');
+                done();
+            });
+
+            it('errors on invalid uri', function (done) {
+
+                var credentials = {
+                    id: '123456',
+                    key: '2983d45yun89q',
+                    algorithm: 'sha256'
+                };
+
+                var header = Browser.client.header(4, 'POST', { credentials: credentials, timestamp: 1353809207, nonce: 'Ygvqdz', payload: 'something to write about', contentType: 'text/plain' });
+                expect(header.field).to.equal('');
+                expect(header.err).to.equal('Invalid argument type');
+                done();
+            });
+
+            it('errors on missing method', function (done) {
+
+                var credentials = {
+                    id: '123456',
+                    key: '2983d45yun89q',
+                    algorithm: 'sha256'
+                };
+
+                var header = Browser.client.header('https://example.net/somewhere/over/the/rainbow', '', { credentials: credentials, timestamp: 1353809207, nonce: 'Ygvqdz', payload: 'something to write about', contentType: 'text/plain' });
+                expect(header.field).to.equal('');
+                expect(header.err).to.equal('Invalid argument type');
+                done();
+            });
+
+            it('errors on invalid method', function (done) {
+
+                var credentials = {
+                    id: '123456',
+                    key: '2983d45yun89q',
+                    algorithm: 'sha256'
+                };
+
+                var header = Browser.client.header('https://example.net/somewhere/over/the/rainbow', 5, { credentials: credentials, timestamp: 1353809207, nonce: 'Ygvqdz', payload: 'something to write about', contentType: 'text/plain' });
+                expect(header.field).to.equal('');
+                expect(header.err).to.equal('Invalid argument type');
+                done();
+            });
+
+            it('errors on missing credentials', function (done) {
+
+                var header = Browser.client.header('https://example.net/somewhere/over/the/rainbow', 'POST', { ext: 'Bazinga!', timestamp: 1353809207 });
+                expect(header.field).to.equal('');
+                expect(header.err).to.equal('Invalid credentials object');
+                done();
+            });
+
+            it('errors on invalid credentials (id)', function (done) {
 
                 var credentials = {
                     key: '2983d45yun89q',
                     algorithm: 'sha256'
                 };
 
-                var header = Browser.client.header('https://example.net/somewhere/over/the/rainbow', 'POST', { credentials: credentials, ext: 'Bazinga!', timestamp: 1353809207 }).field;
-                expect(header).to.equal('');
+                var header = Browser.client.header('https://example.net/somewhere/over/the/rainbow', 'POST', { credentials: credentials, ext: 'Bazinga!', timestamp: 1353809207 });
+                expect(header.field).to.equal('');
+                expect(header.err).to.equal('Invalid credentials object');
                 done();
             });
 
-            it('should return an empty authorization header on invalid algorithm', function (done) {
+            it('errors on invalid credentials (key)', function (done) {
+
+                var credentials = {
+                    id: '123456',
+                    algorithm: 'sha256'
+                };
+
+                var header = Browser.client.header('https://example.net/somewhere/over/the/rainbow', 'POST', { credentials: credentials, ext: 'Bazinga!', timestamp: 1353809207 });
+                expect(header.field).to.equal('');
+                expect(header.err).to.equal('Invalid credentials object');
+                done();
+            });
+
+            it('errors on invalid algorithm', function (done) {
 
                 var credentials = {
                     id: '123456',
@@ -584,15 +678,16 @@ describe('Browser', function () {
                     algorithm: 'hmac-sha-0'
                 };
 
-                var header = Browser.client.header('https://example.net/somewhere/over/the/rainbow', 'POST', { credentials: credentials, payload: 'something, anything!', ext: 'Bazinga!', timestamp: 1353809207 }).field;
-                expect(header).to.equal('');
+                var header = Browser.client.header('https://example.net/somewhere/over/the/rainbow', 'POST', { credentials: credentials, payload: 'something, anything!', ext: 'Bazinga!', timestamp: 1353809207 });
+                expect(header.field).to.equal('');
+                expect(header.err).to.equal('Unknown algorithm');
                 done();
             });
         });
 
         describe('#authenticate', function () {
 
-            it('should return false on invalid header', function (done) {
+            it('returns false on invalid header', function (done) {
 
                 var res = {
                     headers: {
@@ -608,7 +703,7 @@ describe('Browser', function () {
                 done();
             });
 
-            it('should return false on invalid mac', function (done) {
+            it('returns false on invalid mac', function (done) {
 
                 var res = {
                     headers: {
@@ -647,7 +742,7 @@ describe('Browser', function () {
                 done();
             });
 
-            it('should return true on ignoring hash', function (done) {
+            it('returns true on ignoring hash', function (done) {
 
                 var res = {
                     headers: {
@@ -727,7 +822,7 @@ describe('Browser', function () {
         });
 
         describe('#message', function () {
-            it('should generate an authorization then successfully parse it', function (done) {
+            it('generates an authorization then successfully parse it', function (done) {
 
                 credentialsFunc('123456', function (err, credentials) {
 
