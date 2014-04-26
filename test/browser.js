@@ -5,7 +5,6 @@ var Lab = require('lab');
 var Hoek = require('hoek');
 var Hawk = require('../lib');
 var Browser = require('../lib/browser');
-var LocalStorage = require('localStorage');
 
 
 // Declare internals
@@ -143,6 +142,30 @@ describe('Browser', function () {
                 expect(res.headers['server-authorization']).to.exist;
 
                 expect(Browser.client.authenticate(res, credentials, artifacts, { payload: 'some reply' })).to.equal(true);
+                done();
+            });
+        });
+    });
+
+    it('generates a header then successfully parse it (time offset)', function (done) {
+
+        var req = {
+            method: 'GET',
+            url: '/resource/4?filter=a',
+            host: 'example.com',
+            port: 8080
+        };
+
+        credentialsFunc('123456', function (err, credentials) {
+
+            req.authorization = Browser.client.header('http://example.com:8080/resource/4?filter=a', req.method, { credentials: credentials, ext: 'some-app-data', localtimeOffsetMsec: 100000 }).field;
+            expect(req.authorization).to.exist;
+
+            Hawk.server.authenticate(req, credentialsFunc, { localtimeOffsetMsec: 100000 }, function (err, credentials, artifacts) {
+
+                expect(err).to.not.exist;
+                expect(credentials.user).to.equal('steve');
+                expect(artifacts.ext).to.equal('some-app-data');
                 done();
             });
         });
@@ -292,7 +315,10 @@ describe('Browser', function () {
         };
 
         credentialsFunc('123456', function (err, credentials) {
-            Browser.utils.setStorage(LocalStorage)
+
+            var localStorage = new Browser.internals.LocalStorage();
+
+            Browser.utils.setStorage(localStorage)
 
             Browser.utils.setNtpOffset(60 * 60 * 1000);
             var header = Browser.client.header('http://example.com:8080/resource/4?filter=a', req.method, { credentials: credentials, ext: 'some-app-data' });
@@ -314,11 +340,11 @@ describe('Browser', function () {
                     }
                 };
 
-                expect(parseInt(LocalStorage.getItem('hawk_ntp_offset'))).to.equal(60 * 60 * 1000);
+                expect(parseInt(localStorage.getItem('hawk_ntp_offset'))).to.equal(60 * 60 * 1000);
                 expect(Browser.utils.getNtpOffset()).to.equal(60 * 60 * 1000);
                 expect(Browser.client.authenticate(res, credentials, header.artifacts)).to.equal(true);
                 expect(Browser.utils.getNtpOffset()).to.equal(0);
-                expect(parseInt(LocalStorage.getItem('hawk_ntp_offset'))).to.equal(0);
+                expect(parseInt(localStorage.getItem('hawk_ntp_offset'))).to.equal(0);
 
                 req.authorization = Browser.client.header('http://example.com:8080/resource/4?filter=a', req.method, { credentials: credentials, ext: 'some-app-data' }).field;
                 expect(req.authorization).to.exist;
@@ -542,6 +568,19 @@ describe('Browser', function () {
 
                 var header = Browser.client.header('https://example.net/somewhere/over/the/rainbow', 'POST', { credentials: credentials, ext: 'Bazinga!', timestamp: 1353809207, nonce: 'Ygvqdz', payload: 'something to write about', contentType: 'text/plain' }).field;
                 expect(header).to.equal('Hawk id="123456", ts="1353809207", nonce="Ygvqdz", hash="2QfCt3GuY9HQnHWyWD3wX68ZOKbynqlfYmuO2ZBRqtY=", ext="Bazinga!", mac="q1CwFoSHzPZSkbIvl0oYlD+91rBUEvFk763nMjMndj8="');
+                done();
+            });
+
+            it('returns a valid authorization header (empty payload)', function (done) {
+
+                var credentials = {
+                    id: '123456',
+                    key: '2983d45yun89q',
+                    algorithm: 'sha1'
+                };
+
+                var header = Browser.client.header('http://example.net/somewhere/over/the/rainbow', 'POST', { credentials: credentials, ext: 'Bazinga!', timestamp: 1353809207, nonce: 'Ygvqdz', payload: '' }).field;
+                expect(header).to.equal('Hawk id=\"123456\", ts=\"1353809207\", nonce=\"Ygvqdz\", hash=\"404ghL7K+hfyhByKKejFBRGgTjU=\", ext=\"Bazinga!\", mac=\"Bh1sj1DOfFRWOdi3ww52nLCJdBE=\"');
                 done();
             });
 
@@ -1070,74 +1109,133 @@ describe('Browser', function () {
         });
     });
 
-    describe('#parseAuthorizationHeader', function (done) {
+    describe('internals', function () {
 
-        it('returns null on missing header', function (done) {
+        describe('LocalStorage', function () {
 
-            expect(Browser.utils.parseAuthorizationHeader()).to.equal(null);
-            done();
-        });
+            it('goes through the full lifecycle', function (done) {
 
-        it('returns null on bad header syntax (structure)', function (done) {
-
-            expect(Browser.utils.parseAuthorizationHeader('Hawk')).to.equal(null);
-            done();
-        });
-
-        it('returns null on bad header syntax (parts)', function (done) {
-
-            expect(Browser.utils.parseAuthorizationHeader(' ')).to.equal(null);
-            done();
-        });
-
-        it('returns null on bad scheme name', function (done) {
-
-            expect(Browser.utils.parseAuthorizationHeader('Basic asdasd')).to.equal(null);
-            done();
-        });
-
-        it('returns null on bad attribute value', function (done) {
-
-            expect(Browser.utils.parseAuthorizationHeader('Hawk test="\t"', ['test'])).to.equal(null);
-            done();
-        });
-
-        it('returns null on duplicated attribute', function (done) {
-
-            expect(Browser.utils.parseAuthorizationHeader('Hawk test="a", test="b"', ['test'])).to.equal(null);
-            done();
+                var storage = new Browser.internals.LocalStorage();
+                expect(storage.length).to.equal(0);
+                expect(storage.getItem('a')).to.equal(null);
+                storage.setItem('a', 5);
+                expect(storage.length).to.equal(1);
+                expect(storage.key()).to.equal('a');
+                expect(storage.key(0)).to.equal('a');
+                expect(storage.getItem('a')).to.equal('5');
+                storage.setItem('b', 'test');
+                expect(storage.key()).to.equal('a');
+                expect(storage.key(0)).to.equal('a');
+                expect(storage.key(1)).to.equal('b');
+                expect(storage.length).to.equal(2);
+                expect(storage.getItem('b')).to.equal('test');
+                storage.removeItem('a');
+                expect(storage.length).to.equal(1);
+                expect(storage.getItem('a')).to.equal(null);
+                expect(storage.getItem('b')).to.equal('test');
+                storage.clear();
+                expect(storage.length).to.equal(0);
+                expect(storage.getItem('a')).to.equal(null);
+                expect(storage.getItem('b')).to.equal(null);
+                done();
+            });
         });
     });
 
-    describe('#setNtpOffset', function (done) {
+    describe('utils', function () {
 
-        it('catches localStorage errors', function (done) {
+        describe('#setStorage', function () {
 
-            var orig = Browser.utils.storage.setItem;
-            var error = console.error;
-            var count = 0;
-            console.error = function () { if (count++ === 2) { console.error = error; } };
-            Browser.utils.storage.setItem = function () {
+            it('sets storage for the first time', function (done) {
 
-                Browser.utils.storage.setItem = orig;
-                throw new Error()
-            };
+                Browser.utils.storage = new Browser.internals.LocalStorage();        // Reset state
 
-            expect(function () {
-                Browser.utils.setNtpOffset(100);
-            }).not.to.throw();
-
-            done();
+                expect(Browser.utils.storage.getItem('hawk_ntp_offset')).to.not.exist;
+                Browser.utils.storage.setItem('test', '1');
+                Browser.utils.setStorage(new Browser.internals.LocalStorage());
+                expect(Browser.utils.storage.getItem('test')).to.not.exist;
+                Browser.utils.storage.setItem('test', '2');
+                expect(Browser.utils.storage.getItem('test')).to.equal('2');
+                done();
+            });
         });
-    });
 
-    describe('#parseUri', function () {
+        describe('#setNtpOffset', function (done) {
 
-        it('returns empty port when unknown scheme', function (done) {
+            it('catches localStorage errors', function (done) {
 
-            var uri = Browser.utils.parseUri('ftp://domain');
-            expect(uri.port).to.equal('');
-            done();
+                var orig = Browser.utils.storage.setItem;
+                var error = console.error;
+                var count = 0;
+                console.error = function () { if (count++ === 2) { console.error = error; } };
+                Browser.utils.storage.setItem = function () {
+
+                    Browser.utils.storage.setItem = orig;
+                    throw new Error()
+                };
+
+                expect(function () {
+                    Browser.utils.setNtpOffset(100);
+                }).not.to.throw();
+
+                done();
+            });
+        });
+
+        describe('#parseAuthorizationHeader', function (done) {
+
+            it('returns null on missing header', function (done) {
+
+                expect(Browser.utils.parseAuthorizationHeader()).to.equal(null);
+                done();
+            });
+
+            it('returns null on bad header syntax (structure)', function (done) {
+
+                expect(Browser.utils.parseAuthorizationHeader('Hawk')).to.equal(null);
+                done();
+            });
+
+            it('returns null on bad header syntax (parts)', function (done) {
+
+                expect(Browser.utils.parseAuthorizationHeader(' ')).to.equal(null);
+                done();
+            });
+
+            it('returns null on bad scheme name', function (done) {
+
+                expect(Browser.utils.parseAuthorizationHeader('Basic asdasd')).to.equal(null);
+                done();
+            });
+
+            it('returns null on bad attribute value', function (done) {
+
+                expect(Browser.utils.parseAuthorizationHeader('Hawk test="\t"', ['test'])).to.equal(null);
+                done();
+            });
+
+            it('returns null on duplicated attribute', function (done) {
+
+                expect(Browser.utils.parseAuthorizationHeader('Hawk test="a", test="b"', ['test'])).to.equal(null);
+                done();
+            });
+        });
+
+        describe('#parseUri', function () {
+
+            it('returns empty port when unknown scheme', function (done) {
+
+                var uri = Browser.utils.parseUri('ftp://domain');
+                expect(uri.port).to.equal('');
+                done();
+            });
+
+            it('returns default port when missing', function (done) {
+
+                var uri = Browser.utils.parseUri('http://');
+                expect(uri.port).to.equal('80');
+                done();
+            });
         });
     });
 });

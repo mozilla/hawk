@@ -23,8 +23,7 @@
     "sntp": "1.x.x"
   },
   "devDependencies": {
-    "lab": "3.x.x",
-    "localStorage": "1.0.x"
+    "lab": "3.x.x"
   },
   "scripts": {
     "test": "make test-cov"
