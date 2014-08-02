@@ -1,8 +1,8 @@
 {
   "name": "hawk",
   "description": "HTTP Hawk Authentication Scheme",
-  "version": "2.2.2",
-  "author": "Eran Hammer <eran@hueniverse.com> (http://hueniverse.com)",
+  "version": "2.2.3",
+  "author": "Eran Hammer <eran@hammer.io> (http://hueniverse.com)",
   "contributors": [],
   "repository": "git://github.com/hueniverse/hawk",
   "main": "index",
