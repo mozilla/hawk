@@ -23,7 +23,7 @@ describe('Hawk', function () {
 
     describe('server', function () {
 
-        var credentialsFunc = function (id, callback) {
+        var credentialsFunc = function (id, data, callback) {
 
             var credentials = {
                 id: id,
@@ -146,6 +146,38 @@ describe('Hawk', function () {
                     done();
                 });
             });
+
+            it('passes extra data to credentials function', function (done) {
+
+                var credentialsFunc = function (id, data, callback) {
+
+                    var credentials = {
+                        id: id,
+                        key: 'werxhqb98rpaxn39848xrunpaw3489ruxnpa98w4rxn',
+                        algorithm: (id === '1' ? 'sha1' : 'sha256'),
+                        user: 'steve'
+                    };
+
+                    expect(data).to.equal('some data');
+                    return callback(null, credentials);
+                };
+
+                var req = {
+                    method: 'POST',
+                    url: '/resource/4?filter=a',
+                    host: 'example.com',
+                    port: 8080,
+                    authorization: 'Hawk id="123456", ts="1357926341", nonce="1AwuJD", hash="qAiXIVv+yjDATneWxZP2YCTa9aHRgQdnH9b3Wc+o3dg=", ext="some-app-data", mac="UeYcj5UoTVaAWXNvJfLVia7kU3VabxCqrccXP8sUGC4="'
+                };
+
+                Hawk.server.authenticate(req, credentialsFunc, { localtimeOffsetMsec: 1357926341000 - Hawk.utils.now(), credentialsFuncData: 'some data' }, function (err, credentials, artifacts) {
+
+                    expect(err).to.not.exist;
+                    expect(credentials.user).to.equal('steve');
+                    done();
+                });
+            });
+
 
             it('errors on a stale timestamp', function (done) {
 
@@ -514,7 +546,7 @@ describe('Hawk', function () {
                     authorization: 'Hawk id="123", ts="1353788437", nonce="k3j4h2", mac="/qwS4UjfVWMcUyW6EEgUH4jlr7T/wuKe3dKijvTvSos=", ext="hello"'
                 };
 
-                var credentialsFunc = function (id, callback) {
+                var credentialsFunc = function (id, data, callback) {
 
                     return callback(new Error('Unknown user'));
                 };
@@ -537,7 +569,7 @@ describe('Hawk', function () {
                     authorization: 'Hawk id="123", ts="1353788437", nonce="k3j4h2", mac="/qwS4UjfVWMcUyW6EEgUH4jlr7T/wuKe3dKijvTvSos=", ext="hello"'
                 };
 
-                var credentialsFunc = function (id, callback) {
+                var credentialsFunc = function (id, data, callback) {
 
                     return callback(new Error('Unknown user'), { some: 'value' });
                 };
@@ -561,7 +593,7 @@ describe('Hawk', function () {
                     authorization: 'Hawk id="123", ts="1353788437", nonce="k3j4h2", mac="/qwS4UjfVWMcUyW6EEgUH4jlr7T/wuKe3dKijvTvSos=", ext="hello"'
                 };
 
-                var credentialsFunc = function (id, callback) {
+                var credentialsFunc = function (id, data, callback) {
 
                     return callback(null, null);
                 };
@@ -584,7 +616,7 @@ describe('Hawk', function () {
                     authorization: 'Hawk id="123", ts="1353788437", nonce="k3j4h2", mac="/qwS4UjfVWMcUyW6EEgUH4jlr7T/wuKe3dKijvTvSos=", ext="hello"'
                 };
 
-                var credentialsFunc = function (id, callback) {
+                var credentialsFunc = function (id, data, callback) {
 
                     var credentials = {
                         key: 'werxhqb98rpaxn39848xrunpaw3489ruxnpa98w4rxn',
@@ -613,7 +645,7 @@ describe('Hawk', function () {
                     authorization: 'Hawk id="123", ts="1353788437", nonce="k3j4h2", mac="/qwS4UjfVWMcUyW6EEgUH4jlr7T/wuKe3dKijvTvSos=", ext="hello"'
                 };
 
-                var credentialsFunc = function (id, callback) {
+                var credentialsFunc = function (id, data, callback) {
 
                     var credentials = {
                         id: '23434d3q4d5345d',
@@ -642,7 +674,7 @@ describe('Hawk', function () {
                     authorization: 'Hawk id="123", ts="1353788437", nonce="k3j4h2", mac="/qwS4UjfVWMcUyW6EEgUH4jlr7T/wuKe3dKijvTvSos=", ext="hello"'
                 };
 
-                var credentialsFunc = function (id, callback) {
+                var credentialsFunc = function (id, data, callback) {
 
                     var credentials = {
                         key: 'werxhqb98rpaxn39848xrunpaw3489ruxnpa98w4rxn',
@@ -672,7 +704,7 @@ describe('Hawk', function () {
                     authorization: 'Hawk id="123", ts="1353788437", nonce="k3j4h2", mac="/qwS4UjfVWMcU4jlr7T/wuKe3dKijvTvSos=", ext="hello"'
                 };
 
-                var credentialsFunc = function (id, callback) {
+                var credentialsFunc = function (id, data, callback) {
 
                     var credentials = {
                         key: 'werxhqb98rpaxn39848xrunpaw3489ruxnpa98w4rxn',
@@ -909,7 +941,7 @@ describe('Hawk', function () {
 
             it('errors on invalid authorization (ts)', function (done) {
 
-                credentialsFunc('123456', function (err, credentials) {
+                credentialsFunc('123456', null, function (err, credentials) {
 
                     var auth = Hawk.client.message('example.com', 8080, 'some message', { credentials: credentials });
                     delete auth.ts;
@@ -925,7 +957,7 @@ describe('Hawk', function () {
 
             it('errors on invalid authorization (nonce)', function (done) {
 
-                credentialsFunc('123456', function (err, credentials) {
+                credentialsFunc('123456', null, function (err, credentials) {
 
                     var auth = Hawk.client.message('example.com', 8080, 'some message', { credentials: credentials });
                     delete auth.nonce;
@@ -941,7 +973,7 @@ describe('Hawk', function () {
 
             it('errors on invalid authorization (hash)', function (done) {
 
-                credentialsFunc('123456', function (err, credentials) {
+                credentialsFunc('123456', null, function (err, credentials) {
 
                     var auth = Hawk.client.message('example.com', 8080, 'some message', { credentials: credentials });
                     delete auth.hash;
@@ -957,11 +989,11 @@ describe('Hawk', function () {
 
             it('errors with credentials', function (done) {
 
-                credentialsFunc('123456', function (err, credentials) {
+                credentialsFunc('123456', null, function (err, credentials) {
 
                     var auth = Hawk.client.message('example.com', 8080, 'some message', { credentials: credentials });
 
-                    Hawk.server.authenticateMessage('example.com', 8080, 'some message', auth, function (id, callback) { callback(new Error('something'), { some: 'value' }); }, {}, function (err, credentials) {
+                    Hawk.server.authenticateMessage('example.com', 8080, 'some message', auth, function (id, data, callback) { callback(new Error('something'), { some: 'value' }); }, {}, function (err, credentials) {
 
                         expect(err).to.exist;
                         expect(err.message).to.equal('something');

@@ -23,7 +23,7 @@ var it = Lab.test;
 
 describe('Browser', function () {
 
-    var credentialsFunc = function (id, callback) {
+    var credentialsFunc = function (id, data, callback) {
 
         var credentials = {
             id: id,
@@ -44,7 +44,7 @@ describe('Browser', function () {
             port: 8080
         };
 
-        credentialsFunc('123456', function (err, credentials) {
+        credentialsFunc('123456', null, function (err, credentials) {
 
             req.authorization = Browser.client.header('http://example.com:8080/resource/4?filter=a', req.method, { credentials: credentials, ext: 'some-app-data' }).field;
             expect(req.authorization).to.exist;
@@ -72,7 +72,7 @@ describe('Browser', function () {
 
         var payload = 'some not so random text';
 
-        credentialsFunc('123456', function (err, credentials) {
+        credentialsFunc('123456', null, function (err, credentials) {
 
             var reqHeader = Browser.client.header('http://example.com:8080/resource/4?filter=a', req.method, { credentials: credentials, ext: 'some-app-data', payload: payload, contentType: req.headers['content-type'] });
             req.headers.authorization = reqHeader.field;
@@ -116,7 +116,7 @@ describe('Browser', function () {
 
         var payload = 'some not so random text';
 
-        credentialsFunc('123456', function (err, credentials) {
+        credentialsFunc('123456', null, function (err, credentials) {
 
             var reqHeader = Browser.client.header('http://example.com:8080/resource/4?filter=a', req.method, { credentials: credentials, ext: 'some-app-data', payload: payload, contentType: req.headers['content-type'] });
             req.headers.authorization = reqHeader.field;
@@ -156,7 +156,7 @@ describe('Browser', function () {
             port: 8080
         };
 
-        credentialsFunc('123456', function (err, credentials) {
+        credentialsFunc('123456', null, function (err, credentials) {
 
             req.authorization = Browser.client.header('http://example.com:8080/resource/4?filter=a', req.method, { credentials: credentials, ext: 'some-app-data', localtimeOffsetMsec: 100000 }).field;
             expect(req.authorization).to.exist;
@@ -184,7 +184,7 @@ describe('Browser', function () {
 
         var payload = 'some not so random text';
 
-        credentialsFunc('123456', function (err, credentials) {
+        credentialsFunc('123456', null, function (err, credentials) {
 
             var reqHeader = Browser.client.header('http://example.com:8080/resource/4?filter=a', req.method, { credentials: credentials, ext: 'some-app-data', payload: payload, contentType: req.headers['content-type'] });
             req.headers.authorization = reqHeader.field;
@@ -228,7 +228,7 @@ describe('Browser', function () {
 
         var payload = 'some not so random text';
 
-        credentialsFunc('123456', function (err, credentials) {
+        credentialsFunc('123456', null, function (err, credentials) {
 
             var reqHeader = Browser.client.header('http://example.com:8080/resource/4?filter=a', req.method, { credentials: credentials, ext: 'some-app-data', payload: payload, contentType: req.headers['content-type'] });
             req.headers.authorization = reqHeader.field;
@@ -265,7 +265,7 @@ describe('Browser', function () {
             port: 8080
         };
 
-        credentialsFunc('123456', function (err, credentials) {
+        credentialsFunc('123456', null, function (err, credentials) {
 
             Browser.utils.setNtpOffset(60 * 60 * 1000);
             var header = Browser.client.header('http://example.com:8080/resource/4?filter=a', req.method, { credentials: credentials, ext: 'some-app-data' });
@@ -314,7 +314,7 @@ describe('Browser', function () {
             port: 8080
         };
 
-        credentialsFunc('123456', function (err, credentials) {
+        credentialsFunc('123456', null, function (err, credentials) {
 
             var localStorage = new Browser.internals.LocalStorage();
 
@@ -373,7 +373,7 @@ describe('Browser', function () {
 
         var payload = 'some not so random text';
 
-        credentialsFunc('123456', function (err, credentials) {
+        credentialsFunc('123456', null, function (err, credentials) {
 
             var reqHeader = Browser.client.header('http://example.com:8080/resource/4?filter=a', req.method, { credentials: credentials, ext: 'some-app-data', payload: payload, contentType: req.headers['content-type'] });
             req.headers.authorization = reqHeader.field;
@@ -413,7 +413,7 @@ describe('Browser', function () {
             port: 8080
         };
 
-        credentialsFunc('123456', function (err, credentials) {
+        credentialsFunc('123456', null, function (err, credentials) {
 
             req.authorization = Browser.client.header('http://example.com:8080/resource/4?filter=a', req.method, { credentials: credentials, payload: 'hola!', ext: 'some-app-data' }).field;
             Hawk.server.authenticate(req, credentialsFunc, {}, function (err, credentials, artifacts) {
@@ -435,7 +435,7 @@ describe('Browser', function () {
             port: 8080
         };
 
-        credentialsFunc('123456', function (err, credentials) {
+        credentialsFunc('123456', null, function (err, credentials) {
 
             req.authorization = Browser.client.header('http://example.com:8080/resource/4?filter=a', req.method, { credentials: credentials, payload: 'hola!', ext: 'some-app-data' }).field;
             Hawk.server.authenticate(req, credentialsFunc, {}, function (err, credentials, artifacts) {
@@ -459,7 +459,7 @@ describe('Browser', function () {
             port: 8080
         };
 
-        credentialsFunc('123456', function (err, credentials) {
+        credentialsFunc('123456', null, function (err, credentials) {
 
             req.authorization = Browser.client.header('http://example.com:8080/resource/4?filter=a', req.method, { credentials: credentials, ext: 'some-app-data', app: 'asd23ased' }).field;
             Hawk.server.authenticate(req, credentialsFunc, {}, function (err, credentials, artifacts) {
@@ -482,7 +482,7 @@ describe('Browser', function () {
             port: 8080
         };
 
-        credentialsFunc('123456', function (err, credentials) {
+        credentialsFunc('123456', null, function (err, credentials) {
 
             req.authorization = Browser.client.header('http://example.com:8080/resource/4?filter=a', req.method, { credentials: credentials, ext: 'some-app-data', app: 'asd23ased', dlg: '23434szr3q4d' }).field;
             Hawk.server.authenticate(req, credentialsFunc, {}, function (err, credentials, artifacts) {
@@ -506,7 +506,7 @@ describe('Browser', function () {
             port: 8080
         };
 
-        credentialsFunc('123456', function (err, credentials) {
+        credentialsFunc('123456', null, function (err, credentials) {
 
             req.authorization = Browser.client.header('http://example.com:8080/resource/4?filter=a', req.method, { credentials: credentials, payload: 'hola!', ext: 'some-app-data' }).field;
             Hawk.server.authenticate(req, credentialsFunc, { payload: 'byebye!' }, function (err, credentials, artifacts) {
@@ -527,7 +527,7 @@ describe('Browser', function () {
             port: 8080
         };
 
-        credentialsFunc('123456', function (err, credentials) {
+        credentialsFunc('123456', null, function (err, credentials) {
 
             req.authorization = Browser.client.header('http://example.com:8080/resource/4?filter=a', req.method, { credentials: credentials, ext: 'some-app-data' }).field;
             req.url = '/something/else';
@@ -925,7 +925,7 @@ describe('Browser', function () {
 
             it('generates an authorization then successfully parse it', function (done) {
 
-                credentialsFunc('123456', function (err, credentials) {
+                credentialsFunc('123456', null, function (err, credentials) {
 
                     var auth = Browser.client.message('example.com', 8080, 'some message', { credentials: credentials });
                     expect(auth).to.exist;
@@ -941,7 +941,7 @@ describe('Browser', function () {
 
             it('generates an authorization using custom nonce/timestamp', function (done) {
 
-                credentialsFunc('123456', function (err, credentials) {
+                credentialsFunc('123456', null, function (err, credentials) {
 
                     var auth = Browser.client.message('example.com', 8080, 'some message', { credentials: credentials, nonce: 'abc123', timestamp: 1398536270957 });
                     expect(auth).to.exist;
@@ -953,7 +953,7 @@ describe('Browser', function () {
 
             it('errors on missing host', function (done) {
 
-                credentialsFunc('123456', function (err, credentials) {
+                credentialsFunc('123456', null, function (err, credentials) {
 
                     var auth = Browser.client.message(null, 8080, 'some message', { credentials: credentials });
                     expect(auth).to.not.exist;
@@ -963,7 +963,7 @@ describe('Browser', function () {
 
             it('errors on invalid host', function (done) {
 
-                credentialsFunc('123456', function (err, credentials) {
+                credentialsFunc('123456', null, function (err, credentials) {
 
                     var auth = Browser.client.message(5, 8080, 'some message', { credentials: credentials });
                     expect(auth).to.not.exist;
@@ -973,7 +973,7 @@ describe('Browser', function () {
 
             it('errors on missing port', function (done) {
 
-                credentialsFunc('123456', function (err, credentials) {
+                credentialsFunc('123456', null, function (err, credentials) {
 
                     var auth = Browser.client.message('example.com', 0, 'some message', { credentials: credentials });
                     expect(auth).to.not.exist;
@@ -983,7 +983,7 @@ describe('Browser', function () {
 
             it('errors on invalid port', function (done) {
 
-                credentialsFunc('123456', function (err, credentials) {
+                credentialsFunc('123456', null, function (err, credentials) {
 
                     var auth = Browser.client.message('example.com', 'a', 'some message', { credentials: credentials });
                     expect(auth).to.not.exist;
@@ -993,7 +993,7 @@ describe('Browser', function () {
 
             it('errors on missing message', function (done) {
 
-                credentialsFunc('123456', function (err, credentials) {
+                credentialsFunc('123456', null, function (err, credentials) {
 
                     var auth = Browser.client.message('example.com', 8080, undefined, { credentials: credentials });
                     expect(auth).to.not.exist;
@@ -1003,7 +1003,7 @@ describe('Browser', function () {
 
             it('errors on null message', function (done) {
 
-                credentialsFunc('123456', function (err, credentials) {
+                credentialsFunc('123456', null, function (err, credentials) {
 
                     var auth = Browser.client.message('example.com', 8080, null, { credentials: credentials });
                     expect(auth).to.not.exist;
@@ -1013,7 +1013,7 @@ describe('Browser', function () {
 
             it('errors on invalid message', function (done) {
 
-                credentialsFunc('123456', function (err, credentials) {
+                credentialsFunc('123456', null, function (err, credentials) {
 
                     var auth = Browser.client.message('example.com', 8080, 5, { credentials: credentials });
                     expect(auth).to.not.exist;
@@ -1037,7 +1037,7 @@ describe('Browser', function () {
 
             it('errors on invalid credentials (id)', function (done) {
 
-                credentialsFunc('123456', function (err, credentials) {
+                credentialsFunc('123456', null, function (err, credentials) {
 
                     var creds = Hoek.clone(credentials);
                     delete creds.id;
@@ -1049,7 +1049,7 @@ describe('Browser', function () {
 
             it('errors on invalid credentials (key)', function (done) {
 
-                credentialsFunc('123456', function (err, credentials) {
+                credentialsFunc('123456', null, function (err, credentials) {
 
                     var creds = Hoek.clone(credentials);
                     delete creds.key;
@@ -1061,7 +1061,7 @@ describe('Browser', function () {
 
             it('errors on invalid algorithm', function (done) {
 
-                credentialsFunc('123456', function (err, credentials) {
+                credentialsFunc('123456', null, function (err, credentials) {
 
                     var creds = Hoek.clone(credentials);
                     creds.algorithm = 'blah';
@@ -1076,7 +1076,7 @@ describe('Browser', function () {
 
             it('validates a timestamp', function (done) {
 
-                credentialsFunc('123456', function (err, credentials) {
+                credentialsFunc('123456', null, function (err, credentials) {
 
                     var tsm = Hawk.crypto.timestampMessage(credentials);
                     expect(Browser.client.authenticateTimestamp(tsm, credentials)).to.equal(true);
@@ -1086,7 +1086,7 @@ describe('Browser', function () {
 
             it('validates a timestamp without updating local time', function (done) {
 
-                credentialsFunc('123456', function (err, credentials) {
+                credentialsFunc('123456', null, function (err, credentials) {
 
                     var offset = Browser.utils.getNtpOffset();
                     var tsm = Hawk.crypto.timestampMessage(credentials, 10000);
@@ -1098,7 +1098,7 @@ describe('Browser', function () {
 
             it('detects a bad timestamp', function (done) {
 
-                credentialsFunc('123456', function (err, credentials) {
+                credentialsFunc('123456', null, function (err, credentials) {
 
                     var tsm = Hawk.crypto.timestampMessage(credentials);
                     tsm.ts = 4;

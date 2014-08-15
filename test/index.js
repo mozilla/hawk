@@ -21,7 +21,7 @@ var it = Lab.test;
 
 describe('Hawk', function () {
 
-    var credentialsFunc = function (id, callback) {
+    var credentialsFunc = function (id, data, callback) {
 
         var credentials = {
             id: id,
@@ -42,7 +42,7 @@ describe('Hawk', function () {
             port: 8080
         };
 
-        credentialsFunc('123456', function (err, credentials) {
+        credentialsFunc('123456', null, function (err, credentials) {
 
             req.authorization = Hawk.client.header(Url.parse('http://example.com:8080/resource/4?filter=a'), req.method, { credentials: credentials, ext: 'some-app-data' }).field;
             expect(req.authorization).to.exist;
@@ -70,7 +70,7 @@ describe('Hawk', function () {
 
         var payload = 'some not so random text';
 
-        credentialsFunc('123456', function (err, credentials) {
+        credentialsFunc('123456', null, function (err, credentials) {
 
             var reqHeader = Hawk.client.header('http://example.com:8080/resource/4?filter=a', req.method, { credentials: credentials, ext: 'some-app-data', payload: payload, contentType: req.headers['content-type'] });
             req.headers.authorization = reqHeader.field;
@@ -110,7 +110,7 @@ describe('Hawk', function () {
 
         var payload = 'some not so random text';
 
-        credentialsFunc('123456', function (err, credentials) {
+        credentialsFunc('123456', null, function (err, credentials) {
 
             var reqHeader = Hawk.client.header('http://example.com:8080/resource/4?filter=a', req.method, { credentials: credentials, ext: 'some-app-data', payload: payload, contentType: req.headers['content-type'] });
             req.headers.authorization = reqHeader.field;
@@ -150,7 +150,7 @@ describe('Hawk', function () {
 
         var payload = 'some not so random text';
 
-        credentialsFunc('123456', function (err, credentials) {
+        credentialsFunc('123456', null, function (err, credentials) {
 
             var reqHeader = Hawk.client.header('http://example.com:8080/resource/4?filter=a', req.method, { credentials: credentials, ext: 'some-app-data', payload: payload, contentType: req.headers['content-type'] });
             req.headers.authorization = reqHeader.field;
@@ -190,7 +190,7 @@ describe('Hawk', function () {
 
         var payload = 'some not so random text';
 
-        credentialsFunc('123456', function (err, credentials) {
+        credentialsFunc('123456', null, function (err, credentials) {
 
             var reqHeader = Hawk.client.header('http://example.com:8080/resource/4?filter=a', req.method, { credentials: credentials, ext: 'some-app-data', payload: payload, contentType: req.headers['content-type'] });
             req.headers.authorization = reqHeader.field;
@@ -226,7 +226,7 @@ describe('Hawk', function () {
             port: 8080
         };
 
-        credentialsFunc('123456', function (err, credentials) {
+        credentialsFunc('123456', null, function (err, credentials) {
 
             req.authorization = Hawk.client.header('http://example.com:8080/resource/4?filter=a', req.method, { credentials: credentials, payload: 'hola!', ext: 'some-app-data' }).field;
             Hawk.server.authenticate(req, credentialsFunc, {}, function (err, credentials, artifacts) {
@@ -248,7 +248,7 @@ describe('Hawk', function () {
             port: 8080
         };
 
-        credentialsFunc('123456', function (err, credentials) {
+        credentialsFunc('123456', null, function (err, credentials) {
 
             req.authorization = Hawk.client.header('http://example.com:8080/resource/4?filter=a', req.method, { credentials: credentials, payload: 'hola!', ext: 'some-app-data' }).field;
             Hawk.server.authenticate(req, credentialsFunc, {}, function (err, credentials, artifacts) {
@@ -272,7 +272,7 @@ describe('Hawk', function () {
             port: 8080
         };
 
-        credentialsFunc('123456', function (err, credentials) {
+        credentialsFunc('123456', null, function (err, credentials) {
 
             req.authorization = Hawk.client.header('http://example.com:8080/resource/4?filter=a', req.method, { credentials: credentials, payload: 'hola!', ext: 'some-app-data' }).field;
             Hawk.server.authenticate(req, credentialsFunc, { payload: 'hola!' }, function (err, credentials, artifacts) {
@@ -294,7 +294,7 @@ describe('Hawk', function () {
             port: 8080
         };
 
-        credentialsFunc('123456', function (err, credentials) {
+        credentialsFunc('123456', null, function (err, credentials) {
 
             req.authorization = Hawk.client.header('http://example.com:8080/resource/4?filter=a', req.method, { credentials: credentials, ext: 'some-app-data', app: 'asd23ased' }).field;
             Hawk.server.authenticate(req, credentialsFunc, {}, function (err, credentials, artifacts) {
@@ -317,7 +317,7 @@ describe('Hawk', function () {
             port: 8080
         };
 
-        credentialsFunc('123456', function (err, credentials) {
+        credentialsFunc('123456', null, function (err, credentials) {
 
             req.authorization = Hawk.client.header('http://example.com:8080/resource/4?filter=a', req.method, { credentials: credentials, ext: 'some-app-data', app: 'asd23ased', dlg: '23434szr3q4d' }).field;
             Hawk.server.authenticate(req, credentialsFunc, {}, function (err, credentials, artifacts) {
@@ -341,7 +341,7 @@ describe('Hawk', function () {
             port: 8080
         };
 
-        credentialsFunc('123456', function (err, credentials) {
+        credentialsFunc('123456', null, function (err, credentials) {
 
             req.authorization = Hawk.client.header('http://example.com:8080/resource/4?filter=a', req.method, { credentials: credentials, payload: 'hola!', ext: 'some-app-data' }).field;
             Hawk.server.authenticate(req, credentialsFunc, { payload: 'byebye!' }, function (err, credentials, artifacts) {
@@ -362,7 +362,7 @@ describe('Hawk', function () {
             port: 8080
         };
 
-        credentialsFunc('123456', function (err, credentials) {
+        credentialsFunc('123456', null, function (err, credentials) {
 
             req.authorization = Hawk.client.header('http://example.com:8080/resource/4?filter=a', req.method, { credentials: credentials, ext: 'some-app-data' }).field;
             req.url = '/something/else';
