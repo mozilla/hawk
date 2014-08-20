@@ -73,11 +73,11 @@ describe('Hawk', function () {
                 });
             });
 
-            it('parses a valid authentication header (host override)', function (done) {
-
+            it('parses a valid authentication header (host override and use of an express.Router)', function (done) {
                 var req = {
                     method: 'GET',
-                    url: '/resource/4?filter=a',
+                    originalUrl: '/resource/4?filter=a',
+                    url: '/4?filter=a',
                     headers: {
                         host: 'example1.com:8080',
                         authorization: 'Hawk id="1", ts="1353788437", nonce="k3j4h2", mac="zy79QQ5/EYFmQqutVnYb73gAc/U=", ext="hello"'
