@@ -97,7 +97,7 @@ describe('Browser', function () {
             done();
         });
 
-        it('returns a valid bewit value (explicit port)', function (done) {
+        it('returns a valid bewit value (explicit HTTP port)', function (done) {
 
             var credentials = {
                 id: '123456',
@@ -105,8 +105,21 @@ describe('Browser', function () {
                 algorithm: 'sha256'
             };
 
-            var bewit = Browser.client.bewit('https://example.com:8080/somewhere/over/the/rainbow', { credentials: credentials, ttlSec: 300, localtimeOffsetMsec: 1356420407232 - Hawk.utils.now(), ext: 'xandyandz' });
+            var bewit = Browser.client.bewit('http://example.com:8080/somewhere/over/the/rainbow', { credentials: credentials, ttlSec: 300, localtimeOffsetMsec: 1356420407232 - Hawk.utils.now(), ext: 'xandyandz' });
             expect(bewit).to.equal('MTIzNDU2XDEzNTY0MjA3MDdcaFpiSjNQMmNLRW80a3kwQzhqa1pBa1J5Q1p1ZWc0V1NOYnhWN3ZxM3hIVT1ceGFuZHlhbmR6');
+            done();
+        });
+
+        it('returns a valid bewit value (explicit HTTPS port)', function (done) {
+
+            var credentials = {
+                id: '123456',
+                key: '2983d45yun89q',
+                algorithm: 'sha256'
+            };
+
+            var bewit = Browser.client.bewit('https://example.com:8043/somewhere/over/the/rainbow', { credentials: credentials, ttlSec: 300, localtimeOffsetMsec: 1356420407232 - Hawk.utils.now(), ext: 'xandyandz' });
+            expect(bewit).to.equal('MTIzNDU2XDEzNTY0MjA3MDdcL2t4UjhwK0xSaTdvQTRnUXc3cWlxa3BiVHRKYkR4OEtRMC9HRUwvVytTUT1ceGFuZHlhbmR6');
             done();
         });
 
