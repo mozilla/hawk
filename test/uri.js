@@ -24,7 +24,7 @@ describe('Hawk', function () {
 
     describe('Uri', function () {
 
-        var credentialsFunc = function (id, callback) {
+        var credentialsFunc = function (id, data, callback) {
 
             var credentials = {
                 id: id,
@@ -45,7 +45,7 @@ describe('Hawk', function () {
                 port: 80
             };
 
-            credentialsFunc('123456', function (err, credentials) {
+            credentialsFunc('123456', null, function (err, credentials) {
 
                 var bewit = Hawk.uri.getBewit('http://example.com/resource/4?a=1&b=2', { credentials: credentials, ttlSec: 60 * 60 * 24 * 365 * 100, ext: 'some-app-data' });
                 req.url += '&bewit=' + bewit;
@@ -69,7 +69,7 @@ describe('Hawk', function () {
                 port: 80
             };
 
-            credentialsFunc('123456', function (err, credentials) {
+            credentialsFunc('123456', null, function (err, credentials) {
 
                 var bewit = Hawk.uri.getBewit('http://example.com/resource/4?a=1&b=2', { credentials: credentials, ttlSec: 60 * 60 * 24 * 365 * 100 });
                 req.url += '&bewit=' + bewit;
@@ -157,7 +157,7 @@ describe('Hawk', function () {
 
         it('should fail on method other than GET', function (done) {
 
-            credentialsFunc('123456', function (err, credentials) {
+            credentialsFunc('123456', null, function (err, credentials) {
 
                 var req = {
                     method: 'POST',
@@ -340,7 +340,7 @@ describe('Hawk', function () {
                 port: 8080
             };
 
-            Hawk.uri.authenticate(req, function (id, callback) { callback(Hawk.error.badRequest('Boom')); }, {}, function (err, credentials, attributes) {
+            Hawk.uri.authenticate(req, function (id, data, callback) { callback(Hawk.error.badRequest('Boom')); }, {}, function (err, credentials, attributes) {
 
                 expect(err).to.exist;
                 expect(err.output.payload.message).to.equal('Boom');
@@ -357,7 +357,7 @@ describe('Hawk', function () {
                 port: 8080
             };
 
-            Hawk.uri.authenticate(req, function (id, callback) { callback(Hawk.error.badRequest('Boom'), { some: 'value' }); }, {}, function (err, credentials, attributes) {
+            Hawk.uri.authenticate(req, function (id, data, callback) { callback(Hawk.error.badRequest('Boom'), { some: 'value' }); }, {}, function (err, credentials, attributes) {
 
                 expect(err).to.exist;
                 expect(err.output.payload.message).to.equal('Boom');
@@ -375,7 +375,7 @@ describe('Hawk', function () {
                 port: 8080
             };
 
-            Hawk.uri.authenticate(req, function (id, callback) { callback(null, null); }, {}, function (err, credentials, attributes) {
+            Hawk.uri.authenticate(req, function (id, data, callback) { callback(null, null); }, {}, function (err, credentials, attributes) {
 
                 expect(err).to.exist;
                 expect(err.output.payload.message).to.equal('Unknown credentials');
@@ -392,7 +392,7 @@ describe('Hawk', function () {
                 port: 8080
             };
 
-            Hawk.uri.authenticate(req, function (id, callback) { callback(null, {}); }, {}, function (err, credentials, attributes) {
+            Hawk.uri.authenticate(req, function (id, data, callback) { callback(null, {}); }, {}, function (err, credentials, attributes) {
 
                 expect(err).to.exist;
                 expect(err.message).to.equal('Invalid credentials');
@@ -409,7 +409,7 @@ describe('Hawk', function () {
                 port: 8080
             };
 
-            Hawk.uri.authenticate(req, function (id, callback) { callback(null, { key: 'xxx', algorithm: 'xxx' }); }, {}, function (err, credentials, attributes) {
+            Hawk.uri.authenticate(req, function (id, data, callback) { callback(null, { key: 'xxx', algorithm: 'xxx' }); }, {}, function (err, credentials, attributes) {
 
                 expect(err).to.exist;
                 expect(err.message).to.equal('Unknown algorithm');
@@ -426,7 +426,7 @@ describe('Hawk', function () {
                 port: 8080
             };
 
-            Hawk.uri.authenticate(req, function (id, callback) { callback(null, { key: 'xxx', algorithm: 'sha256' }); }, {}, function (err, credentials, attributes) {
+            Hawk.uri.authenticate(req, function (id, data, callback) { callback(null, { key: 'xxx', algorithm: 'sha256' }); }, {}, function (err, credentials, attributes) {
 
                 expect(err).to.exist;
                 expect(err.output.payload.message).to.equal('Bad mac');
