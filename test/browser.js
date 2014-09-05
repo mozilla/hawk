@@ -35,6 +35,204 @@ describe('Browser', function () {
         return callback(null, credentials);
     };
 
+    it('should generate a bewit then successfully authenticate it', function (done) {
+
+        var req = {
+            method: 'GET',
+            url: '/resource/4?a=1&b=2',
+            host: 'example.com',
+            port: 80
+        };
+
+        credentialsFunc('123456', function (err, credentials) {
+
+            var bewit = Browser.client.bewit('http://example.com/resource/4?a=1&b=2', { credentials: credentials, ttlSec: 60 * 60 * 24 * 365 * 100, ext: 'some-app-data' });
+            req.url += '&bewit=' + bewit;
+
+            Hawk.uri.authenticate(req, credentialsFunc, {}, function (err, credentials, attributes) {
+
+                expect(err).to.not.exist;
+                expect(credentials.user).to.equal('steve');
+                expect(attributes.ext).to.equal('some-app-data');
+                done();
+            });
+        });
+    });
+
+    it('should generate a bewit then successfully authenticate it (no ext)', function (done) {
+
+        var req = {
+            method: 'GET',
+            url: '/resource/4?a=1&b=2',
+            host: 'example.com',
+            port: 80
+        };
+
+        credentialsFunc('123456', function (err, credentials) {
+
+            var bewit = Browser.client.bewit('http://example.com/resource/4?a=1&b=2', { credentials: credentials, ttlSec: 60 * 60 * 24 * 365 * 100 });
+            req.url += '&bewit=' + bewit;
+
+            Hawk.uri.authenticate(req, credentialsFunc, {}, function (err, credentials, attributes) {
+
+                expect(err).to.not.exist;
+                expect(credentials.user).to.equal('steve');
+                done();
+            });
+        });
+    });
+
+    describe('#bewit', function () {
+
+        it('returns a valid bewit value', function (done) {
+
+            var credentials = {
+                id: '123456',
+                key: '2983d45yun89q',
+                algorithm: 'sha256'
+            };
+
+            var bewit = Browser.client.bewit('https://example.com/somewhere/over/the/rainbow', { credentials: credentials, ttlSec: 300, localtimeOffsetMsec: 1356420407232 - Hawk.utils.now(), ext: 'xandyandz' });
+            expect(bewit).to.equal('MTIzNDU2XDEzNTY0MjA3MDdca3NjeHdOUjJ0SnBQMVQxekRMTlBiQjVVaUtJVTl0T1NKWFRVZEc3WDloOD1ceGFuZHlhbmR6');
+            done();
+        });
+
+        it('returns a valid bewit value (explicit HTTP port)', function (done) {
+
+            var credentials = {
+                id: '123456',
+                key: '2983d45yun89q',
+                algorithm: 'sha256'
+            };
+
+            var bewit = Browser.client.bewit('http://example.com:8080/somewhere/over/the/rainbow', { credentials: credentials, ttlSec: 300, localtimeOffsetMsec: 1356420407232 - Hawk.utils.now(), ext: 'xandyandz' });
+            expect(bewit).to.equal('MTIzNDU2XDEzNTY0MjA3MDdcaFpiSjNQMmNLRW80a3kwQzhqa1pBa1J5Q1p1ZWc0V1NOYnhWN3ZxM3hIVT1ceGFuZHlhbmR6');
+            done();
+        });
+
+        it('returns a valid bewit value (explicit HTTPS port)', function (done) {
+
+            var credentials = {
+                id: '123456',
+                key: '2983d45yun89q',
+                algorithm: 'sha256'
+            };
+
+            var bewit = Browser.client.bewit('https://example.com:8043/somewhere/over/the/rainbow', { credentials: credentials, ttlSec: 300, localtimeOffsetMsec: 1356420407232 - Hawk.utils.now(), ext: 'xandyandz' });
+            expect(bewit).to.equal('MTIzNDU2XDEzNTY0MjA3MDdcL2t4UjhwK0xSaTdvQTRnUXc3cWlxa3BiVHRKYkR4OEtRMC9HRUwvVytTUT1ceGFuZHlhbmR6');
+            done();
+        });
+
+        it('returns a valid bewit value (null ext)', function (done) {
+
+            var credentials = {
+                id: '123456',
+                key: '2983d45yun89q',
+                algorithm: 'sha256'
+            };
+
+            var bewit = Browser.client.bewit('https://example.com/somewhere/over/the/rainbow', { credentials: credentials, ttlSec: 300, localtimeOffsetMsec: 1356420407232 - Hawk.utils.now(), ext: null });
+            expect(bewit).to.equal('MTIzNDU2XDEzNTY0MjA3MDdcSUdZbUxnSXFMckNlOEN4dktQczRKbFdJQStValdKSm91d2dBUmlWaENBZz1c');
+            done();
+        });
+
+        it('errors on invalid options', function (done) {
+
+            var credentials = {
+                id: '123456',
+                key: '2983d45yun89q',
+                algorithm: 'sha256'
+            };
+
+            var bewit = Browser.client.bewit('https://example.com/somewhere/over/the/rainbow', 4);
+            expect(bewit).to.equal('');
+            done();
+        });
+
+        it('errors on missing uri', function (done) {
+
+            var credentials = {
+                id: '123456',
+                key: '2983d45yun89q',
+                algorithm: 'sha256'
+            };
+
+            var bewit = Browser.client.bewit('', { credentials: credentials, ttlSec: 300, localtimeOffsetMsec: 1356420407232 - Hawk.utils.now(), ext: 'xandyandz' });
+            expect(bewit).to.equal('');
+            done();
+        });
+
+        it('errors on invalid uri', function (done) {
+
+            var credentials = {
+                id: '123456',
+                key: '2983d45yun89q',
+                algorithm: 'sha256'
+            };
+
+            var bewit = Browser.client.bewit(5, { credentials: credentials, ttlSec: 300, localtimeOffsetMsec: 1356420407232 - Hawk.utils.now(), ext: 'xandyandz' });
+            expect(bewit).to.equal('');
+            done();
+        });
+
+        it('errors on invalid credentials (id)', function (done) {
+
+            var credentials = {
+                key: '2983d45yun89q',
+                algorithm: 'sha256'
+            };
+
+            var bewit = Browser.client.bewit('https://example.com/somewhere/over/the/rainbow', { credentials: credentials, ttlSec: 3000, ext: 'xandyandz' });
+            expect(bewit).to.equal('');
+            done();
+        });
+
+        it('errors on missing credentials', function (done) {
+
+            var bewit = Browser.client.bewit('https://example.com/somewhere/over/the/rainbow', { ttlSec: 3000, ext: 'xandyandz' });
+            expect(bewit).to.equal('');
+            done();
+        });
+
+        it('errors on invalid credentials (key)', function (done) {
+
+            var credentials = {
+                id: '123456',
+                algorithm: 'sha256'
+            };
+
+            var bewit = Browser.client.bewit('https://example.com/somewhere/over/the/rainbow', { credentials: credentials, ttlSec: 3000, ext: 'xandyandz' });
+            expect(bewit).to.equal('');
+            done();
+        });
+
+        it('errors on invalid algorithm', function (done) {
+
+            var credentials = {
+                id: '123456',
+                key: '2983d45yun89q',
+                algorithm: 'hmac-sha-0'
+            };
+
+            var bewit = Browser.client.bewit('https://example.com/somewhere/over/the/rainbow', { credentials: credentials, ttlSec: 300, ext: 'xandyandz' });
+            expect(bewit).to.equal('');
+            done();
+        });
+
+        it('errors on missing options', function (done) {
+
+            var credentials = {
+                id: '123456',
+                key: '2983d45yun89q',
+                algorithm: 'hmac-sha-0'
+            };
+
+            var bewit = Browser.client.bewit('https://example.com/somewhere/over/the/rainbow');
+            expect(bewit).to.equal('');
+            done();
+        });
+    });
+
     it('generates a header then successfully parse it (configuration)', function (done) {
 
         var req = {
@@ -1237,5 +1435,19 @@ describe('Browser', function () {
                 done();
             });
         });
+
+        var str = "https://www.google.ca/webhp?sourceid=chrome-instant&ion=1&espv=2&ie=UTF-8#q=url";
+        var base64str = "aHR0cHM6Ly93d3cuZ29vZ2xlLmNhL3dlYmhwP3NvdXJjZWlkPWNocm9tZS1pbnN0YW50Jmlvbj0xJmVzcHY9MiZpZT1VVEYtOCNxPXVybA";
+
+        describe('#base64urlEncode', function () {
+
+            it('should base64 URL-safe decode a string', function (done) {
+
+                expect(Browser.utils.base64urlEncode(str)).to.equal(base64str);
+                done();
+            });
+
+        });
+
     });
 });
