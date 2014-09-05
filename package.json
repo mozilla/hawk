@@ -1,7 +1,7 @@
 {
   "name": "hawk",
   "description": "HTTP Hawk Authentication Scheme",
-  "version": "2.2.3",
+  "version": "2.3.0",
   "author": "Eran Hammer <eran@hammer.io> (http://hueniverse.com)",
   "contributors": [],
   "repository": "git://github.com/hueniverse/hawk",
@@ -23,7 +23,7 @@
     "sntp": "1.x.x"
   },
   "devDependencies": {
-    "lab": "3.x.x"
+    "lab": "4.x.x"
   },
   "scripts": {
     "test": "make test-cov"

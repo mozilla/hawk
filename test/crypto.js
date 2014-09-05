@@ -11,11 +11,10 @@ var internals = {};
 
 // Test shortcuts
 
+var lab = exports.lab = Lab.script();
+var describe = lab.experiment;
+var it = lab.test;
 var expect = Lab.expect;
-var before = Lab.before;
-var after = Lab.after;
-var describe = Lab.experiment;
-var it = Lab.test;
 
 
 describe('Hawk', function () {
