@@ -37,6 +37,7 @@ used by the module and used by the node API.
 <p></p>
 - [**Frequently Asked Questions**](#frequently-asked-questions)
 <p></p>
+- [**Implementations**](#implementations)
 - [**Acknowledgements**](#acknowledgements)
 
 # Introduction
@@ -617,6 +618,12 @@ at work to produce more garbage.
 **Hawk** provides a simple HTTP authentication scheme for making client-server requests. It does not address the OAuth use case
 of delegating access to a third party. If you are looking for an OAuth alternative, check out [Oz](https://github.com/hueniverse/oz).
 
+# Implementations
+
+- [Logibit Hawk in F#/.Net](https://github.com/logibit/logibit.hawk/)
+- [Tent Hawk in Ruby](https://github.com/tent/hawk-ruby)
+- [Wealdtech in Java](https://github.com/wealdtech/hawk)
+- [Kumar's Mohawk in Python](https://github.com/kumar303/mohawk/)
 
 # Acknowledgements
 
