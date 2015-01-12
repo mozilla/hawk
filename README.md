@@ -602,7 +602,7 @@ but with the additional security of delegated credentials.
 
 When calculating a hash or MAC, a static prefix (tag) is added. The prefix is used to prevent MAC values from being
 used or reused for a purpose other than what they were created for (i.e. prevents switching MAC values between a request,
-response, and a bewit use cases). It also protects against expliots created after a potential change in how the protocol
+response, and a bewit use cases). It also protects against exploits created after a potential change in how the protocol
 creates the normalized string. For example, if a future version would switch the order of nonce and timestamp, it
 can create an exploit opportunity for cases where the nonce is similar in format to a timestamp.
 
