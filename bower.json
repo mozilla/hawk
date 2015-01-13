@@ -1,0 +1,32 @@
+{
+  "name": "hawk",
+  "main": "lib/browser.js",
+  "license": "./LICENSE",
+  "ignore": [
+    "example",
+    "images",
+    "!lib",
+    "lib/*",
+    "!lib/browser.js",
+    "test",
+    ".gitignore",
+    ".travis.yml",
+    "Makefile",
+    "component.json",
+    "index.js",
+    "package.json"
+  ],
+  "keywords": [
+    "http",
+    "authentication",
+    "scheme",
+    "hawk"
+  ],
+  "authors": [
+    "Eran Hammer <eran@hammer.io>"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/hueniverse/hawk.git"
+  }
+}
