@@ -3,18 +3,10 @@
   "main": "lib/browser.js",
   "license": "./LICENSE",
   "ignore": [
-    "example",
-    "images",
     "!lib",
     "lib/*",
     "!lib/browser.js",
-    "test",
-    ".gitignore",
-    ".travis.yml",
-    "Makefile",
-    "component.json",
-    "index.js",
-    "package.json"
+    "index.js"
   ],
   "keywords": [
     "http",
