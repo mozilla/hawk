@@ -1,9 +1,10 @@
 // Load modules
 
 var Url = require('url');
-var Lab = require('lab');
-var Hoek = require('hoek');
+var Code = require('code');
 var Hawk = require('../lib');
+var Hoek = require('hoek');
+var Lab = require('lab');
 var Browser = require('../lib/browser');
 
 
@@ -17,7 +18,7 @@ var internals = {};
 var lab = exports.lab = Lab.script();
 var describe = lab.experiment;
 var it = lab.test;
-var expect = Lab.expect;
+var expect = Code.expect;
 
 
 describe('Browser', function () {
@@ -50,7 +51,7 @@ describe('Browser', function () {
 
             Hawk.uri.authenticate(req, credentialsFunc, {}, function (err, credentials, attributes) {
 
-                expect(err).to.not.exist;
+                expect(err).to.not.exist();
                 expect(credentials.user).to.equal('steve');
                 expect(attributes.ext).to.equal('some-app-data');
                 done();
@@ -74,7 +75,7 @@ describe('Browser', function () {
 
             Hawk.uri.authenticate(req, credentialsFunc, {}, function (err, credentials, attributes) {
 
-                expect(err).to.not.exist;
+                expect(err).to.not.exist();
                 expect(credentials.user).to.equal('steve');
                 done();
             });
@@ -244,11 +245,11 @@ describe('Browser', function () {
         credentialsFunc('123456', function (err, credentials) {
 
             req.authorization = Browser.client.header('http://example.com:8080/resource/4?filter=a', req.method, { credentials: credentials, ext: 'some-app-data' }).field;
-            expect(req.authorization).to.exist;
+            expect(req.authorization).to.exist();
 
             Hawk.server.authenticate(req, credentialsFunc, {}, function (err, credentials, artifacts) {
 
-                expect(err).to.not.exist;
+                expect(err).to.not.exist();
                 expect(credentials.user).to.equal('steve');
                 expect(artifacts.ext).to.equal('some-app-data');
                 done();
@@ -276,7 +277,7 @@ describe('Browser', function () {
 
             Hawk.server.authenticate(req, credentialsFunc, {}, function (err, credentials, artifacts) {
 
-                expect(err).to.not.exist;
+                expect(err).to.not.exist();
                 expect(credentials.user).to.equal('steve');
                 expect(artifacts.ext).to.equal('some-app-data');
                 expect(Hawk.server.authenticatePayload(payload, credentials, artifacts, req.headers['content-type'])).to.equal(true);
@@ -292,7 +293,7 @@ describe('Browser', function () {
                 };
 
                 res.headers['server-authorization'] = Hawk.server.header(credentials, artifacts, { payload: 'some reply', contentType: 'text/plain', ext: 'response-specific' });
-                expect(res.headers['server-authorization']).to.exist;
+                expect(res.headers['server-authorization']).to.exist();
 
                 expect(Browser.client.authenticate(res, credentials, artifacts, { payload: 'some reply' })).to.equal(true);
                 done();
@@ -320,7 +321,7 @@ describe('Browser', function () {
 
             Hawk.server.authenticate(req, credentialsFunc, {}, function (err, credentials, artifacts) {
 
-                expect(err).to.not.exist;
+                expect(err).to.not.exist();
                 expect(credentials.user).to.equal('steve');
                 expect(artifacts.ext).to.equal('some-app-data');
                 expect(Hawk.server.authenticatePayload(payload, credentials, artifacts, req.headers['content-type'])).to.equal(true);
@@ -336,7 +337,7 @@ describe('Browser', function () {
                 };
 
                 res.headers['server-authorization'] = Hawk.server.header(credentials, artifacts, { payload: 'some reply', contentType: 'text/plain', ext: 'response-specific' });
-                expect(res.headers['server-authorization']).to.exist;
+                expect(res.headers['server-authorization']).to.exist();
 
                 expect(Browser.client.authenticate(res, credentials, artifacts, { payload: 'some reply' })).to.equal(true);
                 done();
@@ -356,11 +357,11 @@ describe('Browser', function () {
         credentialsFunc('123456', function (err, credentials) {
 
             req.authorization = Browser.client.header('http://example.com:8080/resource/4?filter=a', req.method, { credentials: credentials, ext: 'some-app-data', localtimeOffsetMsec: 100000 }).field;
-            expect(req.authorization).to.exist;
+            expect(req.authorization).to.exist();
 
             Hawk.server.authenticate(req, credentialsFunc, { localtimeOffsetMsec: 100000 }, function (err, credentials, artifacts) {
 
-                expect(err).to.not.exist;
+                expect(err).to.not.exist();
                 expect(credentials.user).to.equal('steve');
                 expect(artifacts.ext).to.equal('some-app-data');
                 done();
@@ -388,7 +389,7 @@ describe('Browser', function () {
 
             Hawk.server.authenticate(req, credentialsFunc, {}, function (err, credentials, artifacts) {
 
-                expect(err).to.not.exist;
+                expect(err).to.not.exist();
                 expect(credentials.user).to.equal('steve');
                 expect(artifacts.ext).to.equal('some-app-data');
                 expect(Hawk.server.authenticatePayload(payload, credentials, artifacts, req.headers['content-type'])).to.equal(true);
@@ -404,7 +405,7 @@ describe('Browser', function () {
                 };
 
                 res.headers['server-authorization'] = Hawk.server.header(credentials, artifacts);
-                expect(res.headers['server-authorization']).to.exist;
+                expect(res.headers['server-authorization']).to.exist();
 
                 expect(Browser.client.authenticate(res, credentials, artifacts)).to.equal(true);
                 done();
@@ -432,7 +433,7 @@ describe('Browser', function () {
 
             Hawk.server.authenticate(req, credentialsFunc, {}, function (err, credentials, artifacts) {
 
-                expect(err).to.not.exist;
+                expect(err).to.not.exist();
                 expect(credentials.user).to.equal('steve');
                 expect(artifacts.ext).to.equal('some-app-data');
                 expect(Hawk.server.authenticatePayload(payload, credentials, artifacts, req.headers['content-type'])).to.equal(true);
@@ -467,11 +468,11 @@ describe('Browser', function () {
             Browser.utils.setNtpOffset(60 * 60 * 1000);
             var header = Browser.client.header('http://example.com:8080/resource/4?filter=a', req.method, { credentials: credentials, ext: 'some-app-data' });
             req.authorization = header.field;
-            expect(req.authorization).to.exist;
+            expect(req.authorization).to.exist();
 
             Hawk.server.authenticate(req, credentialsFunc, {}, function (err, credentials, artifacts) {
 
-                expect(err).to.exist;
+                expect(err).to.exist();
                 expect(err.message).to.equal('Stale timestamp');
 
                 var res = {
@@ -489,11 +490,11 @@ describe('Browser', function () {
                 expect(Browser.utils.getNtpOffset()).to.equal(0);
 
                 req.authorization = Browser.client.header('http://example.com:8080/resource/4?filter=a', req.method, { credentials: credentials, ext: 'some-app-data' }).field;
-                expect(req.authorization).to.exist;
+                expect(req.authorization).to.exist();
 
                 Hawk.server.authenticate(req, credentialsFunc, {}, function (err, credentials, artifacts) {
 
-                    expect(err).to.not.exist;
+                    expect(err).to.not.exist();
                     expect(credentials.user).to.equal('steve');
                     expect(artifacts.ext).to.equal('some-app-data');
                     done();
@@ -520,11 +521,11 @@ describe('Browser', function () {
             Browser.utils.setNtpOffset(60 * 60 * 1000);
             var header = Browser.client.header('http://example.com:8080/resource/4?filter=a', req.method, { credentials: credentials, ext: 'some-app-data' });
             req.authorization = header.field;
-            expect(req.authorization).to.exist;
+            expect(req.authorization).to.exist();
 
             Hawk.server.authenticate(req, credentialsFunc, {}, function (err, credentials, artifacts) {
 
-                expect(err).to.exist;
+                expect(err).to.exist();
                 expect(err.message).to.equal('Stale timestamp');
 
                 var res = {
@@ -544,11 +545,11 @@ describe('Browser', function () {
                 expect(parseInt(localStorage.getItem('hawk_ntp_offset'))).to.equal(0);
 
                 req.authorization = Browser.client.header('http://example.com:8080/resource/4?filter=a', req.method, { credentials: credentials, ext: 'some-app-data' }).field;
-                expect(req.authorization).to.exist;
+                expect(req.authorization).to.exist();
 
                 Hawk.server.authenticate(req, credentialsFunc, {}, function (err, credentials, artifacts) {
 
-                    expect(err).to.not.exist;
+                    expect(err).to.not.exist();
                     expect(credentials.user).to.equal('steve');
                     expect(artifacts.ext).to.equal('some-app-data');
                     done();
@@ -577,7 +578,7 @@ describe('Browser', function () {
 
             Hawk.server.authenticate(req, credentialsFunc, {}, function (err, credentials, artifacts) {
 
-                expect(err).to.not.exist;
+                expect(err).to.not.exist();
                 expect(credentials.user).to.equal('steve');
                 expect(artifacts.ext).to.equal('some-app-data');
                 expect(Hawk.server.authenticatePayload(payload, credentials, artifacts, req.headers['content-type'])).to.equal(true);
@@ -593,7 +594,7 @@ describe('Browser', function () {
                 };
 
                 res.headers['server-authorization'] = Hawk.server.header(credentials, artifacts);
-                expect(res.headers['server-authorization']).to.exist;
+                expect(res.headers['server-authorization']).to.exist();
 
                 expect(Browser.client.authenticate(res, credentials, artifacts, { payload: 'some reply' })).to.equal(false);
                 done();
@@ -615,7 +616,7 @@ describe('Browser', function () {
             req.authorization = Browser.client.header('http://example.com:8080/resource/4?filter=a', req.method, { credentials: credentials, payload: 'hola!', ext: 'some-app-data' }).field;
             Hawk.server.authenticate(req, credentialsFunc, {}, function (err, credentials, artifacts) {
 
-                expect(err).to.not.exist;
+                expect(err).to.not.exist();
                 expect(credentials.user).to.equal('steve');
                 expect(artifacts.ext).to.equal('some-app-data');
                 done();
@@ -637,11 +638,11 @@ describe('Browser', function () {
             req.authorization = Browser.client.header('http://example.com:8080/resource/4?filter=a', req.method, { credentials: credentials, payload: 'hola!', ext: 'some-app-data' }).field;
             Hawk.server.authenticate(req, credentialsFunc, {}, function (err, credentials, artifacts) {
 
-                expect(err).to.not.exist;
+                expect(err).to.not.exist();
                 expect(credentials.user).to.equal('steve');
                 expect(artifacts.ext).to.equal('some-app-data');
-                expect(Hawk.server.authenticatePayload('hola!', credentials, artifacts)).to.be.true;
-                expect(Hawk.server.authenticatePayload('hello!', credentials, artifacts)).to.be.false;
+                expect(Hawk.server.authenticatePayload('hola!', credentials, artifacts)).to.be.true();
+                expect(Hawk.server.authenticatePayload('hello!', credentials, artifacts)).to.be.false();
                 done();
             });
         });
@@ -661,7 +662,7 @@ describe('Browser', function () {
             req.authorization = Browser.client.header('http://example.com:8080/resource/4?filter=a', req.method, { credentials: credentials, ext: 'some-app-data', app: 'asd23ased' }).field;
             Hawk.server.authenticate(req, credentialsFunc, {}, function (err, credentials, artifacts) {
 
-                expect(err).to.not.exist;
+                expect(err).to.not.exist();
                 expect(credentials.user).to.equal('steve');
                 expect(artifacts.ext).to.equal('some-app-data');
                 expect(artifacts.app).to.equal('asd23ased');
@@ -684,7 +685,7 @@ describe('Browser', function () {
             req.authorization = Browser.client.header('http://example.com:8080/resource/4?filter=a', req.method, { credentials: credentials, ext: 'some-app-data', app: 'asd23ased', dlg: '23434szr3q4d' }).field;
             Hawk.server.authenticate(req, credentialsFunc, {}, function (err, credentials, artifacts) {
 
-                expect(err).to.not.exist;
+                expect(err).to.not.exist();
                 expect(credentials.user).to.equal('steve');
                 expect(artifacts.ext).to.equal('some-app-data');
                 expect(artifacts.app).to.equal('asd23ased');
@@ -708,7 +709,7 @@ describe('Browser', function () {
             req.authorization = Browser.client.header('http://example.com:8080/resource/4?filter=a', req.method, { credentials: credentials, payload: 'hola!', ext: 'some-app-data' }).field;
             Hawk.server.authenticate(req, credentialsFunc, { payload: 'byebye!' }, function (err, credentials, artifacts) {
 
-                expect(err).to.exist;
+                expect(err).to.exist();
                 expect(err.output.payload.message).to.equal('Bad payload hash');
                 done();
             });
@@ -731,8 +732,8 @@ describe('Browser', function () {
 
             Hawk.server.authenticate(req, credentialsFunc, {}, function (err, credentials, artifacts) {
 
-                expect(err).to.exist;
-                expect(credentials).to.exist;
+                expect(err).to.exist();
+                expect(credentials).to.exist();
                 done();
             });
         });
@@ -1125,11 +1126,11 @@ describe('Browser', function () {
                 credentialsFunc('123456', function (err, credentials) {
 
                     var auth = Browser.client.message('example.com', 8080, 'some message', { credentials: credentials });
-                    expect(auth).to.exist;
+                    expect(auth).to.exist();
 
                     Hawk.server.authenticateMessage('example.com', 8080, 'some message', auth, credentialsFunc, {}, function (err, credentials) {
 
-                        expect(err).to.not.exist;
+                        expect(err).to.not.exist();
                         expect(credentials.user).to.equal('steve');
                         done();
                     });
@@ -1141,7 +1142,7 @@ describe('Browser', function () {
                 credentialsFunc('123456', function (err, credentials) {
 
                     var auth = Browser.client.message('example.com', 8080, 'some message', { credentials: credentials, nonce: 'abc123', timestamp: 1398536270957 });
-                    expect(auth).to.exist;
+                    expect(auth).to.exist();
                     expect(auth.nonce).to.equal('abc123');
                     expect(auth.ts).to.equal(1398536270957);
                     done();
@@ -1153,7 +1154,7 @@ describe('Browser', function () {
                 credentialsFunc('123456', function (err, credentials) {
 
                     var auth = Browser.client.message(null, 8080, 'some message', { credentials: credentials });
-                    expect(auth).to.not.exist;
+                    expect(auth).to.not.exist();
                     done();
                 });
             });
@@ -1163,7 +1164,7 @@ describe('Browser', function () {
                 credentialsFunc('123456', function (err, credentials) {
 
                     var auth = Browser.client.message(5, 8080, 'some message', { credentials: credentials });
-                    expect(auth).to.not.exist;
+                    expect(auth).to.not.exist();
                     done();
                 });
             });
@@ -1173,7 +1174,7 @@ describe('Browser', function () {
                 credentialsFunc('123456', function (err, credentials) {
 
                     var auth = Browser.client.message('example.com', 0, 'some message', { credentials: credentials });
-                    expect(auth).to.not.exist;
+                    expect(auth).to.not.exist();
                     done();
                 });
             });
@@ -1183,7 +1184,7 @@ describe('Browser', function () {
                 credentialsFunc('123456', function (err, credentials) {
 
                     var auth = Browser.client.message('example.com', 'a', 'some message', { credentials: credentials });
-                    expect(auth).to.not.exist;
+                    expect(auth).to.not.exist();
                     done();
                 });
             });
@@ -1193,7 +1194,7 @@ describe('Browser', function () {
                 credentialsFunc('123456', function (err, credentials) {
 
                     var auth = Browser.client.message('example.com', 8080, undefined, { credentials: credentials });
-                    expect(auth).to.not.exist;
+                    expect(auth).to.not.exist();
                     done();
                 });
             });
@@ -1203,7 +1204,7 @@ describe('Browser', function () {
                 credentialsFunc('123456', function (err, credentials) {
 
                     var auth = Browser.client.message('example.com', 8080, null, { credentials: credentials });
-                    expect(auth).to.not.exist;
+                    expect(auth).to.not.exist();
                     done();
                 });
             });
@@ -1213,7 +1214,7 @@ describe('Browser', function () {
                 credentialsFunc('123456', function (err, credentials) {
 
                     var auth = Browser.client.message('example.com', 8080, 5, { credentials: credentials });
-                    expect(auth).to.not.exist;
+                    expect(auth).to.not.exist();
                     done();
                 });
             });
@@ -1221,14 +1222,14 @@ describe('Browser', function () {
             it('errors on missing credentials', function (done) {
 
                 var auth = Browser.client.message('example.com', 8080, 'some message', {});
-                expect(auth).to.not.exist;
+                expect(auth).to.not.exist();
                 done();
             });
 
             it('errors on missing options', function (done) {
 
                 var auth = Browser.client.message('example.com', 8080, 'some message');
-                expect(auth).to.not.exist;
+                expect(auth).to.not.exist();
                 done();
             });
 
@@ -1239,7 +1240,7 @@ describe('Browser', function () {
                     var creds = Hoek.clone(credentials);
                     delete creds.id;
                     var auth = Browser.client.message('example.com', 8080, 'some message', { credentials: creds });
-                    expect(auth).to.not.exist;
+                    expect(auth).to.not.exist();
                     done();
                 });
             });
@@ -1251,7 +1252,7 @@ describe('Browser', function () {
                     var creds = Hoek.clone(credentials);
                     delete creds.key;
                     var auth = Browser.client.message('example.com', 8080, 'some message', { credentials: creds });
-                    expect(auth).to.not.exist;
+                    expect(auth).to.not.exist();
                     done();
                 });
             });
@@ -1263,7 +1264,7 @@ describe('Browser', function () {
                     var creds = Hoek.clone(credentials);
                     creds.algorithm = 'blah';
                     var auth = Browser.client.message('example.com', 8080, 'some message', { credentials: creds });
-                    expect(auth).to.not.exist;
+                    expect(auth).to.not.exist();
                     done();
                 });
             });
@@ -1347,10 +1348,10 @@ describe('Browser', function () {
 
                 Browser.utils.storage = new Browser.internals.LocalStorage();        // Reset state
 
-                expect(Browser.utils.storage.getItem('hawk_ntp_offset')).to.not.exist;
+                expect(Browser.utils.storage.getItem('hawk_ntp_offset')).to.not.exist();
                 Browser.utils.storage.setItem('test', '1');
                 Browser.utils.setStorage(new Browser.internals.LocalStorage());
-                expect(Browser.utils.storage.getItem('test')).to.not.exist;
+                expect(Browser.utils.storage.getItem('test')).to.not.exist();
                 Browser.utils.storage.setItem('test', '2');
                 expect(Browser.utils.storage.getItem('test')).to.equal('2');
                 done();

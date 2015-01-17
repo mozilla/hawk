@@ -1,8 +1,9 @@
 // Load modules
 
 var Url = require('url');
-var Lab = require('lab');
+var Code = require('code');
 var Hawk = require('../lib');
+var Lab = require('lab');
 
 
 // Declare internals
@@ -15,7 +16,7 @@ var internals = {};
 var lab = exports.lab = Lab.script();
 var describe = lab.experiment;
 var it = lab.test;
-var expect = Lab.expect;
+var expect = Code.expect;
 
 
 describe('Hawk', function () {
@@ -317,7 +318,7 @@ describe('Hawk', function () {
                 };
 
                 var auth = Hawk.client.message('example.com', 80, 'I am the boodyman', { credentials: credentials, timestamp: 1353809207, nonce: 'abc123' });
-                expect(auth).to.exist;
+                expect(auth).to.exist();
                 expect(auth.ts).to.equal(1353809207);
                 expect(auth.nonce).to.equal('abc123');
                 done();
@@ -332,7 +333,7 @@ describe('Hawk', function () {
                 };
 
                 var auth = Hawk.client.message(5, 80, 'I am the boodyman', { credentials: credentials, timestamp: 1353809207, nonce: 'abc123' });
-                expect(auth).to.not.exist;
+                expect(auth).to.not.exist();
                 done();
             });
 
@@ -345,7 +346,7 @@ describe('Hawk', function () {
                 };
 
                 var auth = Hawk.client.message('example.com', '80', 'I am the boodyman', { credentials: credentials, timestamp: 1353809207, nonce: 'abc123' });
-                expect(auth).to.not.exist;
+                expect(auth).to.not.exist();
                 done();
             });
 
@@ -358,7 +359,7 @@ describe('Hawk', function () {
                 };
 
                 var auth = Hawk.client.message('example.com', 0, 'I am the boodyman', { credentials: credentials, timestamp: 1353809207, nonce: 'abc123' });
-                expect(auth).to.not.exist;
+                expect(auth).to.not.exist();
                 done();
             });
 
@@ -371,7 +372,7 @@ describe('Hawk', function () {
                 };
 
                 var auth = Hawk.client.message('example.com', 80, null, { credentials: credentials, timestamp: 1353809207, nonce: 'abc123' });
-                expect(auth).to.not.exist;
+                expect(auth).to.not.exist();
                 done();
             });
 
@@ -384,7 +385,7 @@ describe('Hawk', function () {
                 };
 
                 var auth = Hawk.client.message('example.com', 80, undefined, { credentials: credentials, timestamp: 1353809207, nonce: 'abc123' });
-                expect(auth).to.not.exist;
+                expect(auth).to.not.exist();
                 done();
             });
 
@@ -397,7 +398,7 @@ describe('Hawk', function () {
                 };
 
                 var auth = Hawk.client.message('example.com', 80, 5, { credentials: credentials, timestamp: 1353809207, nonce: 'abc123' });
-                expect(auth).to.not.exist;
+                expect(auth).to.not.exist();
                 done();
             });
 
@@ -410,7 +411,7 @@ describe('Hawk', function () {
                 };
 
                 var auth = Hawk.client.message('example.com', 80, 'I am the boodyman');
-                expect(auth).to.not.exist;
+                expect(auth).to.not.exist();
                 done();
             });
 
@@ -422,7 +423,7 @@ describe('Hawk', function () {
                 };
 
                 var auth = Hawk.client.message('example.com', 80, 'I am the boodyman', { credentials: credentials, timestamp: 1353809207, nonce: 'abc123' });
-                expect(auth).to.not.exist;
+                expect(auth).to.not.exist();
                 done();
             });
 
@@ -434,7 +435,7 @@ describe('Hawk', function () {
                 };
 
                 var auth = Hawk.client.message('example.com', 80, 'I am the boodyman', { credentials: credentials, timestamp: 1353809207, nonce: 'abc123' });
-                expect(auth).to.not.exist;
+                expect(auth).to.not.exist();
                 done();
             });
         });

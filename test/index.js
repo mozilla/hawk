@@ -1,8 +1,9 @@
 // Load modules
 
 var Url = require('url');
-var Lab = require('lab');
+var Code = require('code');
 var Hawk = require('../lib');
+var Lab = require('lab');
 
 
 // Declare internals
@@ -15,7 +16,7 @@ var internals = {};
 var lab = exports.lab = Lab.script();
 var describe = lab.experiment;
 var it = lab.test;
-var expect = Lab.expect;
+var expect = Code.expect;
 
 
 describe('Hawk', function () {
@@ -44,11 +45,11 @@ describe('Hawk', function () {
         credentialsFunc('123456', function (err, credentials) {
 
             req.authorization = Hawk.client.header(Url.parse('http://example.com:8080/resource/4?filter=a'), req.method, { credentials: credentials, ext: 'some-app-data' }).field;
-            expect(req.authorization).to.exist;
+            expect(req.authorization).to.exist();
 
             Hawk.server.authenticate(req, credentialsFunc, {}, function (err, credentials, artifacts) {
 
-                expect(err).to.not.exist;
+                expect(err).to.not.exist();
                 expect(credentials.user).to.equal('steve');
                 expect(artifacts.ext).to.equal('some-app-data');
                 done();
@@ -76,7 +77,7 @@ describe('Hawk', function () {
 
             Hawk.server.authenticate(req, credentialsFunc, {}, function (err, credentials, artifacts) {
 
-                expect(err).to.not.exist;
+                expect(err).to.not.exist();
                 expect(credentials.user).to.equal('steve');
                 expect(artifacts.ext).to.equal('some-app-data');
                 expect(Hawk.server.authenticatePayload(payload, credentials, artifacts, req.headers['content-type'])).to.equal(true);
@@ -88,7 +89,7 @@ describe('Hawk', function () {
                 };
 
                 res.headers['server-authorization'] = Hawk.server.header(credentials, artifacts, { payload: 'some reply', contentType: 'text/plain', ext: 'response-specific' });
-                expect(res.headers['server-authorization']).to.exist;
+                expect(res.headers['server-authorization']).to.exist();
 
                 expect(Hawk.client.authenticate(res, credentials, artifacts, { payload: 'some reply' })).to.equal(true);
                 done();
@@ -116,7 +117,7 @@ describe('Hawk', function () {
 
             Hawk.server.authenticate(req, credentialsFunc, {}, function (err, credentials, artifacts) {
 
-                expect(err).to.not.exist;
+                expect(err).to.not.exist();
                 expect(credentials.user).to.equal('steve');
                 expect(artifacts.ext).to.equal('some-app-data');
                 expect(Hawk.server.authenticatePayload(payload, credentials, artifacts, req.headers['content-type'])).to.equal(true);
@@ -128,7 +129,7 @@ describe('Hawk', function () {
                 };
 
                 res.headers['server-authorization'] = Hawk.server.header(credentials, artifacts, { payload: 'some reply', contentType: 'text/plain', ext: 'response-specific' });
-                expect(res.headers['server-authorization']).to.exist;
+                expect(res.headers['server-authorization']).to.exist();
 
                 expect(Hawk.client.authenticate(res, credentials, artifacts, { payload: 'some reply' })).to.equal(true);
                 done();
@@ -156,7 +157,7 @@ describe('Hawk', function () {
 
             Hawk.server.authenticate(req, credentialsFunc, {}, function (err, credentials, artifacts) {
 
-                expect(err).to.not.exist;
+                expect(err).to.not.exist();
                 expect(credentials.user).to.equal('steve');
                 expect(artifacts.ext).to.equal('some-app-data');
                 expect(Hawk.server.authenticatePayload(payload, credentials, artifacts, req.headers['content-type'])).to.equal(true);
@@ -168,7 +169,7 @@ describe('Hawk', function () {
                 };
 
                 res.headers['server-authorization'] = Hawk.server.header(credentials, artifacts);
-                expect(res.headers['server-authorization']).to.exist;
+                expect(res.headers['server-authorization']).to.exist();
 
                 expect(Hawk.client.authenticate(res, credentials, artifacts)).to.equal(true);
                 done();
@@ -196,7 +197,7 @@ describe('Hawk', function () {
 
             Hawk.server.authenticate(req, credentialsFunc, {}, function (err, credentials, artifacts) {
 
-                expect(err).to.not.exist;
+                expect(err).to.not.exist();
                 expect(credentials.user).to.equal('steve');
                 expect(artifacts.ext).to.equal('some-app-data');
                 expect(Hawk.server.authenticatePayload(payload, credentials, artifacts, req.headers['content-type'])).to.equal(true);
@@ -208,7 +209,7 @@ describe('Hawk', function () {
                 };
 
                 res.headers['server-authorization'] = Hawk.server.header(credentials, artifacts);
-                expect(res.headers['server-authorization']).to.exist;
+                expect(res.headers['server-authorization']).to.exist();
 
                 expect(Hawk.client.authenticate(res, credentials, artifacts, { payload: 'some reply' })).to.equal(false);
                 done();
@@ -230,7 +231,7 @@ describe('Hawk', function () {
             req.authorization = Hawk.client.header('http://example.com:8080/resource/4?filter=a', req.method, { credentials: credentials, payload: 'hola!', ext: 'some-app-data' }).field;
             Hawk.server.authenticate(req, credentialsFunc, {}, function (err, credentials, artifacts) {
 
-                expect(err).to.not.exist;
+                expect(err).to.not.exist();
                 expect(credentials.user).to.equal('steve');
                 expect(artifacts.ext).to.equal('some-app-data');
                 done();
@@ -252,11 +253,11 @@ describe('Hawk', function () {
             req.authorization = Hawk.client.header('http://example.com:8080/resource/4?filter=a', req.method, { credentials: credentials, payload: 'hola!', ext: 'some-app-data' }).field;
             Hawk.server.authenticate(req, credentialsFunc, {}, function (err, credentials, artifacts) {
 
-                expect(err).to.not.exist;
+                expect(err).to.not.exist();
                 expect(credentials.user).to.equal('steve');
                 expect(artifacts.ext).to.equal('some-app-data');
-                expect(Hawk.server.authenticatePayload('hola!', credentials, artifacts)).to.be.true;
-                expect(Hawk.server.authenticatePayload('hello!', credentials, artifacts)).to.be.false;
+                expect(Hawk.server.authenticatePayload('hola!', credentials, artifacts)).to.be.true();
+                expect(Hawk.server.authenticatePayload('hello!', credentials, artifacts)).to.be.false();
                 done();
             });
         });
@@ -276,7 +277,7 @@ describe('Hawk', function () {
             req.authorization = Hawk.client.header('http://example.com:8080/resource/4?filter=a', req.method, { credentials: credentials, payload: 'hola!', ext: 'some-app-data' }).field;
             Hawk.server.authenticate(req, credentialsFunc, { payload: 'hola!' }, function (err, credentials, artifacts) {
 
-                expect(err).to.not.exist;
+                expect(err).to.not.exist();
                 expect(credentials.user).to.equal('steve');
                 expect(artifacts.ext).to.equal('some-app-data');
                 done();
@@ -298,7 +299,7 @@ describe('Hawk', function () {
             req.authorization = Hawk.client.header('http://example.com:8080/resource/4?filter=a', req.method, { credentials: credentials, ext: 'some-app-data', app: 'asd23ased' }).field;
             Hawk.server.authenticate(req, credentialsFunc, {}, function (err, credentials, artifacts) {
 
-                expect(err).to.not.exist;
+                expect(err).to.not.exist();
                 expect(credentials.user).to.equal('steve');
                 expect(artifacts.ext).to.equal('some-app-data');
                 expect(artifacts.app).to.equal('asd23ased');
@@ -321,7 +322,7 @@ describe('Hawk', function () {
             req.authorization = Hawk.client.header('http://example.com:8080/resource/4?filter=a', req.method, { credentials: credentials, ext: 'some-app-data', app: 'asd23ased', dlg: '23434szr3q4d' }).field;
             Hawk.server.authenticate(req, credentialsFunc, {}, function (err, credentials, artifacts) {
 
-                expect(err).to.not.exist;
+                expect(err).to.not.exist();
                 expect(credentials.user).to.equal('steve');
                 expect(artifacts.ext).to.equal('some-app-data');
                 expect(artifacts.app).to.equal('asd23ased');
@@ -345,7 +346,7 @@ describe('Hawk', function () {
             req.authorization = Hawk.client.header('http://example.com:8080/resource/4?filter=a', req.method, { credentials: credentials, payload: 'hola!', ext: 'some-app-data' }).field;
             Hawk.server.authenticate(req, credentialsFunc, { payload: 'byebye!' }, function (err, credentials, artifacts) {
 
-                expect(err).to.exist;
+                expect(err).to.exist();
                 expect(err.output.payload.message).to.equal('Bad payload hash');
                 done();
             });
@@ -368,8 +369,8 @@ describe('Hawk', function () {
 
             Hawk.server.authenticate(req, credentialsFunc, {}, function (err, credentials, artifacts) {
 
-                expect(err).to.exist;
-                expect(credentials).to.exist;
+                expect(err).to.exist();
+                expect(credentials).to.exist();
                 done();
             });
         });

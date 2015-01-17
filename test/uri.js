@@ -2,9 +2,10 @@
 
 var Http = require('http');
 var Url = require('url');
+var Code = require('code');
+var Hawk = require('../lib');
 var Hoek = require('hoek');
 var Lab = require('lab');
-var Hawk = require('../lib');
 
 
 // Declare internals
@@ -17,7 +18,7 @@ var internals = {};
 var lab = exports.lab = Lab.script();
 var describe = lab.experiment;
 var it = lab.test;
-var expect = Lab.expect;
+var expect = Code.expect;
 
 
 describe('Hawk', function () {
@@ -52,7 +53,7 @@ describe('Hawk', function () {
 
                 Hawk.uri.authenticate(req, credentialsFunc, {}, function (err, credentials, attributes) {
 
-                    expect(err).to.not.exist;
+                    expect(err).to.not.exist();
                     expect(credentials.user).to.equal('steve');
                     expect(attributes.ext).to.equal('some-app-data');
                     done();
@@ -76,7 +77,7 @@ describe('Hawk', function () {
 
                 Hawk.uri.authenticate(req, credentialsFunc, {}, function (err, credentials, attributes) {
 
-                    expect(err).to.not.exist;
+                    expect(err).to.not.exist();
                     expect(credentials.user).to.equal('steve');
                     done();
                 });
@@ -94,7 +95,7 @@ describe('Hawk', function () {
 
             Hawk.uri.authenticate(req, credentialsFunc, {}, function (err, credentials, attributes) {
 
-                expect(err).to.not.exist;
+                expect(err).to.not.exist();
                 expect(credentials.user).to.equal('steve');
                 expect(attributes.ext).to.equal('some-app-data');
                 done();
@@ -112,7 +113,7 @@ describe('Hawk', function () {
 
             Hawk.uri.authenticate(req, credentialsFunc, {}, function (err, credentials, attributes) {
 
-                expect(err).to.not.exist;
+                expect(err).to.not.exist();
                 expect(credentials.user).to.equal('steve');
                 expect(attributes.ext).to.equal('some-app-data');
                 done();
@@ -130,7 +131,7 @@ describe('Hawk', function () {
 
             Hawk.uri.authenticate(req, credentialsFunc, {}, function (err, credentials, attributes) {
 
-                expect(err).to.not.exist;
+                expect(err).to.not.exist();
                 expect(credentials.user).to.equal('steve');
                 expect(attributes.ext).to.equal('some-app-data');
                 done();
@@ -149,7 +150,7 @@ describe('Hawk', function () {
 
             Hawk.uri.authenticate(req, credentialsFunc, {}, function (err, credentials, attributes) {
 
-                expect(err).to.exist;
+                expect(err).to.exist();
                 expect(err.output.payload.message).to.equal('Multiple authentications');
                 done();
             });
@@ -184,7 +185,7 @@ describe('Hawk', function () {
 
                 Hawk.uri.authenticate(req, credentialsFunc, {}, function (err, credentials, attributes) {
 
-                    expect(err).to.exist;
+                    expect(err).to.exist();
                     expect(err.output.payload.message).to.equal('Invalid method');
                     done();
                 });
@@ -203,7 +204,7 @@ describe('Hawk', function () {
 
             Hawk.uri.authenticate(req, credentialsFunc, {}, function (err, credentials, attributes) {
 
-                expect(err).to.exist;
+                expect(err).to.exist();
                 expect(err.output.payload.message).to.equal('Invalid Host header');
                 done();
             });
@@ -220,9 +221,9 @@ describe('Hawk', function () {
 
             Hawk.uri.authenticate(req, credentialsFunc, {}, function (err, credentials, attributes) {
 
-                expect(err).to.exist;
+                expect(err).to.exist();
                 expect(err.output.payload.message).to.equal('Empty bewit');
-                expect(err.isMissing).to.not.exist;
+                expect(err.isMissing).to.not.exist();
                 done();
             });
         });
@@ -238,9 +239,9 @@ describe('Hawk', function () {
 
             Hawk.uri.authenticate(req, credentialsFunc, {}, function (err, credentials, attributes) {
 
-                expect(err).to.exist;
+                expect(err).to.exist();
                 expect(err.output.payload.message).to.equal('Invalid bewit encoding');
-                expect(err.isMissing).to.not.exist;
+                expect(err.isMissing).to.not.exist();
                 done();
             });
         });
@@ -256,8 +257,8 @@ describe('Hawk', function () {
 
             Hawk.uri.authenticate(req, credentialsFunc, {}, function (err, credentials, attributes) {
 
-                expect(err).to.exist;
-                expect(err.output.payload.message).to.not.exist;
+                expect(err).to.exist();
+                expect(err.output.payload.message).to.not.exist();
                 expect(err.isMissing).to.equal(true);
                 done();
             });
@@ -274,7 +275,7 @@ describe('Hawk', function () {
 
             Hawk.uri.authenticate(req, credentialsFunc, {}, function (err, credentials, attributes) {
 
-                expect(err).to.exist;
+                expect(err).to.exist();
                 expect(err.output.payload.message).to.equal('Invalid bewit structure');
                 done();
             });
@@ -291,7 +292,7 @@ describe('Hawk', function () {
 
             Hawk.uri.authenticate(req, credentialsFunc, {}, function (err, credentials, attributes) {
 
-                expect(err).to.exist;
+                expect(err).to.exist();
                 expect(err.output.payload.message).to.equal('Missing bewit attributes');
                 done();
             });
@@ -308,7 +309,7 @@ describe('Hawk', function () {
 
             Hawk.uri.authenticate(req, credentialsFunc, {}, function (err, credentials, attributes) {
 
-                expect(err).to.exist;
+                expect(err).to.exist();
                 expect(err.output.payload.message).to.equal('Missing bewit attributes');
                 done();
             });
@@ -325,7 +326,7 @@ describe('Hawk', function () {
 
             Hawk.uri.authenticate(req, credentialsFunc, {}, function (err, credentials, attributes) {
 
-                expect(err).to.exist;
+                expect(err).to.exist();
                 expect(err.output.payload.message).to.equal('Access expired');
                 done();
             });
@@ -342,7 +343,7 @@ describe('Hawk', function () {
 
             Hawk.uri.authenticate(req, function (id, callback) { callback(Hawk.error.badRequest('Boom')); }, {}, function (err, credentials, attributes) {
 
-                expect(err).to.exist;
+                expect(err).to.exist();
                 expect(err.output.payload.message).to.equal('Boom');
                 done();
             });
@@ -359,7 +360,7 @@ describe('Hawk', function () {
 
             Hawk.uri.authenticate(req, function (id, callback) { callback(Hawk.error.badRequest('Boom'), { some: 'value' }); }, {}, function (err, credentials, attributes) {
 
-                expect(err).to.exist;
+                expect(err).to.exist();
                 expect(err.output.payload.message).to.equal('Boom');
                 expect(credentials.some).to.equal('value');
                 done();
@@ -377,7 +378,7 @@ describe('Hawk', function () {
 
             Hawk.uri.authenticate(req, function (id, callback) { callback(null, null); }, {}, function (err, credentials, attributes) {
 
-                expect(err).to.exist;
+                expect(err).to.exist();
                 expect(err.output.payload.message).to.equal('Unknown credentials');
                 done();
             });
@@ -394,7 +395,7 @@ describe('Hawk', function () {
 
             Hawk.uri.authenticate(req, function (id, callback) { callback(null, {}); }, {}, function (err, credentials, attributes) {
 
-                expect(err).to.exist;
+                expect(err).to.exist();
                 expect(err.message).to.equal('Invalid credentials');
                 done();
             });
@@ -411,7 +412,7 @@ describe('Hawk', function () {
 
             Hawk.uri.authenticate(req, function (id, callback) { callback(null, { key: 'xxx', algorithm: 'xxx' }); }, {}, function (err, credentials, attributes) {
 
-                expect(err).to.exist;
+                expect(err).to.exist();
                 expect(err.message).to.equal('Unknown algorithm');
                 done();
             });
@@ -428,7 +429,7 @@ describe('Hawk', function () {
 
             Hawk.uri.authenticate(req, function (id, callback) { callback(null, { key: 'xxx', algorithm: 'sha256' }); }, {}, function (err, credentials, attributes) {
 
-                expect(err).to.exist;
+                expect(err).to.exist();
                 expect(err.output.payload.message).to.equal('Bad mac');
                 done();
             });

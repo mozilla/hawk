@@ -1,8 +1,9 @@
 // Load modules
 
-var Lab = require('lab');
-var Hoek = require('hoek');
+var Code = require('code');
 var Hawk = require('../lib');
+var Hoek = require('hoek');
+var Lab = require('lab');
 
 
 // Declare internals
@@ -15,7 +16,7 @@ var internals = {};
 var lab = exports.lab = Lab.script();
 var describe = lab.experiment;
 var it = lab.test;
-var expect = Lab.expect;
+var expect = Code.expect;
 
 
 describe('Hawk', function () {
