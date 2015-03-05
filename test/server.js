@@ -190,13 +190,13 @@ describe('Hawk', function () {
                 var memoryCache = {};
                 var options = {
                     localtimeOffsetMsec: 1353788437000 - Hawk.utils.now(),
-                    nonceFunc: function (nonce, ts, callback) {
+                    nonceFunc: function (key, nonce, ts, callback) {
 
-                        if (memoryCache[nonce]) {
+                        if (memoryCache[key + nonce]) {
                             return callback(new Error());
                         }
 
-                        memoryCache[nonce] = true;
+                        memoryCache[key + nonce] = true;
                         return callback();
                     }
                 };
@@ -966,6 +966,20 @@ describe('Hawk', function () {
                         expect(err).to.exist();
                         expect(err.message).to.equal('something');
                         expect(credentials.some).to.equal('value');
+                        done();
+                    });
+                });
+            });
+
+            it('errors on nonce collision', function (done) {
+
+                credentialsFunc('123456', function (err, credentials) {
+
+                    var auth = Hawk.client.message('example.com', 8080, 'some message', { credentials: credentials });
+                    Hawk.server.authenticateMessage('example.com', 8080, 'some message', auth, credentialsFunc, {nonceFunc: function (key, nonce, ts, nonceCallback) { nonceCallback(true); }}, function (err, credentials) {
+
+                        expect(err).to.exist();
+                        expect(err.message).to.equal('Invalid nonce');
                         done();
                     });
                 });
