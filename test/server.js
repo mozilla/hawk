@@ -215,6 +215,72 @@ describe('Hawk', function () {
                 });
             });
 
+            it('does not error on nonce collision if keys differ', function (done) {
+
+                var reqSteve = {
+                    method: 'GET',
+                    url: '/resource/4?filter=a',
+                    host: 'example.com',
+                    port: 8080,
+                    authorization: 'Hawk id="123", ts="1353788437", nonce="k3j4h2", mac="bXx7a7p1h9QYQNZ8x7QhvDQym8ACgab4m3lVSFn4DBw=", ext="hello"'
+                };
+
+                var reqBob = {
+                    method: 'GET',
+                    url: '/resource/4?filter=a',
+                    host: 'example.com',
+                    port: 8080,
+                    authorization: 'Hawk id="456", ts="1353788437", nonce="k3j4h2", mac="LXfmTnRzrLd9TD7yfH+4se46Bx6AHyhpM94hLCiNia4=", ext="hello"'
+                };
+
+                var credentialsFunc = function (id, callback) {
+
+                    var credentials = {
+                        '123': {
+                            id: id,
+                            key: 'werxhqb98rpaxn39848xrunpaw3489ruxnpa98w4rxn',
+                            algorithm: (id === '1' ? 'sha1' : 'sha256'),
+                            user: 'steve'
+                        },
+                        '456': {
+                            id: id,
+                            key: 'xrunpaw3489ruxnpa98w4rxnwerxhqb98rpaxn39848',
+                            algorithm: (id === '1' ? 'sha1' : 'sha256'),
+                            user: 'bob'
+                        }
+                    };
+
+                    return callback(null, credentials[id]);
+                };
+
+                var memoryCache = {};
+                var options = {
+                    localtimeOffsetMsec: 1353788437000 - Hawk.utils.now(),
+                    nonceFunc: function (key, nonce, ts, callback) {
+
+                        if (memoryCache[key + nonce]) {
+                            return callback(new Error());
+                        }
+
+                        memoryCache[key + nonce] = true;
+                        return callback();
+                    }
+                };
+
+                Hawk.server.authenticate(reqSteve, credentialsFunc, options, function (err, credentials, artifacts) {
+
+                    expect(err).to.not.exist();
+                    expect(credentials.user).to.equal('steve');
+
+                    Hawk.server.authenticate(reqBob, credentialsFunc, options, function (err, credentials, artifacts) {
+
+                        expect(err).to.not.exist();
+                        expect(credentials.user).to.equal('bob');
+                        done();
+                    });
+                });
+            });
+
             it('errors on an invalid authentication header: wrong scheme', function (done) {
 
                 var req = {
@@ -984,6 +1050,7 @@ describe('Hawk', function () {
                     });
                 });
             });
+
         });
 
         describe('#authenticatePayloadHash', function () {
