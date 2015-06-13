@@ -137,7 +137,7 @@ describe('Hawk', function () {
             var auth = Hawk.client.message('example.com', 8080, 'some message', { credentials: credentials });
             expect(auth).to.exist();
 
-            Hawk.server.authenticateMessage('example.com', 8080, 'some message', auth, credentialsFunc, { nonceFunc: function (nonce, ts, callback) { callback (new Error('kaboom')); } }, function (err, credentials) {
+            Hawk.server.authenticateMessage('example.com', 8080, 'some message', auth, credentialsFunc, { nonceFunc: function (key, nonce, ts, callback) { callback (new Error('kaboom')); } }, function (err, credentials) {
 
                 expect(err).to.exist();
                 expect(err.message).to.equal('Invalid nonce');
