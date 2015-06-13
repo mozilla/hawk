@@ -1,11 +1,11 @@
 {
   "name": "hawk",
   "description": "HTTP Hawk Authentication Scheme",
-  "version": "2.3.1",
+  "version": "3.0.0",
   "author": "Eran Hammer <eran@hammer.io> (http://hueniverse.com)",
   "contributors": [],
   "repository": "git://github.com/hueniverse/hawk",
-  "main": "index",
+  "main": "lib/index.js",
   "keywords": [
     "http",
     "authentication",
@@ -13,7 +13,7 @@
     "hawk"
   ],
   "engines": {
-    "node": ">=0.8.0"
+    "node": ">=0.10.32"
   },
   "browser": "./lib/browser.js",
   "dependencies": {
@@ -27,12 +27,8 @@
     "lab": "5.x.x"
   },
   "scripts": {
-    "test": "make test-cov"
+    "test": "lab -a code -t 100 -L",
+    "test-cov-html": "lab -a code -r html -o coverage.html"
   },
-  "licenses": [
-    {
-      "type": "BSD",
-      "url": "http://github.com/hueniverse/hawk/raw/master/LICENSE"
-    }
-  ]
+  "license": "BSD-3-Clause"
 }
