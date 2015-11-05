@@ -1442,6 +1442,33 @@ describe('Browser', function () {
                 expect(uri.port).to.equal('80');
                 done();
             });
+
+            it('handles unusual characters correctly', function (done) {
+                var parts = {
+                    protocol: 'http+vnd.my-extension',
+                    user:     'user!$&\'()*+,;=%40my-domain.com',
+                    password: 'pass!$&\'()*+,;=%40:word',
+                    hostname: 'foo-bar.com',
+                    port:     '99',
+                    pathname: '/path/%40/!$&\'()*+,;=:@/',
+                    query:    'query%40/!$&\'()*+,;=:@/?',
+                    fragment: 'fragm%40/!$&\'()*+,;=:@/?'
+                };
+
+                parts.userInfo  = parts.user + ':' + parts.password;
+                parts.authority = parts.userInfo + '@' + parts.hostname + ':' + parts.port;
+                parts.relative  = parts.pathname + '?' + parts.query;
+                parts.resource  = parts.relative + '#' + parts.fragment;
+                parts.source    = parts.protocol + '://' + parts.authority + parts.resource;
+
+                var uri = Browser.utils.parseUri(parts.source);
+
+                for (var part in parts) {
+                    expect(uri[part]).to.equal(parts[part]);
+                }
+
+                done();
+            });
         });
 
         var str = 'https://www.google.ca/webhp?sourceid=chrome-instant&ion=1&espv=2&ie=UTF-8#q=url';
