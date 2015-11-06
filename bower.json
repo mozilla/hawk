@@ -1,12 +1,11 @@
 {
   "name": "hawk",
-  "main": "lib/browser.js",
+  "main": "dist/browser.js",
   "license": "./LICENSE",
   "ignore": [
-    "!lib",
     "lib/*",
-    "!lib/browser.js",
-    "index.js"
+    "!dist",
+    "!dist/browser.js"
   ],
   "keywords": [
     "http",

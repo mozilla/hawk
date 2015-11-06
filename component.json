@@ -12,8 +12,8 @@
   "dependencies": {},
   "development": {},
   "license": "BSD",
-  "main": "lib/browser.js",
+  "main": "dist/browser.js",
   "scripts": [
-    "lib/browser.js"
+    "dist/browser.js"
   ]
 }
