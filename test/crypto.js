@@ -1,28 +1,30 @@
+'use strict';
+
 // Load modules
 
-var Code = require('code');
-var Hawk = require('../lib');
-var Lab = require('lab');
+const Code = require('code');
+const Hawk = require('../lib');
+const Lab = require('lab');
 
 
 // Declare internals
 
-var internals = {};
+const internals = {};
 
 
 // Test shortcuts
 
-var lab = exports.lab = Lab.script();
-var describe = lab.experiment;
-var it = lab.test;
-var expect = Code.expect;
+const lab = exports.lab = Lab.script();
+const describe = lab.experiment;
+const it = lab.test;
+const expect = Code.expect;
 
 
-describe('Crypto', function () {
+describe('Crypto', () => {
 
-    describe('generateNormalizedString()', function () {
+    describe('generateNormalizedString()', () => {
 
-        it('should return a valid normalized string', function (done) {
+        it('should return a valid normalized string', (done) => {
 
             expect(Hawk.crypto.generateNormalizedString('header', {
                 ts: 1357747017,
@@ -36,7 +38,7 @@ describe('Crypto', function () {
             done();
         });
 
-        it('should return a valid normalized string (ext)', function (done) {
+        it('should return a valid normalized string (ext)', (done) => {
 
             expect(Hawk.crypto.generateNormalizedString('header', {
                 ts: 1357747017,
@@ -51,7 +53,7 @@ describe('Crypto', function () {
             done();
         });
 
-        it('should return a valid normalized string (payload + ext)', function (done) {
+        it('should return a valid normalized string (payload + ext)', (done) => {
 
             expect(Hawk.crypto.generateNormalizedString('header', {
                 ts: 1357747017,

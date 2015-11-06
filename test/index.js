@@ -1,29 +1,31 @@
+'use strict';
+
 // Load modules
 
-var Url = require('url');
-var Code = require('code');
-var Hawk = require('../lib');
-var Lab = require('lab');
+const Url = require('url');
+const Code = require('code');
+const Hawk = require('../lib');
+const Lab = require('lab');
 
 
 // Declare internals
 
-var internals = {};
+const internals = {};
 
 
 // Test shortcuts
 
-var lab = exports.lab = Lab.script();
-var describe = lab.experiment;
-var it = lab.test;
-var expect = Code.expect;
+const lab = exports.lab = Lab.script();
+const describe = lab.experiment;
+const it = lab.test;
+const expect = Code.expect;
 
 
-describe('Hawk', function () {
+describe('Hawk', () => {
 
-    var credentialsFunc = function (id, callback) {
+    const credentialsFunc = function (id, callback) {
 
-        var credentials = {
+        const credentials = {
             id: id,
             key: 'werxhqb98rpaxn39848xrunpaw3489ruxnpa98w4rxn',
             algorithm: (id === '1' ? 'sha1' : 'sha256'),
@@ -33,21 +35,21 @@ describe('Hawk', function () {
         return callback(null, credentials);
     };
 
-    it('generates a header then successfully parse it (configuration)', function (done) {
+    it('generates a header then successfully parse it (configuration)', (done) => {
 
-        var req = {
+        const req = {
             method: 'GET',
             url: '/resource/4?filter=a',
             host: 'example.com',
             port: 8080
         };
 
-        credentialsFunc('123456', function (err, credentials1) {
+        credentialsFunc('123456', (err, credentials1) => {
 
             req.authorization = Hawk.client.header(Url.parse('http://example.com:8080/resource/4?filter=a'), req.method, { credentials: credentials1, ext: 'some-app-data' }).field;
             expect(req.authorization).to.exist();
 
-            Hawk.server.authenticate(req, credentialsFunc, {}, function (err, credentials2, artifacts) {
+            Hawk.server.authenticate(req, credentialsFunc, {}, (err, credentials2, artifacts) => {
 
                 expect(err).to.not.exist();
                 expect(credentials2.user).to.equal('steve');
@@ -57,9 +59,9 @@ describe('Hawk', function () {
         });
     });
 
-    it('generates a header then successfully parse it (node request)', function (done) {
+    it('generates a header then successfully parse it (node request)', (done) => {
 
-        var req = {
+        const req = {
             method: 'POST',
             url: '/resource/4?filter=a',
             headers: {
@@ -68,21 +70,21 @@ describe('Hawk', function () {
             }
         };
 
-        var payload = 'some not so random text';
+        const payload = 'some not so random text';
 
-        credentialsFunc('123456', function (err, credentials1) {
+        credentialsFunc('123456', (err, credentials1) => {
 
-            var reqHeader = Hawk.client.header('http://example.com:8080/resource/4?filter=a', req.method, { credentials: credentials1, ext: 'some-app-data', payload: payload, contentType: req.headers['content-type'] });
+            const reqHeader = Hawk.client.header('http://example.com:8080/resource/4?filter=a', req.method, { credentials: credentials1, ext: 'some-app-data', payload: payload, contentType: req.headers['content-type'] });
             req.headers.authorization = reqHeader.field;
 
-            Hawk.server.authenticate(req, credentialsFunc, {}, function (err, credentials2, artifacts) {
+            Hawk.server.authenticate(req, credentialsFunc, {}, (err, credentials2, artifacts) => {
 
                 expect(err).to.not.exist();
                 expect(credentials2.user).to.equal('steve');
                 expect(artifacts.ext).to.equal('some-app-data');
                 expect(Hawk.server.authenticatePayload(payload, credentials2, artifacts, req.headers['content-type'])).to.equal(true);
 
-                var res = {
+                const res = {
                     headers: {
                         'content-type': 'text/plain'
                     }
@@ -97,9 +99,9 @@ describe('Hawk', function () {
         });
     });
 
-    it('generates a header then successfully parse it (absolute request uri)', function (done) {
+    it('generates a header then successfully parse it (absolute request uri)', (done) => {
 
-        var req = {
+        const req = {
             method: 'POST',
             url: 'http://example.com:8080/resource/4?filter=a',
             headers: {
@@ -108,21 +110,21 @@ describe('Hawk', function () {
             }
         };
 
-        var payload = 'some not so random text';
+        const payload = 'some not so random text';
 
-        credentialsFunc('123456', function (err, credentials1) {
+        credentialsFunc('123456', (err, credentials1) => {
 
-            var reqHeader = Hawk.client.header('http://example.com:8080/resource/4?filter=a', req.method, { credentials: credentials1, ext: 'some-app-data', payload: payload, contentType: req.headers['content-type'] });
+            const reqHeader = Hawk.client.header('http://example.com:8080/resource/4?filter=a', req.method, { credentials: credentials1, ext: 'some-app-data', payload: payload, contentType: req.headers['content-type'] });
             req.headers.authorization = reqHeader.field;
 
-            Hawk.server.authenticate(req, credentialsFunc, {}, function (err, credentials2, artifacts) {
+            Hawk.server.authenticate(req, credentialsFunc, {}, (err, credentials2, artifacts) => {
 
                 expect(err).to.not.exist();
                 expect(credentials2.user).to.equal('steve');
                 expect(artifacts.ext).to.equal('some-app-data');
                 expect(Hawk.server.authenticatePayload(payload, credentials2, artifacts, req.headers['content-type'])).to.equal(true);
 
-                var res = {
+                const res = {
                     headers: {
                         'content-type': 'text/plain'
                     }
@@ -137,9 +139,9 @@ describe('Hawk', function () {
         });
     });
 
-    it('generates a header then successfully parse it (no server header options)', function (done) {
+    it('generates a header then successfully parse it (no server header options)', (done) => {
 
-        var req = {
+        const req = {
             method: 'POST',
             url: '/resource/4?filter=a',
             headers: {
@@ -148,21 +150,21 @@ describe('Hawk', function () {
             }
         };
 
-        var payload = 'some not so random text';
+        const payload = 'some not so random text';
 
-        credentialsFunc('123456', function (err, credentials1) {
+        credentialsFunc('123456', (err, credentials1) => {
 
-            var reqHeader = Hawk.client.header('http://example.com:8080/resource/4?filter=a', req.method, { credentials: credentials1, ext: 'some-app-data', payload: payload, contentType: req.headers['content-type'] });
+            const reqHeader = Hawk.client.header('http://example.com:8080/resource/4?filter=a', req.method, { credentials: credentials1, ext: 'some-app-data', payload: payload, contentType: req.headers['content-type'] });
             req.headers.authorization = reqHeader.field;
 
-            Hawk.server.authenticate(req, credentialsFunc, {}, function (err, credentials2, artifacts) {
+            Hawk.server.authenticate(req, credentialsFunc, {}, (err, credentials2, artifacts) => {
 
                 expect(err).to.not.exist();
                 expect(credentials2.user).to.equal('steve');
                 expect(artifacts.ext).to.equal('some-app-data');
                 expect(Hawk.server.authenticatePayload(payload, credentials2, artifacts, req.headers['content-type'])).to.equal(true);
 
-                var res = {
+                const res = {
                     headers: {
                         'content-type': 'text/plain'
                     }
@@ -177,9 +179,9 @@ describe('Hawk', function () {
         });
     });
 
-    it('generates a header then fails to parse it (missing server header hash)', function (done) {
+    it('generates a header then fails to parse it (missing server header hash)', (done) => {
 
-        var req = {
+        const req = {
             method: 'POST',
             url: '/resource/4?filter=a',
             headers: {
@@ -188,21 +190,21 @@ describe('Hawk', function () {
             }
         };
 
-        var payload = 'some not so random text';
+        const payload = 'some not so random text';
 
-        credentialsFunc('123456', function (err, credentials1) {
+        credentialsFunc('123456', (err, credentials1) => {
 
-            var reqHeader = Hawk.client.header('http://example.com:8080/resource/4?filter=a', req.method, { credentials: credentials1, ext: 'some-app-data', payload: payload, contentType: req.headers['content-type'] });
+            const reqHeader = Hawk.client.header('http://example.com:8080/resource/4?filter=a', req.method, { credentials: credentials1, ext: 'some-app-data', payload: payload, contentType: req.headers['content-type'] });
             req.headers.authorization = reqHeader.field;
 
-            Hawk.server.authenticate(req, credentialsFunc, {}, function (err, credentials2, artifacts) {
+            Hawk.server.authenticate(req, credentialsFunc, {}, (err, credentials2, artifacts) => {
 
                 expect(err).to.not.exist();
                 expect(credentials2.user).to.equal('steve');
                 expect(artifacts.ext).to.equal('some-app-data');
                 expect(Hawk.server.authenticatePayload(payload, credentials2, artifacts, req.headers['content-type'])).to.equal(true);
 
-                var res = {
+                const res = {
                     headers: {
                         'content-type': 'text/plain'
                     }
@@ -217,19 +219,19 @@ describe('Hawk', function () {
         });
     });
 
-    it('generates a header then successfully parse it (with hash)', function (done) {
+    it('generates a header then successfully parse it (with hash)', (done) => {
 
-        var req = {
+        const req = {
             method: 'GET',
             url: '/resource/4?filter=a',
             host: 'example.com',
             port: 8080
         };
 
-        credentialsFunc('123456', function (err, credentials1) {
+        credentialsFunc('123456', (err, credentials1) => {
 
             req.authorization = Hawk.client.header('http://example.com:8080/resource/4?filter=a', req.method, { credentials: credentials1, payload: 'hola!', ext: 'some-app-data' }).field;
-            Hawk.server.authenticate(req, credentialsFunc, {}, function (err, credentials2, artifacts) {
+            Hawk.server.authenticate(req, credentialsFunc, {}, (err, credentials2, artifacts) => {
 
                 expect(err).to.not.exist();
                 expect(credentials2.user).to.equal('steve');
@@ -239,19 +241,19 @@ describe('Hawk', function () {
         });
     });
 
-    it('generates a header then successfully parse it then validate payload', function (done) {
+    it('generates a header then successfully parse it then validate payload', (done) => {
 
-        var req = {
+        const req = {
             method: 'GET',
             url: '/resource/4?filter=a',
             host: 'example.com',
             port: 8080
         };
 
-        credentialsFunc('123456', function (err, credentials1) {
+        credentialsFunc('123456', (err, credentials1) => {
 
             req.authorization = Hawk.client.header('http://example.com:8080/resource/4?filter=a', req.method, { credentials: credentials1, payload: 'hola!', ext: 'some-app-data' }).field;
-            Hawk.server.authenticate(req, credentialsFunc, {}, function (err, credentials2, artifacts) {
+            Hawk.server.authenticate(req, credentialsFunc, {}, (err, credentials2, artifacts) => {
 
                 expect(err).to.not.exist();
                 expect(credentials2.user).to.equal('steve');
@@ -263,19 +265,19 @@ describe('Hawk', function () {
         });
     });
 
-    it('generates a header then successfully parses and validates payload', function (done) {
+    it('generates a header then successfully parses and validates payload', (done) => {
 
-        var req = {
+        const req = {
             method: 'GET',
             url: '/resource/4?filter=a',
             host: 'example.com',
             port: 8080
         };
 
-        credentialsFunc('123456', function (err, credentials1) {
+        credentialsFunc('123456', (err, credentials1) => {
 
             req.authorization = Hawk.client.header('http://example.com:8080/resource/4?filter=a', req.method, { credentials: credentials1, payload: 'hola!', ext: 'some-app-data' }).field;
-            Hawk.server.authenticate(req, credentialsFunc, { payload: 'hola!' }, function (err, credentials2, artifacts) {
+            Hawk.server.authenticate(req, credentialsFunc, { payload: 'hola!' }, (err, credentials2, artifacts) => {
 
                 expect(err).to.not.exist();
                 expect(credentials2.user).to.equal('steve');
@@ -285,19 +287,19 @@ describe('Hawk', function () {
         });
     });
 
-    it('generates a header then successfully parse it (app)', function (done) {
+    it('generates a header then successfully parse it (app)', (done) => {
 
-        var req = {
+        const req = {
             method: 'GET',
             url: '/resource/4?filter=a',
             host: 'example.com',
             port: 8080
         };
 
-        credentialsFunc('123456', function (err, credentials1) {
+        credentialsFunc('123456', (err, credentials1) => {
 
             req.authorization = Hawk.client.header('http://example.com:8080/resource/4?filter=a', req.method, { credentials: credentials1, ext: 'some-app-data', app: 'asd23ased' }).field;
-            Hawk.server.authenticate(req, credentialsFunc, {}, function (err, credentials2, artifacts) {
+            Hawk.server.authenticate(req, credentialsFunc, {}, (err, credentials2, artifacts) => {
 
                 expect(err).to.not.exist();
                 expect(credentials2.user).to.equal('steve');
@@ -308,19 +310,19 @@ describe('Hawk', function () {
         });
     });
 
-    it('generates a header then successfully parse it (app, dlg)', function (done) {
+    it('generates a header then successfully parse it (app, dlg)', (done) => {
 
-        var req = {
+        const req = {
             method: 'GET',
             url: '/resource/4?filter=a',
             host: 'example.com',
             port: 8080
         };
 
-        credentialsFunc('123456', function (err, credentials1) {
+        credentialsFunc('123456', (err, credentials1) => {
 
             req.authorization = Hawk.client.header('http://example.com:8080/resource/4?filter=a', req.method, { credentials: credentials1, ext: 'some-app-data', app: 'asd23ased', dlg: '23434szr3q4d' }).field;
-            Hawk.server.authenticate(req, credentialsFunc, {}, function (err, credentials2, artifacts) {
+            Hawk.server.authenticate(req, credentialsFunc, {}, (err, credentials2, artifacts) => {
 
                 expect(err).to.not.exist();
                 expect(credentials2.user).to.equal('steve');
@@ -332,19 +334,19 @@ describe('Hawk', function () {
         });
     });
 
-    it('generates a header then fail authentication due to bad hash', function (done) {
+    it('generates a header then fail authentication due to bad hash', (done) => {
 
-        var req = {
+        const req = {
             method: 'GET',
             url: '/resource/4?filter=a',
             host: 'example.com',
             port: 8080
         };
 
-        credentialsFunc('123456', function (err, credentials1) {
+        credentialsFunc('123456', (err, credentials1) => {
 
             req.authorization = Hawk.client.header('http://example.com:8080/resource/4?filter=a', req.method, { credentials: credentials1, payload: 'hola!', ext: 'some-app-data' }).field;
-            Hawk.server.authenticate(req, credentialsFunc, { payload: 'byebye!' }, function (err, credentials2, artifacts) {
+            Hawk.server.authenticate(req, credentialsFunc, { payload: 'byebye!' }, (err, credentials2, artifacts) => {
 
                 expect(err).to.exist();
                 expect(err.output.payload.message).to.equal('Bad payload hash');
@@ -353,21 +355,21 @@ describe('Hawk', function () {
         });
     });
 
-    it('generates a header for one resource then fail to authenticate another', function (done) {
+    it('generates a header for one resource then fail to authenticate another', (done) => {
 
-        var req = {
+        const req = {
             method: 'GET',
             url: '/resource/4?filter=a',
             host: 'example.com',
             port: 8080
         };
 
-        credentialsFunc('123456', function (err, credentials1) {
+        credentialsFunc('123456', (err, credentials1) => {
 
             req.authorization = Hawk.client.header('http://example.com:8080/resource/4?filter=a', req.method, { credentials: credentials1, ext: 'some-app-data' }).field;
             req.url = '/something/else';
 
-            Hawk.server.authenticate(req, credentialsFunc, {}, function (err, credentials2, artifacts) {
+            Hawk.server.authenticate(req, credentialsFunc, {}, (err, credentials2, artifacts) => {
 
                 expect(err).to.exist();
                 expect(credentials2).to.exist();

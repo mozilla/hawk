@@ -1,31 +1,32 @@
+'use strict';
+
 // Load modules
 
-var Url = require('url');
-var Code = require('code');
-var Hawk = require('../lib');
-var Hoek = require('hoek');
-var Lab = require('lab');
-var Browser = require('../lib/browser');
+const Code = require('code');
+const Hawk = require('../lib');
+const Hoek = require('hoek');
+const Lab = require('lab');
+const Browser = require('../lib/browser');
 
 
 // Declare internals
 
-var internals = {};
+const internals = {};
 
 
 // Test shortcuts
 
-var lab = exports.lab = Lab.script();
-var describe = lab.experiment;
-var it = lab.test;
-var expect = Code.expect;
+const lab = exports.lab = Lab.script();
+const describe = lab.experiment;
+const it = lab.test;
+const expect = Code.expect;
 
 
-describe('Browser', function () {
+describe('Browser', () => {
 
-    var credentialsFunc = function (id, callback) {
+    const credentialsFunc = function (id, callback) {
 
-        var credentials = {
+        const credentials = {
             id: id,
             key: 'werxhqb98rpaxn39848xrunpaw3489ruxnpa98w4rxn',
             algorithm: (id === '1' ? 'sha1' : 'sha256'),
@@ -35,21 +36,21 @@ describe('Browser', function () {
         return callback(null, credentials);
     };
 
-    it('should generate a bewit then successfully authenticate it', function (done) {
+    it('should generate a bewit then successfully authenticate it', (done) => {
 
-        var req = {
+        const req = {
             method: 'GET',
             url: '/resource/4?a=1&b=2',
             host: 'example.com',
             port: 80
         };
 
-        credentialsFunc('123456', function (err, credentials1) {
+        credentialsFunc('123456', (err, credentials1) => {
 
-            var bewit = Browser.client.bewit('http://example.com/resource/4?a=1&b=2', { credentials: credentials1, ttlSec: 60 * 60 * 24 * 365 * 100, ext: 'some-app-data' });
+            const bewit = Browser.client.bewit('http://example.com/resource/4?a=1&b=2', { credentials: credentials1, ttlSec: 60 * 60 * 24 * 365 * 100, ext: 'some-app-data' });
             req.url += '&bewit=' + bewit;
 
-            Hawk.uri.authenticate(req, credentialsFunc, {}, function (err, credentials2, attributes) {
+            Hawk.uri.authenticate(req, credentialsFunc, {}, (err, credentials2, attributes) => {
 
                 expect(err).to.not.exist();
                 expect(credentials2.user).to.equal('steve');
@@ -59,21 +60,21 @@ describe('Browser', function () {
         });
     });
 
-    it('should generate a bewit then successfully authenticate it (no ext)', function (done) {
+    it('should generate a bewit then successfully authenticate it (no ext)', (done) => {
 
-        var req = {
+        const req = {
             method: 'GET',
             url: '/resource/4?a=1&b=2',
             host: 'example.com',
             port: 80
         };
 
-        credentialsFunc('123456', function (err, credentials1) {
+        credentialsFunc('123456', (err, credentials1) => {
 
-            var bewit = Browser.client.bewit('http://example.com/resource/4?a=1&b=2', { credentials: credentials1, ttlSec: 60 * 60 * 24 * 365 * 100 });
+            const bewit = Browser.client.bewit('http://example.com/resource/4?a=1&b=2', { credentials: credentials1, ttlSec: 60 * 60 * 24 * 365 * 100 });
             req.url += '&bewit=' + bewit;
 
-            Hawk.uri.authenticate(req, credentialsFunc, {}, function (err, credentials2, attributes) {
+            Hawk.uri.authenticate(req, credentialsFunc, {}, (err, credentials2, attributes) => {
 
                 expect(err).to.not.exist();
                 expect(credentials2.user).to.equal('steve');
@@ -82,172 +83,160 @@ describe('Browser', function () {
         });
     });
 
-    describe('bewit()', function () {
+    describe('bewit()', () => {
 
-        it('returns a valid bewit value', function (done) {
+        it('returns a valid bewit value', (done) => {
 
-            var credentials = {
+            const credentials = {
                 id: '123456',
                 key: '2983d45yun89q',
                 algorithm: 'sha256'
             };
 
-            var bewit = Browser.client.bewit('https://example.com/somewhere/over/the/rainbow', { credentials: credentials, ttlSec: 300, localtimeOffsetMsec: 1356420407232 - Hawk.utils.now(), ext: 'xandyandz' });
+            const bewit = Browser.client.bewit('https://example.com/somewhere/over/the/rainbow', { credentials: credentials, ttlSec: 300, localtimeOffsetMsec: 1356420407232 - Hawk.utils.now(), ext: 'xandyandz' });
             expect(bewit).to.equal('MTIzNDU2XDEzNTY0MjA3MDdca3NjeHdOUjJ0SnBQMVQxekRMTlBiQjVVaUtJVTl0T1NKWFRVZEc3WDloOD1ceGFuZHlhbmR6');
             done();
         });
 
-        it('returns a valid bewit value (explicit HTTP port)', function (done) {
+        it('returns a valid bewit value (explicit HTTP port)', (done) => {
 
-            var credentials = {
+            const credentials = {
                 id: '123456',
                 key: '2983d45yun89q',
                 algorithm: 'sha256'
             };
 
-            var bewit = Browser.client.bewit('http://example.com:8080/somewhere/over/the/rainbow', { credentials: credentials, ttlSec: 300, localtimeOffsetMsec: 1356420407232 - Hawk.utils.now(), ext: 'xandyandz' });
+            const bewit = Browser.client.bewit('http://example.com:8080/somewhere/over/the/rainbow', { credentials: credentials, ttlSec: 300, localtimeOffsetMsec: 1356420407232 - Hawk.utils.now(), ext: 'xandyandz' });
             expect(bewit).to.equal('MTIzNDU2XDEzNTY0MjA3MDdcaFpiSjNQMmNLRW80a3kwQzhqa1pBa1J5Q1p1ZWc0V1NOYnhWN3ZxM3hIVT1ceGFuZHlhbmR6');
             done();
         });
 
-        it('returns a valid bewit value (explicit HTTPS port)', function (done) {
+        it('returns a valid bewit value (explicit HTTPS port)', (done) => {
 
-            var credentials = {
+            const credentials = {
                 id: '123456',
                 key: '2983d45yun89q',
                 algorithm: 'sha256'
             };
 
-            var bewit = Browser.client.bewit('https://example.com:8043/somewhere/over/the/rainbow', { credentials: credentials, ttlSec: 300, localtimeOffsetMsec: 1356420407232 - Hawk.utils.now(), ext: 'xandyandz' });
+            const bewit = Browser.client.bewit('https://example.com:8043/somewhere/over/the/rainbow', { credentials: credentials, ttlSec: 300, localtimeOffsetMsec: 1356420407232 - Hawk.utils.now(), ext: 'xandyandz' });
             expect(bewit).to.equal('MTIzNDU2XDEzNTY0MjA3MDdcL2t4UjhwK0xSaTdvQTRnUXc3cWlxa3BiVHRKYkR4OEtRMC9HRUwvVytTUT1ceGFuZHlhbmR6');
             done();
         });
 
-        it('returns a valid bewit value (null ext)', function (done) {
+        it('returns a valid bewit value (null ext)', (done) => {
 
-            var credentials = {
+            const credentials = {
                 id: '123456',
                 key: '2983d45yun89q',
                 algorithm: 'sha256'
             };
 
-            var bewit = Browser.client.bewit('https://example.com/somewhere/over/the/rainbow', { credentials: credentials, ttlSec: 300, localtimeOffsetMsec: 1356420407232 - Hawk.utils.now(), ext: null });
+            const bewit = Browser.client.bewit('https://example.com/somewhere/over/the/rainbow', { credentials: credentials, ttlSec: 300, localtimeOffsetMsec: 1356420407232 - Hawk.utils.now(), ext: null });
             expect(bewit).to.equal('MTIzNDU2XDEzNTY0MjA3MDdcSUdZbUxnSXFMckNlOEN4dktQczRKbFdJQStValdKSm91d2dBUmlWaENBZz1c');
             done();
         });
 
-        it('errors on invalid options', function (done) {
+        it('errors on invalid options', (done) => {
 
-            var credentials = {
+            const bewit = Browser.client.bewit('https://example.com/somewhere/over/the/rainbow', 4);
+            expect(bewit).to.equal('');
+            done();
+        });
+
+        it('errors on missing uri', (done) => {
+
+            const credentials = {
                 id: '123456',
                 key: '2983d45yun89q',
                 algorithm: 'sha256'
             };
 
-            var bewit = Browser.client.bewit('https://example.com/somewhere/over/the/rainbow', 4);
+            const bewit = Browser.client.bewit('', { credentials: credentials, ttlSec: 300, localtimeOffsetMsec: 1356420407232 - Hawk.utils.now(), ext: 'xandyandz' });
             expect(bewit).to.equal('');
             done();
         });
 
-        it('errors on missing uri', function (done) {
+        it('errors on invalid uri', (done) => {
 
-            var credentials = {
+            const credentials = {
                 id: '123456',
                 key: '2983d45yun89q',
                 algorithm: 'sha256'
             };
 
-            var bewit = Browser.client.bewit('', { credentials: credentials, ttlSec: 300, localtimeOffsetMsec: 1356420407232 - Hawk.utils.now(), ext: 'xandyandz' });
+            const bewit = Browser.client.bewit(5, { credentials: credentials, ttlSec: 300, localtimeOffsetMsec: 1356420407232 - Hawk.utils.now(), ext: 'xandyandz' });
             expect(bewit).to.equal('');
             done();
         });
 
-        it('errors on invalid uri', function (done) {
+        it('errors on invalid credentials (id)', (done) => {
 
-            var credentials = {
-                id: '123456',
+            const credentials = {
                 key: '2983d45yun89q',
                 algorithm: 'sha256'
             };
 
-            var bewit = Browser.client.bewit(5, { credentials: credentials, ttlSec: 300, localtimeOffsetMsec: 1356420407232 - Hawk.utils.now(), ext: 'xandyandz' });
+            const bewit = Browser.client.bewit('https://example.com/somewhere/over/the/rainbow', { credentials: credentials, ttlSec: 3000, ext: 'xandyandz' });
             expect(bewit).to.equal('');
             done();
         });
 
-        it('errors on invalid credentials (id)', function (done) {
+        it('errors on missing credentials', (done) => {
 
-            var credentials = {
-                key: '2983d45yun89q',
-                algorithm: 'sha256'
-            };
-
-            var bewit = Browser.client.bewit('https://example.com/somewhere/over/the/rainbow', { credentials: credentials, ttlSec: 3000, ext: 'xandyandz' });
+            const bewit = Browser.client.bewit('https://example.com/somewhere/over/the/rainbow', { ttlSec: 3000, ext: 'xandyandz' });
             expect(bewit).to.equal('');
             done();
         });
 
-        it('errors on missing credentials', function (done) {
+        it('errors on invalid credentials (key)', (done) => {
 
-            var bewit = Browser.client.bewit('https://example.com/somewhere/over/the/rainbow', { ttlSec: 3000, ext: 'xandyandz' });
-            expect(bewit).to.equal('');
-            done();
-        });
-
-        it('errors on invalid credentials (key)', function (done) {
-
-            var credentials = {
+            const credentials = {
                 id: '123456',
                 algorithm: 'sha256'
             };
 
-            var bewit = Browser.client.bewit('https://example.com/somewhere/over/the/rainbow', { credentials: credentials, ttlSec: 3000, ext: 'xandyandz' });
+            const bewit = Browser.client.bewit('https://example.com/somewhere/over/the/rainbow', { credentials: credentials, ttlSec: 3000, ext: 'xandyandz' });
             expect(bewit).to.equal('');
             done();
         });
 
-        it('errors on invalid algorithm', function (done) {
+        it('errors on invalid algorithm', (done) => {
 
-            var credentials = {
+            const credentials = {
                 id: '123456',
                 key: '2983d45yun89q',
                 algorithm: 'hmac-sha-0'
             };
 
-            var bewit = Browser.client.bewit('https://example.com/somewhere/over/the/rainbow', { credentials: credentials, ttlSec: 300, ext: 'xandyandz' });
+            const bewit = Browser.client.bewit('https://example.com/somewhere/over/the/rainbow', { credentials: credentials, ttlSec: 300, ext: 'xandyandz' });
             expect(bewit).to.equal('');
             done();
         });
 
-        it('errors on missing options', function (done) {
+        it('errors on missing options', (done) => {
 
-            var credentials = {
-                id: '123456',
-                key: '2983d45yun89q',
-                algorithm: 'hmac-sha-0'
-            };
-
-            var bewit = Browser.client.bewit('https://example.com/somewhere/over/the/rainbow');
+            const bewit = Browser.client.bewit('https://example.com/somewhere/over/the/rainbow');
             expect(bewit).to.equal('');
             done();
         });
     });
 
-    it('generates a header then successfully parse it (configuration)', function (done) {
+    it('generates a header then successfully parse it (configuration)', (done) => {
 
-        var req = {
+        const req = {
             method: 'GET',
             url: '/resource/4?filter=a',
             host: 'example.com',
             port: 8080
         };
 
-        credentialsFunc('123456', function (err, credentials1) {
+        credentialsFunc('123456', (err, credentials1) => {
 
             req.authorization = Browser.client.header('http://example.com:8080/resource/4?filter=a', req.method, { credentials: credentials1, ext: 'some-app-data' }).field;
             expect(req.authorization).to.exist();
 
-            Hawk.server.authenticate(req, credentialsFunc, {}, function (err, credentials2, artifacts) {
+            Hawk.server.authenticate(req, credentialsFunc, {}, (err, credentials2, artifacts) => {
 
                 expect(err).to.not.exist();
                 expect(credentials2.user).to.equal('steve');
@@ -257,9 +246,9 @@ describe('Browser', function () {
         });
     });
 
-    it('generates a header then successfully parse it (node request)', function (done) {
+    it('generates a header then successfully parse it (node request)', (done) => {
 
-        var req = {
+        const req = {
             method: 'POST',
             url: '/resource/4?filter=a',
             headers: {
@@ -268,21 +257,21 @@ describe('Browser', function () {
             }
         };
 
-        var payload = 'some not so random text';
+        const payload = 'some not so random text';
 
-        credentialsFunc('123456', function (err, credentials1) {
+        credentialsFunc('123456', (err, credentials1) => {
 
-            var reqHeader = Browser.client.header('http://example.com:8080/resource/4?filter=a', req.method, { credentials: credentials1, ext: 'some-app-data', payload: payload, contentType: req.headers['content-type'] });
+            const reqHeader = Browser.client.header('http://example.com:8080/resource/4?filter=a', req.method, { credentials: credentials1, ext: 'some-app-data', payload: payload, contentType: req.headers['content-type'] });
             req.headers.authorization = reqHeader.field;
 
-            Hawk.server.authenticate(req, credentialsFunc, {}, function (err, credentials2, artifacts) {
+            Hawk.server.authenticate(req, credentialsFunc, {}, (err, credentials2, artifacts) => {
 
                 expect(err).to.not.exist();
                 expect(credentials2.user).to.equal('steve');
                 expect(artifacts.ext).to.equal('some-app-data');
                 expect(Hawk.server.authenticatePayload(payload, credentials2, artifacts, req.headers['content-type'])).to.equal(true);
 
-                var res = {
+                const res = {
                     headers: {
                         'content-type': 'text/plain'
                     },
@@ -301,9 +290,9 @@ describe('Browser', function () {
         });
     });
 
-    it('generates a header then successfully parse it (browserify)', function (done) {
+    it('generates a header then successfully parse it (browserify)', (done) => {
 
-        var req = {
+        const req = {
             method: 'POST',
             url: '/resource/4?filter=a',
             headers: {
@@ -312,21 +301,21 @@ describe('Browser', function () {
             }
         };
 
-        var payload = 'some not so random text';
+        const payload = 'some not so random text';
 
-        credentialsFunc('123456', function (err, credentials1) {
+        credentialsFunc('123456', (err, credentials1) => {
 
-            var reqHeader = Browser.client.header('http://example.com:8080/resource/4?filter=a', req.method, { credentials: credentials1, ext: 'some-app-data', payload: payload, contentType: req.headers['content-type'] });
+            const reqHeader = Browser.client.header('http://example.com:8080/resource/4?filter=a', req.method, { credentials: credentials1, ext: 'some-app-data', payload: payload, contentType: req.headers['content-type'] });
             req.headers.authorization = reqHeader.field;
 
-            Hawk.server.authenticate(req, credentialsFunc, {}, function (err, credentials2, artifacts) {
+            Hawk.server.authenticate(req, credentialsFunc, {}, (err, credentials2, artifacts) => {
 
                 expect(err).to.not.exist();
                 expect(credentials2.user).to.equal('steve');
                 expect(artifacts.ext).to.equal('some-app-data');
                 expect(Hawk.server.authenticatePayload(payload, credentials2, artifacts, req.headers['content-type'])).to.equal(true);
 
-                var res = {
+                const res = {
                     headers: {
                         'content-type': 'text/plain'
                     },
@@ -345,21 +334,21 @@ describe('Browser', function () {
         });
     });
 
-    it('generates a header then successfully parse it (time offset)', function (done) {
+    it('generates a header then successfully parse it (time offset)', (done) => {
 
-        var req = {
+        const req = {
             method: 'GET',
             url: '/resource/4?filter=a',
             host: 'example.com',
             port: 8080
         };
 
-        credentialsFunc('123456', function (err, credentials1) {
+        credentialsFunc('123456', (err, credentials1) => {
 
             req.authorization = Browser.client.header('http://example.com:8080/resource/4?filter=a', req.method, { credentials: credentials1, ext: 'some-app-data', localtimeOffsetMsec: 100000 }).field;
             expect(req.authorization).to.exist();
 
-            Hawk.server.authenticate(req, credentialsFunc, { localtimeOffsetMsec: 100000 }, function (err, credentials2, artifacts) {
+            Hawk.server.authenticate(req, credentialsFunc, { localtimeOffsetMsec: 100000 }, (err, credentials2, artifacts) => {
 
                 expect(err).to.not.exist();
                 expect(credentials2.user).to.equal('steve');
@@ -369,9 +358,9 @@ describe('Browser', function () {
         });
     });
 
-    it('generates a header then successfully parse it (no server header options)', function (done) {
+    it('generates a header then successfully parse it (no server header options)', (done) => {
 
-        var req = {
+        const req = {
             method: 'POST',
             url: '/resource/4?filter=a',
             headers: {
@@ -380,21 +369,21 @@ describe('Browser', function () {
             }
         };
 
-        var payload = 'some not so random text';
+        const payload = 'some not so random text';
 
-        credentialsFunc('123456', function (err, credentials1) {
+        credentialsFunc('123456', (err, credentials1) => {
 
-            var reqHeader = Browser.client.header('http://example.com:8080/resource/4?filter=a', req.method, { credentials: credentials1, ext: 'some-app-data', payload: payload, contentType: req.headers['content-type'] });
+            const reqHeader = Browser.client.header('http://example.com:8080/resource/4?filter=a', req.method, { credentials: credentials1, ext: 'some-app-data', payload: payload, contentType: req.headers['content-type'] });
             req.headers.authorization = reqHeader.field;
 
-            Hawk.server.authenticate(req, credentialsFunc, {}, function (err, credentials2, artifacts) {
+            Hawk.server.authenticate(req, credentialsFunc, {}, (err, credentials2, artifacts) => {
 
                 expect(err).to.not.exist();
                 expect(credentials2.user).to.equal('steve');
                 expect(artifacts.ext).to.equal('some-app-data');
                 expect(Hawk.server.authenticatePayload(payload, credentials2, artifacts, req.headers['content-type'])).to.equal(true);
 
-                var res = {
+                const res = {
                     headers: {
                         'content-type': 'text/plain'
                     },
@@ -413,9 +402,9 @@ describe('Browser', function () {
         });
     });
 
-    it('generates a header then successfully parse it (no server header)', function (done) {
+    it('generates a header then successfully parse it (no server header)', (done) => {
 
-        var req = {
+        const req = {
             method: 'POST',
             url: '/resource/4?filter=a',
             headers: {
@@ -424,21 +413,21 @@ describe('Browser', function () {
             }
         };
 
-        var payload = 'some not so random text';
+        const payload = 'some not so random text';
 
-        credentialsFunc('123456', function (err, credentials1) {
+        credentialsFunc('123456', (err, credentials1) => {
 
-            var reqHeader = Browser.client.header('http://example.com:8080/resource/4?filter=a', req.method, { credentials: credentials1, ext: 'some-app-data', payload: payload, contentType: req.headers['content-type'] });
+            const reqHeader = Browser.client.header('http://example.com:8080/resource/4?filter=a', req.method, { credentials: credentials1, ext: 'some-app-data', payload: payload, contentType: req.headers['content-type'] });
             req.headers.authorization = reqHeader.field;
 
-            Hawk.server.authenticate(req, credentialsFunc, {}, function (err, credentials2, artifacts) {
+            Hawk.server.authenticate(req, credentialsFunc, {}, (err, credentials2, artifacts) => {
 
                 expect(err).to.not.exist();
                 expect(credentials2.user).to.equal('steve');
                 expect(artifacts.ext).to.equal('some-app-data');
                 expect(Hawk.server.authenticatePayload(payload, credentials2, artifacts, req.headers['content-type'])).to.equal(true);
 
-                var res = {
+                const res = {
                     headers: {
                         'content-type': 'text/plain'
                     },
@@ -454,28 +443,28 @@ describe('Browser', function () {
         });
     });
 
-    it('generates a header with stale ts and successfully authenticate on second call', function (done) {
+    it('generates a header with stale ts and successfully authenticate on second call', (done) => {
 
-        var req = {
+        const req = {
             method: 'GET',
             url: '/resource/4?filter=a',
             host: 'example.com',
             port: 8080
         };
 
-        credentialsFunc('123456', function (err, credentials1) {
+        credentialsFunc('123456', (err, credentials1) => {
 
             Browser.utils.setNtpOffset(60 * 60 * 1000);
-            var header = Browser.client.header('http://example.com:8080/resource/4?filter=a', req.method, { credentials: credentials1, ext: 'some-app-data' });
+            const header = Browser.client.header('http://example.com:8080/resource/4?filter=a', req.method, { credentials: credentials1, ext: 'some-app-data' });
             req.authorization = header.field;
             expect(req.authorization).to.exist();
 
-            Hawk.server.authenticate(req, credentialsFunc, {}, function (err, credentials2, artifacts2) {
+            Hawk.server.authenticate(req, credentialsFunc, {}, (err, credentials2, artifacts2) => {
 
                 expect(err).to.exist();
                 expect(err.message).to.equal('Stale timestamp');
 
-                var res = {
+                const res = {
                     headers: {
                         'www-authenticate': err.output.headers['WWW-Authenticate']
                     },
@@ -492,7 +481,7 @@ describe('Browser', function () {
                 req.authorization = Browser.client.header('http://example.com:8080/resource/4?filter=a', req.method, { credentials: credentials2, ext: 'some-app-data' }).field;
                 expect(req.authorization).to.exist();
 
-                Hawk.server.authenticate(req, credentialsFunc, {}, function (err, credentials3, artifacts3) {
+                Hawk.server.authenticate(req, credentialsFunc, {}, (err, credentials3, artifacts3) => {
 
                     expect(err).to.not.exist();
                     expect(credentials3.user).to.equal('steve');
@@ -503,32 +492,32 @@ describe('Browser', function () {
         });
     });
 
-    it('generates a header with stale ts and successfully authenticate on second call (manual localStorage)', function (done) {
+    it('generates a header with stale ts and successfully authenticate on second call (manual localStorage)', (done) => {
 
-        var req = {
+        const req = {
             method: 'GET',
             url: '/resource/4?filter=a',
             host: 'example.com',
             port: 8080
         };
 
-        credentialsFunc('123456', function (err, credentials1) {
+        credentialsFunc('123456', (err, credentials1) => {
 
-            var localStorage = new Browser.internals.LocalStorage();
+            const localStorage = new Browser.internals.LocalStorage();
 
             Browser.utils.setStorage(localStorage);
 
             Browser.utils.setNtpOffset(60 * 60 * 1000);
-            var header = Browser.client.header('http://example.com:8080/resource/4?filter=a', req.method, { credentials: credentials1, ext: 'some-app-data' });
+            const header = Browser.client.header('http://example.com:8080/resource/4?filter=a', req.method, { credentials: credentials1, ext: 'some-app-data' });
             req.authorization = header.field;
             expect(req.authorization).to.exist();
 
-            Hawk.server.authenticate(req, credentialsFunc, {}, function (err, credentials2, artifacts2) {
+            Hawk.server.authenticate(req, credentialsFunc, {}, (err, credentials2, artifacts2) => {
 
                 expect(err).to.exist();
                 expect(err.message).to.equal('Stale timestamp');
 
-                var res = {
+                const res = {
                     headers: {
                         'www-authenticate': err.output.headers['WWW-Authenticate']
                     },
@@ -547,7 +536,7 @@ describe('Browser', function () {
                 req.authorization = Browser.client.header('http://example.com:8080/resource/4?filter=a', req.method, { credentials: credentials2, ext: 'some-app-data' }).field;
                 expect(req.authorization).to.exist();
 
-                Hawk.server.authenticate(req, credentialsFunc, {}, function (err, credentials3, artifacts3) {
+                Hawk.server.authenticate(req, credentialsFunc, {}, (err, credentials3, artifacts3) => {
 
                     expect(err).to.not.exist();
                     expect(credentials3.user).to.equal('steve');
@@ -558,9 +547,9 @@ describe('Browser', function () {
         });
     });
 
-    it('generates a header then fails to parse it (missing server header hash)', function (done) {
+    it('generates a header then fails to parse it (missing server header hash)', (done) => {
 
-        var req = {
+        const req = {
             method: 'POST',
             url: '/resource/4?filter=a',
             headers: {
@@ -569,21 +558,21 @@ describe('Browser', function () {
             }
         };
 
-        var payload = 'some not so random text';
+        const payload = 'some not so random text';
 
-        credentialsFunc('123456', function (err, credentials1) {
+        credentialsFunc('123456', (err, credentials1) => {
 
-            var reqHeader = Browser.client.header('http://example.com:8080/resource/4?filter=a', req.method, { credentials: credentials1, ext: 'some-app-data', payload: payload, contentType: req.headers['content-type'] });
+            const reqHeader = Browser.client.header('http://example.com:8080/resource/4?filter=a', req.method, { credentials: credentials1, ext: 'some-app-data', payload: payload, contentType: req.headers['content-type'] });
             req.headers.authorization = reqHeader.field;
 
-            Hawk.server.authenticate(req, credentialsFunc, {}, function (err, credentials2, artifacts) {
+            Hawk.server.authenticate(req, credentialsFunc, {}, (err, credentials2, artifacts) => {
 
                 expect(err).to.not.exist();
                 expect(credentials2.user).to.equal('steve');
                 expect(artifacts.ext).to.equal('some-app-data');
                 expect(Hawk.server.authenticatePayload(payload, credentials2, artifacts, req.headers['content-type'])).to.equal(true);
 
-                var res = {
+                const res = {
                     headers: {
                         'content-type': 'text/plain'
                     },
@@ -602,19 +591,19 @@ describe('Browser', function () {
         });
     });
 
-    it('generates a header then successfully parse it (with hash)', function (done) {
+    it('generates a header then successfully parse it (with hash)', (done) => {
 
-        var req = {
+        const req = {
             method: 'GET',
             url: '/resource/4?filter=a',
             host: 'example.com',
             port: 8080
         };
 
-        credentialsFunc('123456', function (err, credentials1) {
+        credentialsFunc('123456', (err, credentials1) => {
 
             req.authorization = Browser.client.header('http://example.com:8080/resource/4?filter=a', req.method, { credentials: credentials1, payload: 'hola!', ext: 'some-app-data' }).field;
-            Hawk.server.authenticate(req, credentialsFunc, {}, function (err, credentials2, artifacts) {
+            Hawk.server.authenticate(req, credentialsFunc, {}, (err, credentials2, artifacts) => {
 
                 expect(err).to.not.exist();
                 expect(credentials2.user).to.equal('steve');
@@ -624,19 +613,19 @@ describe('Browser', function () {
         });
     });
 
-    it('generates a header then successfully parse it then validate payload', function (done) {
+    it('generates a header then successfully parse it then validate payload', (done) => {
 
-        var req = {
+        const req = {
             method: 'GET',
             url: '/resource/4?filter=a',
             host: 'example.com',
             port: 8080
         };
 
-        credentialsFunc('123456', function (err, credentials1) {
+        credentialsFunc('123456', (err, credentials1) => {
 
             req.authorization = Browser.client.header('http://example.com:8080/resource/4?filter=a', req.method, { credentials: credentials1, payload: 'hola!', ext: 'some-app-data' }).field;
-            Hawk.server.authenticate(req, credentialsFunc, {}, function (err, credentials2, artifacts) {
+            Hawk.server.authenticate(req, credentialsFunc, {}, (err, credentials2, artifacts) => {
 
                 expect(err).to.not.exist();
                 expect(credentials2.user).to.equal('steve');
@@ -648,19 +637,19 @@ describe('Browser', function () {
         });
     });
 
-    it('generates a header then successfully parse it (app)', function (done) {
+    it('generates a header then successfully parse it (app)', (done) => {
 
-        var req = {
+        const req = {
             method: 'GET',
             url: '/resource/4?filter=a',
             host: 'example.com',
             port: 8080
         };
 
-        credentialsFunc('123456', function (err, credentials1) {
+        credentialsFunc('123456', (err, credentials1) => {
 
             req.authorization = Browser.client.header('http://example.com:8080/resource/4?filter=a', req.method, { credentials: credentials1, ext: 'some-app-data', app: 'asd23ased' }).field;
-            Hawk.server.authenticate(req, credentialsFunc, {}, function (err, credentials2, artifacts) {
+            Hawk.server.authenticate(req, credentialsFunc, {}, (err, credentials2, artifacts) => {
 
                 expect(err).to.not.exist();
                 expect(credentials2.user).to.equal('steve');
@@ -671,19 +660,19 @@ describe('Browser', function () {
         });
     });
 
-    it('generates a header then successfully parse it (app, dlg)', function (done) {
+    it('generates a header then successfully parse it (app, dlg)', (done) => {
 
-        var req = {
+        const req = {
             method: 'GET',
             url: '/resource/4?filter=a',
             host: 'example.com',
             port: 8080
         };
 
-        credentialsFunc('123456', function (err, credentials1) {
+        credentialsFunc('123456', (err, credentials1) => {
 
             req.authorization = Browser.client.header('http://example.com:8080/resource/4?filter=a', req.method, { credentials: credentials1, ext: 'some-app-data', app: 'asd23ased', dlg: '23434szr3q4d' }).field;
-            Hawk.server.authenticate(req, credentialsFunc, {}, function (err, credentials2, artifacts) {
+            Hawk.server.authenticate(req, credentialsFunc, {}, (err, credentials2, artifacts) => {
 
                 expect(err).to.not.exist();
                 expect(credentials2.user).to.equal('steve');
@@ -695,19 +684,19 @@ describe('Browser', function () {
         });
     });
 
-    it('generates a header then fail authentication due to bad hash', function (done) {
+    it('generates a header then fail authentication due to bad hash', (done) => {
 
-        var req = {
+        const req = {
             method: 'GET',
             url: '/resource/4?filter=a',
             host: 'example.com',
             port: 8080
         };
 
-        credentialsFunc('123456', function (err, credentials1) {
+        credentialsFunc('123456', (err, credentials1) => {
 
             req.authorization = Browser.client.header('http://example.com:8080/resource/4?filter=a', req.method, { credentials: credentials1, payload: 'hola!', ext: 'some-app-data' }).field;
-            Hawk.server.authenticate(req, credentialsFunc, { payload: 'byebye!' }, function (err, credentials2, artifacts) {
+            Hawk.server.authenticate(req, credentialsFunc, { payload: 'byebye!' }, (err, credentials2, artifacts) => {
 
                 expect(err).to.exist();
                 expect(err.output.payload.message).to.equal('Bad payload hash');
@@ -716,21 +705,21 @@ describe('Browser', function () {
         });
     });
 
-    it('generates a header for one resource then fail to authenticate another', function (done) {
+    it('generates a header for one resource then fail to authenticate another', (done) => {
 
-        var req = {
+        const req = {
             method: 'GET',
             url: '/resource/4?filter=a',
             host: 'example.com',
             port: 8080
         };
 
-        credentialsFunc('123456', function (err, credentials1) {
+        credentialsFunc('123456', (err, credentials1) => {
 
             req.authorization = Browser.client.header('http://example.com:8080/resource/4?filter=a', req.method, { credentials: credentials1, ext: 'some-app-data' }).field;
             req.url = '/something/else';
 
-            Hawk.server.authenticate(req, credentialsFunc, {}, function (err, credentials2, artifacts) {
+            Hawk.server.authenticate(req, credentialsFunc, {}, (err, credentials2, artifacts) => {
 
                 expect(err).to.exist();
                 expect(credentials2).to.exist();
@@ -739,222 +728,222 @@ describe('Browser', function () {
         });
     });
 
-    describe('client', function () {
+    describe('client', () => {
 
-        describe('header()', function () {
+        describe('header()', () => {
 
-            it('returns a valid authorization header (sha1)', function (done) {
+            it('returns a valid authorization header (sha1)', (done) => {
 
-                var credentials = {
+                const credentials = {
                     id: '123456',
                     key: '2983d45yun89q',
                     algorithm: 'sha1'
                 };
 
-                var header = Browser.client.header('http://example.net/somewhere/over/the/rainbow', 'POST', { credentials: credentials, ext: 'Bazinga!', timestamp: 1353809207, nonce: 'Ygvqdz', payload: 'something to write about' }).field;
+                const header = Browser.client.header('http://example.net/somewhere/over/the/rainbow', 'POST', { credentials: credentials, ext: 'Bazinga!', timestamp: 1353809207, nonce: 'Ygvqdz', payload: 'something to write about' }).field;
                 expect(header).to.equal('Hawk id="123456", ts="1353809207", nonce="Ygvqdz", hash="bsvY3IfUllw6V5rvk4tStEvpBhE=", ext="Bazinga!", mac="qbf1ZPG/r/e06F4ht+T77LXi5vw="');
                 done();
             });
 
-            it('returns a valid authorization header (sha256)', function (done) {
+            it('returns a valid authorization header (sha256)', (done) => {
 
-                var credentials = {
+                const credentials = {
                     id: '123456',
                     key: '2983d45yun89q',
                     algorithm: 'sha256'
                 };
 
-                var header = Browser.client.header('https://example.net/somewhere/over/the/rainbow', 'POST', { credentials: credentials, ext: 'Bazinga!', timestamp: 1353809207, nonce: 'Ygvqdz', payload: 'something to write about', contentType: 'text/plain' }).field;
+                const header = Browser.client.header('https://example.net/somewhere/over/the/rainbow', 'POST', { credentials: credentials, ext: 'Bazinga!', timestamp: 1353809207, nonce: 'Ygvqdz', payload: 'something to write about', contentType: 'text/plain' }).field;
                 expect(header).to.equal('Hawk id="123456", ts="1353809207", nonce="Ygvqdz", hash="2QfCt3GuY9HQnHWyWD3wX68ZOKbynqlfYmuO2ZBRqtY=", ext="Bazinga!", mac="q1CwFoSHzPZSkbIvl0oYlD+91rBUEvFk763nMjMndj8="');
                 done();
             });
 
-            it('returns a valid authorization header (empty payload)', function (done) {
+            it('returns a valid authorization header (empty payload)', (done) => {
 
-                var credentials = {
+                const credentials = {
                     id: '123456',
                     key: '2983d45yun89q',
                     algorithm: 'sha1'
                 };
 
-                var header = Browser.client.header('http://example.net/somewhere/over/the/rainbow', 'POST', { credentials: credentials, ext: 'Bazinga!', timestamp: 1353809207, nonce: 'Ygvqdz', payload: '' }).field;
+                const header = Browser.client.header('http://example.net/somewhere/over/the/rainbow', 'POST', { credentials: credentials, ext: 'Bazinga!', timestamp: 1353809207, nonce: 'Ygvqdz', payload: '' }).field;
                 expect(header).to.equal('Hawk id=\"123456\", ts=\"1353809207\", nonce=\"Ygvqdz\", hash=\"404ghL7K+hfyhByKKejFBRGgTjU=\", ext=\"Bazinga!\", mac=\"Bh1sj1DOfFRWOdi3ww52nLCJdBE=\"');
                 done();
             });
 
-            it('returns a valid authorization header (no ext)', function (done) {
+            it('returns a valid authorization header (no ext)', (done) => {
 
-                var credentials = {
+                const credentials = {
                     id: '123456',
                     key: '2983d45yun89q',
                     algorithm: 'sha256'
                 };
 
-                var header = Browser.client.header('https://example.net/somewhere/over/the/rainbow', 'POST', { credentials: credentials, timestamp: 1353809207, nonce: 'Ygvqdz', payload: 'something to write about', contentType: 'text/plain' }).field;
+                const header = Browser.client.header('https://example.net/somewhere/over/the/rainbow', 'POST', { credentials: credentials, timestamp: 1353809207, nonce: 'Ygvqdz', payload: 'something to write about', contentType: 'text/plain' }).field;
                 expect(header).to.equal('Hawk id="123456", ts="1353809207", nonce="Ygvqdz", hash="2QfCt3GuY9HQnHWyWD3wX68ZOKbynqlfYmuO2ZBRqtY=", mac="HTgtd0jPI6E4izx8e4OHdO36q00xFCU0FolNq3RiCYs="');
                 done();
             });
 
-            it('returns a valid authorization header (null ext)', function (done) {
+            it('returns a valid authorization header (null ext)', (done) => {
 
-                var credentials = {
+                const credentials = {
                     id: '123456',
                     key: '2983d45yun89q',
                     algorithm: 'sha256'
                 };
 
-                var header = Browser.client.header('https://example.net/somewhere/over/the/rainbow', 'POST', { credentials: credentials, timestamp: 1353809207, nonce: 'Ygvqdz', payload: 'something to write about', contentType: 'text/plain', ext: null }).field;
+                const header = Browser.client.header('https://example.net/somewhere/over/the/rainbow', 'POST', { credentials: credentials, timestamp: 1353809207, nonce: 'Ygvqdz', payload: 'something to write about', contentType: 'text/plain', ext: null }).field;
                 expect(header).to.equal('Hawk id="123456", ts="1353809207", nonce="Ygvqdz", hash="2QfCt3GuY9HQnHWyWD3wX68ZOKbynqlfYmuO2ZBRqtY=", mac="HTgtd0jPI6E4izx8e4OHdO36q00xFCU0FolNq3RiCYs="');
                 done();
             });
 
-            it('returns a valid authorization header (uri object)', function (done) {
+            it('returns a valid authorization header (uri object)', (done) => {
 
-                var credentials = {
+                const credentials = {
                     id: '123456',
                     key: '2983d45yun89q',
                     algorithm: 'sha256'
                 };
 
-                var uri = Browser.utils.parseUri('https://example.net/somewhere/over/the/rainbow');
-                var header = Browser.client.header(uri, 'POST', { credentials: credentials, timestamp: 1353809207, nonce: 'Ygvqdz', payload: 'something to write about', contentType: 'text/plain' }).field;
+                const uri = Browser.utils.parseUri('https://example.net/somewhere/over/the/rainbow');
+                const header = Browser.client.header(uri, 'POST', { credentials: credentials, timestamp: 1353809207, nonce: 'Ygvqdz', payload: 'something to write about', contentType: 'text/plain' }).field;
                 expect(header).to.equal('Hawk id="123456", ts="1353809207", nonce="Ygvqdz", hash="2QfCt3GuY9HQnHWyWD3wX68ZOKbynqlfYmuO2ZBRqtY=", mac="HTgtd0jPI6E4izx8e4OHdO36q00xFCU0FolNq3RiCYs="');
                 done();
             });
 
-            it('errors on missing options', function (done) {
+            it('errors on missing options', (done) => {
 
-                var header = Browser.client.header('https://example.net/somewhere/over/the/rainbow', 'POST');
+                const header = Browser.client.header('https://example.net/somewhere/over/the/rainbow', 'POST');
                 expect(header.field).to.equal('');
                 expect(header.err).to.equal('Invalid argument type');
                 done();
             });
 
-            it('errors on empty uri', function (done) {
+            it('errors on empty uri', (done) => {
 
-                var credentials = {
+                const credentials = {
                     id: '123456',
                     key: '2983d45yun89q',
                     algorithm: 'sha256'
                 };
 
-                var header = Browser.client.header('', 'POST', { credentials: credentials, timestamp: 1353809207, nonce: 'Ygvqdz', payload: 'something to write about', contentType: 'text/plain' });
+                const header = Browser.client.header('', 'POST', { credentials: credentials, timestamp: 1353809207, nonce: 'Ygvqdz', payload: 'something to write about', contentType: 'text/plain' });
                 expect(header.field).to.equal('');
                 expect(header.err).to.equal('Invalid argument type');
                 done();
             });
 
-            it('errors on invalid uri', function (done) {
+            it('errors on invalid uri', (done) => {
 
-                var credentials = {
+                const credentials = {
                     id: '123456',
                     key: '2983d45yun89q',
                     algorithm: 'sha256'
                 };
 
-                var header = Browser.client.header(4, 'POST', { credentials: credentials, timestamp: 1353809207, nonce: 'Ygvqdz', payload: 'something to write about', contentType: 'text/plain' });
+                const header = Browser.client.header(4, 'POST', { credentials: credentials, timestamp: 1353809207, nonce: 'Ygvqdz', payload: 'something to write about', contentType: 'text/plain' });
                 expect(header.field).to.equal('');
                 expect(header.err).to.equal('Invalid argument type');
                 done();
             });
 
-            it('errors on missing method', function (done) {
+            it('errors on missing method', (done) => {
 
-                var credentials = {
+                const credentials = {
                     id: '123456',
                     key: '2983d45yun89q',
                     algorithm: 'sha256'
                 };
 
-                var header = Browser.client.header('https://example.net/somewhere/over/the/rainbow', '', { credentials: credentials, timestamp: 1353809207, nonce: 'Ygvqdz', payload: 'something to write about', contentType: 'text/plain' });
+                const header = Browser.client.header('https://example.net/somewhere/over/the/rainbow', '', { credentials: credentials, timestamp: 1353809207, nonce: 'Ygvqdz', payload: 'something to write about', contentType: 'text/plain' });
                 expect(header.field).to.equal('');
                 expect(header.err).to.equal('Invalid argument type');
                 done();
             });
 
-            it('errors on invalid method', function (done) {
+            it('errors on invalid method', (done) => {
 
-                var credentials = {
+                const credentials = {
                     id: '123456',
                     key: '2983d45yun89q',
                     algorithm: 'sha256'
                 };
 
-                var header = Browser.client.header('https://example.net/somewhere/over/the/rainbow', 5, { credentials: credentials, timestamp: 1353809207, nonce: 'Ygvqdz', payload: 'something to write about', contentType: 'text/plain' });
+                const header = Browser.client.header('https://example.net/somewhere/over/the/rainbow', 5, { credentials: credentials, timestamp: 1353809207, nonce: 'Ygvqdz', payload: 'something to write about', contentType: 'text/plain' });
                 expect(header.field).to.equal('');
                 expect(header.err).to.equal('Invalid argument type');
                 done();
             });
 
-            it('errors on missing credentials', function (done) {
+            it('errors on missing credentials', (done) => {
 
-                var header = Browser.client.header('https://example.net/somewhere/over/the/rainbow', 'POST', { ext: 'Bazinga!', timestamp: 1353809207 });
+                const header = Browser.client.header('https://example.net/somewhere/over/the/rainbow', 'POST', { ext: 'Bazinga!', timestamp: 1353809207 });
                 expect(header.field).to.equal('');
                 expect(header.err).to.equal('Invalid credentials object');
                 done();
             });
 
-            it('errors on invalid credentials (id)', function (done) {
+            it('errors on invalid credentials (id)', (done) => {
 
-                var credentials = {
+                const credentials = {
                     key: '2983d45yun89q',
                     algorithm: 'sha256'
                 };
 
-                var header = Browser.client.header('https://example.net/somewhere/over/the/rainbow', 'POST', { credentials: credentials, ext: 'Bazinga!', timestamp: 1353809207 });
+                const header = Browser.client.header('https://example.net/somewhere/over/the/rainbow', 'POST', { credentials: credentials, ext: 'Bazinga!', timestamp: 1353809207 });
                 expect(header.field).to.equal('');
                 expect(header.err).to.equal('Invalid credentials object');
                 done();
             });
 
-            it('errors on invalid credentials (key)', function (done) {
+            it('errors on invalid credentials (key)', (done) => {
 
-                var credentials = {
+                const credentials = {
                     id: '123456',
                     algorithm: 'sha256'
                 };
 
-                var header = Browser.client.header('https://example.net/somewhere/over/the/rainbow', 'POST', { credentials: credentials, ext: 'Bazinga!', timestamp: 1353809207 });
+                const header = Browser.client.header('https://example.net/somewhere/over/the/rainbow', 'POST', { credentials: credentials, ext: 'Bazinga!', timestamp: 1353809207 });
                 expect(header.field).to.equal('');
                 expect(header.err).to.equal('Invalid credentials object');
                 done();
             });
 
-            it('errors on invalid algorithm', function (done) {
+            it('errors on invalid algorithm', (done) => {
 
-                var credentials = {
+                const credentials = {
                     id: '123456',
                     key: '2983d45yun89q',
                     algorithm: 'hmac-sha-0'
                 };
 
-                var header = Browser.client.header('https://example.net/somewhere/over/the/rainbow', 'POST', { credentials: credentials, payload: 'something, anything!', ext: 'Bazinga!', timestamp: 1353809207 });
+                const header = Browser.client.header('https://example.net/somewhere/over/the/rainbow', 'POST', { credentials: credentials, payload: 'something, anything!', ext: 'Bazinga!', timestamp: 1353809207 });
                 expect(header.field).to.equal('');
                 expect(header.err).to.equal('Unknown algorithm');
                 done();
             });
 
-            it('uses a pre-calculated payload hash', function (done) {
+            it('uses a pre-calculated payload hash', (done) => {
 
-                var credentials = {
+                const credentials = {
                     id: '123456',
                     key: '2983d45yun89q',
                     algorithm: 'sha256'
                 };
 
-                var options = { credentials: credentials, ext: 'Bazinga!', timestamp: 1353809207, nonce: 'Ygvqdz', payload: 'something to write about', contentType: 'text/plain' };
+                const options = { credentials: credentials, ext: 'Bazinga!', timestamp: 1353809207, nonce: 'Ygvqdz', payload: 'something to write about', contentType: 'text/plain' };
                 options.hash = Browser.crypto.calculatePayloadHash(options.payload, credentials.algorithm, options.contentType);
-                var header = Browser.client.header('https://example.net/somewhere/over/the/rainbow', 'POST', options).field;
+                const header = Browser.client.header('https://example.net/somewhere/over/the/rainbow', 'POST', options).field;
                 expect(header).to.equal('Hawk id="123456", ts="1353809207", nonce="Ygvqdz", hash="2QfCt3GuY9HQnHWyWD3wX68ZOKbynqlfYmuO2ZBRqtY=", ext="Bazinga!", mac="q1CwFoSHzPZSkbIvl0oYlD+91rBUEvFk763nMjMndj8="');
                 done();
             });
         });
 
-        describe('authenticate()', function () {
+        describe('authenticate()', () => {
 
-            it('skips tsm validation when missing ts', function (done) {
+            it('skips tsm validation when missing ts', (done) => {
 
-                var res = {
+                const res = {
                     headers: {
                         'www-authenticate': 'Hawk error="Stale timestamp"'
                     },
@@ -964,14 +953,14 @@ describe('Browser', function () {
                     }
                 };
 
-                var credentials = {
+                const credentials = {
                     id: '123456',
                     key: 'werxhqb98rpaxn39848xrunpaw3489ruxnpa98w4rxn',
                     algorithm: 'sha256',
                     user: 'steve'
                 };
 
-                var artifacts = {
+                const artifacts = {
                     ts: 1402135580,
                     nonce: 'iBRB6t',
                     method: 'GET',
@@ -985,9 +974,9 @@ describe('Browser', function () {
                 done();
             });
 
-            it('returns false on invalid header', function (done) {
+            it('returns false on invalid header', (done) => {
 
-                var res = {
+                const res = {
                     headers: {
                         'server-authorization': 'Hawk mac="abc", bad="xyz"'
                     },
@@ -1001,9 +990,9 @@ describe('Browser', function () {
                 done();
             });
 
-            it('returns false on invalid mac', function (done) {
+            it('returns false on invalid mac', (done) => {
 
-                var res = {
+                const res = {
                     headers: {
                         'content-type': 'text/plain',
                         'server-authorization': 'Hawk mac="_IJRsMl/4oL+nn+vKoeVZPdCHXB4yJkNnBbTbHFZUYE=", hash="f9cDF/TDm7TkYRLnGwRMfeDzT6LixQVLvrIKhh0vgmM=", ext="response-specific"'
@@ -1014,7 +1003,7 @@ describe('Browser', function () {
                     }
                 };
 
-                var artifacts = {
+                const artifacts = {
                     method: 'POST',
                     host: 'example.com',
                     port: '8080',
@@ -1029,7 +1018,7 @@ describe('Browser', function () {
                     id: '123456'
                 };
 
-                var credentials = {
+                const credentials = {
                     id: '123456',
                     key: 'werxhqb98rpaxn39848xrunpaw3489ruxnpa98w4rxn',
                     algorithm: 'sha256',
@@ -1040,9 +1029,9 @@ describe('Browser', function () {
                 done();
             });
 
-            it('returns true on ignoring hash', function (done) {
+            it('returns true on ignoring hash', (done) => {
 
-                var res = {
+                const res = {
                     headers: {
                         'content-type': 'text/plain',
                         'server-authorization': 'Hawk mac="XIJRsMl/4oL+nn+vKoeVZPdCHXB4yJkNnBbTbHFZUYE=", hash="f9cDF/TDm7TkYRLnGwRMfeDzT6LixQVLvrIKhh0vgmM=", ext="response-specific"'
@@ -1053,7 +1042,7 @@ describe('Browser', function () {
                     }
                 };
 
-                var artifacts = {
+                const artifacts = {
                     method: 'POST',
                     host: 'example.com',
                     port: '8080',
@@ -1068,7 +1057,7 @@ describe('Browser', function () {
                     id: '123456'
                 };
 
-                var credentials = {
+                const credentials = {
                     id: '123456',
                     key: 'werxhqb98rpaxn39848xrunpaw3489ruxnpa98w4rxn',
                     algorithm: 'sha256',
@@ -1079,9 +1068,9 @@ describe('Browser', function () {
                 done();
             });
 
-            it('errors on invalid WWW-Authenticate header format', function (done) {
+            it('errors on invalid WWW-Authenticate header format', (done) => {
 
-                var res = {
+                const res = {
                     headers: {
                         'www-authenticate': 'Hawk ts="1362346425875", tsm="PhwayS28vtnn3qbv0mqRBYSXebN/zggEtucfeZ620Zo=", x="Stale timestamp"'
                     },
@@ -1095,16 +1084,16 @@ describe('Browser', function () {
                 done();
             });
 
-            it('errors on invalid WWW-Authenticate header format', function (done) {
+            it('errors on invalid WWW-Authenticate header format', (done) => {
 
-                var credentials = {
+                const credentials = {
                     id: '123456',
                     key: 'werxhqb98rpaxn39848xrunpaw3489ruxnpa98w4rxn',
                     algorithm: 'sha256',
                     user: 'steve'
                 };
 
-                var res = {
+                const res = {
                     headers: {
                         'www-authenticate': 'Hawk ts="1362346425875", tsm="hwayS28vtnn3qbv0mqRBYSXebN/zggEtucfeZ620Zo=", error="Stale timestamp"'
                     },
@@ -1119,16 +1108,16 @@ describe('Browser', function () {
             });
         });
 
-        describe('message()', function () {
+        describe('message()', () => {
 
-            it('generates an authorization then successfully parse it', function (done) {
+            it('generates an authorization then successfully parse it', (done) => {
 
-                credentialsFunc('123456', function (err, credentials1) {
+                credentialsFunc('123456', (err, credentials1) => {
 
-                    var auth = Browser.client.message('example.com', 8080, 'some message', { credentials: credentials1 });
+                    const auth = Browser.client.message('example.com', 8080, 'some message', { credentials: credentials1 });
                     expect(auth).to.exist();
 
-                    Hawk.server.authenticateMessage('example.com', 8080, 'some message', auth, credentialsFunc, {}, function (err, credentials2) {
+                    Hawk.server.authenticateMessage('example.com', 8080, 'some message', auth, credentialsFunc, {}, (err, credentials2) => {
 
                         expect(err).to.not.exist();
                         expect(credentials2.user).to.equal('steve');
@@ -1137,11 +1126,11 @@ describe('Browser', function () {
                 });
             });
 
-            it('generates an authorization using custom nonce/timestamp', function (done) {
+            it('generates an authorization using custom nonce/timestamp', (done) => {
 
-                credentialsFunc('123456', function (err, credentials) {
+                credentialsFunc('123456', (err, credentials) => {
 
-                    var auth = Browser.client.message('example.com', 8080, 'some message', { credentials: credentials, nonce: 'abc123', timestamp: 1398536270957 });
+                    const auth = Browser.client.message('example.com', 8080, 'some message', { credentials: credentials, nonce: 'abc123', timestamp: 1398536270957 });
                     expect(auth).to.exist();
                     expect(auth.nonce).to.equal('abc123');
                     expect(auth.ts).to.equal(1398536270957);
@@ -1149,156 +1138,156 @@ describe('Browser', function () {
                 });
             });
 
-            it('errors on missing host', function (done) {
+            it('errors on missing host', (done) => {
 
-                credentialsFunc('123456', function (err, credentials) {
+                credentialsFunc('123456', (err, credentials) => {
 
-                    var auth = Browser.client.message(null, 8080, 'some message', { credentials: credentials });
+                    const auth = Browser.client.message(null, 8080, 'some message', { credentials: credentials });
                     expect(auth).to.not.exist();
                     done();
                 });
             });
 
-            it('errors on invalid host', function (done) {
+            it('errors on invalid host', (done) => {
 
-                credentialsFunc('123456', function (err, credentials) {
+                credentialsFunc('123456', (err, credentials) => {
 
-                    var auth = Browser.client.message(5, 8080, 'some message', { credentials: credentials });
+                    const auth = Browser.client.message(5, 8080, 'some message', { credentials: credentials });
                     expect(auth).to.not.exist();
                     done();
                 });
             });
 
-            it('errors on missing port', function (done) {
+            it('errors on missing port', (done) => {
 
-                credentialsFunc('123456', function (err, credentials) {
+                credentialsFunc('123456', (err, credentials) => {
 
-                    var auth = Browser.client.message('example.com', 0, 'some message', { credentials: credentials });
+                    const auth = Browser.client.message('example.com', 0, 'some message', { credentials: credentials });
                     expect(auth).to.not.exist();
                     done();
                 });
             });
 
-            it('errors on invalid port', function (done) {
+            it('errors on invalid port', (done) => {
 
-                credentialsFunc('123456', function (err, credentials) {
+                credentialsFunc('123456', (err, credentials) => {
 
-                    var auth = Browser.client.message('example.com', 'a', 'some message', { credentials: credentials });
+                    const auth = Browser.client.message('example.com', 'a', 'some message', { credentials: credentials });
                     expect(auth).to.not.exist();
                     done();
                 });
             });
 
-            it('errors on missing message', function (done) {
+            it('errors on missing message', (done) => {
 
-                credentialsFunc('123456', function (err, credentials) {
+                credentialsFunc('123456', (err, credentials) => {
 
-                    var auth = Browser.client.message('example.com', 8080, undefined, { credentials: credentials });
+                    const auth = Browser.client.message('example.com', 8080, undefined, { credentials: credentials });
                     expect(auth).to.not.exist();
                     done();
                 });
             });
 
-            it('errors on null message', function (done) {
+            it('errors on null message', (done) => {
 
-                credentialsFunc('123456', function (err, credentials) {
+                credentialsFunc('123456', (err, credentials) => {
 
-                    var auth = Browser.client.message('example.com', 8080, null, { credentials: credentials });
+                    const auth = Browser.client.message('example.com', 8080, null, { credentials: credentials });
                     expect(auth).to.not.exist();
                     done();
                 });
             });
 
-            it('errors on invalid message', function (done) {
+            it('errors on invalid message', (done) => {
 
-                credentialsFunc('123456', function (err, credentials) {
+                credentialsFunc('123456', (err, credentials) => {
 
-                    var auth = Browser.client.message('example.com', 8080, 5, { credentials: credentials });
+                    const auth = Browser.client.message('example.com', 8080, 5, { credentials: credentials });
                     expect(auth).to.not.exist();
                     done();
                 });
             });
 
-            it('errors on missing credentials', function (done) {
+            it('errors on missing credentials', (done) => {
 
-                var auth = Browser.client.message('example.com', 8080, 'some message', {});
+                const auth = Browser.client.message('example.com', 8080, 'some message', {});
                 expect(auth).to.not.exist();
                 done();
             });
 
-            it('errors on missing options', function (done) {
+            it('errors on missing options', (done) => {
 
-                var auth = Browser.client.message('example.com', 8080, 'some message');
+                const auth = Browser.client.message('example.com', 8080, 'some message');
                 expect(auth).to.not.exist();
                 done();
             });
 
-            it('errors on invalid credentials (id)', function (done) {
+            it('errors on invalid credentials (id)', (done) => {
 
-                credentialsFunc('123456', function (err, credentials) {
+                credentialsFunc('123456', (err, credentials) => {
 
-                    var creds = Hoek.clone(credentials);
+                    const creds = Hoek.clone(credentials);
                     delete creds.id;
-                    var auth = Browser.client.message('example.com', 8080, 'some message', { credentials: creds });
+                    const auth = Browser.client.message('example.com', 8080, 'some message', { credentials: creds });
                     expect(auth).to.not.exist();
                     done();
                 });
             });
 
-            it('errors on invalid credentials (key)', function (done) {
+            it('errors on invalid credentials (key)', (done) => {
 
-                credentialsFunc('123456', function (err, credentials) {
+                credentialsFunc('123456', (err, credentials) => {
 
-                    var creds = Hoek.clone(credentials);
+                    const creds = Hoek.clone(credentials);
                     delete creds.key;
-                    var auth = Browser.client.message('example.com', 8080, 'some message', { credentials: creds });
+                    const auth = Browser.client.message('example.com', 8080, 'some message', { credentials: creds });
                     expect(auth).to.not.exist();
                     done();
                 });
             });
 
-            it('errors on invalid algorithm', function (done) {
+            it('errors on invalid algorithm', (done) => {
 
-                credentialsFunc('123456', function (err, credentials) {
+                credentialsFunc('123456', (err, credentials) => {
 
-                    var creds = Hoek.clone(credentials);
+                    const creds = Hoek.clone(credentials);
                     creds.algorithm = 'blah';
-                    var auth = Browser.client.message('example.com', 8080, 'some message', { credentials: creds });
+                    const auth = Browser.client.message('example.com', 8080, 'some message', { credentials: creds });
                     expect(auth).to.not.exist();
                     done();
                 });
             });
         });
 
-        describe('authenticateTimestamp()', function (done) {
+        describe('authenticateTimestamp()', (done) => {
 
-            it('validates a timestamp', function (done) {
+            it('validates a timestamp', (done) => {
 
-                credentialsFunc('123456', function (err, credentials) {
+                credentialsFunc('123456', (err, credentials) => {
 
-                    var tsm = Hawk.crypto.timestampMessage(credentials);
+                    const tsm = Hawk.crypto.timestampMessage(credentials);
                     expect(Browser.client.authenticateTimestamp(tsm, credentials)).to.equal(true);
                     done();
                 });
             });
 
-            it('validates a timestamp without updating local time', function (done) {
+            it('validates a timestamp without updating local time', (done) => {
 
-                credentialsFunc('123456', function (err, credentials) {
+                credentialsFunc('123456', (err, credentials) => {
 
-                    var offset = Browser.utils.getNtpOffset();
-                    var tsm = Hawk.crypto.timestampMessage(credentials, 10000);
+                    const offset = Browser.utils.getNtpOffset();
+                    const tsm = Hawk.crypto.timestampMessage(credentials, 10000);
                     expect(Browser.client.authenticateTimestamp(tsm, credentials, false)).to.equal(true);
                     expect(offset).to.equal(Browser.utils.getNtpOffset());
                     done();
                 });
             });
 
-            it('detects a bad timestamp', function (done) {
+            it('detects a bad timestamp', (done) => {
 
-                credentialsFunc('123456', function (err, credentials) {
+                credentialsFunc('123456', (err, credentials) => {
 
-                    var tsm = Hawk.crypto.timestampMessage(credentials);
+                    const tsm = Hawk.crypto.timestampMessage(credentials);
                     tsm.ts = 4;
                     expect(Browser.client.authenticateTimestamp(tsm, credentials)).to.equal(false);
                     done();
@@ -1307,13 +1296,13 @@ describe('Browser', function () {
         });
     });
 
-    describe('internals', function () {
+    describe('internals', () => {
 
-        describe('LocalStorage', function () {
+        describe('LocalStorage', () => {
 
-            it('goes through the full lifecycle', function (done) {
+            it('goes through the full lifecycle', (done) => {
 
-                var storage = new Browser.internals.LocalStorage();
+                const storage = new Browser.internals.LocalStorage();
                 expect(storage.length).to.equal(0);
                 expect(storage.getItem('a')).to.equal(null);
                 storage.setItem('a', 5);
@@ -1340,11 +1329,11 @@ describe('Browser', function () {
         });
     });
 
-    describe('utils', function () {
+    describe('utils', () => {
 
-        describe('setStorage()', function () {
+        describe('setStorage()', () => {
 
-            it('sets storage for the first time', function (done) {
+            it('sets storage for the first time', (done) => {
 
                 Browser.utils.storage = new Browser.internals.LocalStorage();        // Reset state
 
@@ -1358,13 +1347,13 @@ describe('Browser', function () {
             });
         });
 
-        describe('setNtpOffset()', function (done) {
+        describe('setNtpOffset()', (done) => {
 
-            it('catches localStorage errors', { parallel: false }, function (done) {
+            it('catches localStorage errors', { parallel: false }, (done) => {
 
-                var orig = Browser.utils.storage.setItem;
-                var consoleOrig = console.error;
-                var count = 0;
+                const orig = Browser.utils.storage.setItem;
+                const consoleOrig = console.error;
+                let count = 0;
                 console.error = function () {
 
                     if (count++ === 2) {
@@ -1379,7 +1368,7 @@ describe('Browser', function () {
                     throw new Error();
                 };
 
-                expect(function () {
+                expect(() => {
 
                     Browser.utils.setNtpOffset(100);
                 }).not.to.throw();
@@ -1388,71 +1377,71 @@ describe('Browser', function () {
             });
         });
 
-        describe('parseAuthorizationHeader()', function (done) {
+        describe('parseAuthorizationHeader()', (done) => {
 
-            it('returns null on missing header', function (done) {
+            it('returns null on missing header', (done) => {
 
                 expect(Browser.utils.parseAuthorizationHeader()).to.equal(null);
                 done();
             });
 
-            it('returns null on bad header syntax (structure)', function (done) {
+            it('returns null on bad header syntax (structure)', (done) => {
 
                 expect(Browser.utils.parseAuthorizationHeader('Hawk')).to.equal(null);
                 done();
             });
 
-            it('returns null on bad header syntax (parts)', function (done) {
+            it('returns null on bad header syntax (parts)', (done) => {
 
                 expect(Browser.utils.parseAuthorizationHeader(' ')).to.equal(null);
                 done();
             });
 
-            it('returns null on bad scheme name', function (done) {
+            it('returns null on bad scheme name', (done) => {
 
                 expect(Browser.utils.parseAuthorizationHeader('Basic asdasd')).to.equal(null);
                 done();
             });
 
-            it('returns null on bad attribute value', function (done) {
+            it('returns null on bad attribute value', (done) => {
 
                 expect(Browser.utils.parseAuthorizationHeader('Hawk test="\t"', ['test'])).to.equal(null);
                 done();
             });
 
-            it('returns null on duplicated attribute', function (done) {
+            it('returns null on duplicated attribute', (done) => {
 
                 expect(Browser.utils.parseAuthorizationHeader('Hawk test="a", test="b"', ['test'])).to.equal(null);
                 done();
             });
         });
 
-        describe('parseUri()', function () {
+        describe('parseUri()', () => {
 
-            it('returns empty object on invalid', function (done) {
+            it('returns empty object on invalid', (done) => {
 
-                var uri = Browser.utils.parseUri('ftp');
+                const uri = Browser.utils.parseUri('ftp');
                 expect(uri).to.deep.equal({ host: '', port: '', resource: '' });
                 done();
             });
 
-            it('returns empty port when unknown scheme', function (done) {
+            it('returns empty port when unknown scheme', (done) => {
 
-                var uri = Browser.utils.parseUri('ftp://example.com');
+                const uri = Browser.utils.parseUri('ftp://example.com');
                 expect(uri.port).to.equal('');
                 done();
             });
 
-            it('returns default port when missing', function (done) {
+            it('returns default port when missing', (done) => {
 
-                var uri = Browser.utils.parseUri('http://example.com');
+                const uri = Browser.utils.parseUri('http://example.com');
                 expect(uri.port).to.equal('80');
                 done();
             });
 
-            it('handles unusual characters correctly', function (done) {
+            it('handles unusual characters correctly', (done) => {
 
-                var parts = {
+                const parts = {
                     protocol: 'http+vnd.my-extension',
                     user: 'user!$&\'()*+,;=%40my-domain.com',
                     password: 'pass!$&\'()*+,;=%40:word',
@@ -1469,7 +1458,7 @@ describe('Browser', function () {
                 parts.resource = parts.relative + '#' + parts.fragment;
                 parts.source = parts.protocol + '://' + parts.authority + parts.resource;
 
-                var uri = Browser.utils.parseUri(parts.source);
+                const uri = Browser.utils.parseUri(parts.source);
                 expect(uri.host).to.equal('foo-bar.com');
                 expect(uri.port).to.equal('99');
                 expect(uri.resource).to.equal(parts.pathname + '?' + parts.query);
@@ -1477,12 +1466,12 @@ describe('Browser', function () {
             });
         });
 
-        var str = 'https://www.google.ca/webhp?sourceid=chrome-instant&ion=1&espv=2&ie=UTF-8#q=url';
-        var base64str = 'aHR0cHM6Ly93d3cuZ29vZ2xlLmNhL3dlYmhwP3NvdXJjZWlkPWNocm9tZS1pbnN0YW50Jmlvbj0xJmVzcHY9MiZpZT1VVEYtOCNxPXVybA';
+        const str = 'https://www.google.ca/webhp?sourceid=chrome-instant&ion=1&espv=2&ie=UTF-8#q=url';
+        const base64str = 'aHR0cHM6Ly93d3cuZ29vZ2xlLmNhL3dlYmhwP3NvdXJjZWlkPWNocm9tZS1pbnN0YW50Jmlvbj0xJmVzcHY9MiZpZT1VVEYtOCNxPXVybA';
 
-        describe('base64urlEncode()', function () {
+        describe('base64urlEncode()', () => {
 
-            it('should base64 URL-safe decode a string', function (done) {
+            it('should base64 URL-safe decode a string', (done) => {
 
                 expect(Browser.utils.base64urlEncode(str)).to.equal(base64str);
                 done();

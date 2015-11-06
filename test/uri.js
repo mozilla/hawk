@@ -1,31 +1,32 @@
+'use strict';
+
 // Load modules
 
-var Http = require('http');
-var Url = require('url');
-var Code = require('code');
-var Hawk = require('../lib');
-var Hoek = require('hoek');
-var Lab = require('lab');
+const Url = require('url');
+const Code = require('code');
+const Hawk = require('../lib');
+const Hoek = require('hoek');
+const Lab = require('lab');
 
 
 // Declare internals
 
-var internals = {};
+const internals = {};
 
 
 // Test shortcuts
 
-var lab = exports.lab = Lab.script();
-var describe = lab.experiment;
-var it = lab.test;
-var expect = Code.expect;
+const lab = exports.lab = Lab.script();
+const describe = lab.experiment;
+const it = lab.test;
+const expect = Code.expect;
 
 
-describe('Uri', function () {
+describe('Uri', () => {
 
-    var credentialsFunc = function (id, callback) {
+    const credentialsFunc = function (id, callback) {
 
-        var credentials = {
+        const credentials = {
             id: id,
             key: 'werxhqb98rpaxn39848xrunpaw3489ruxnpa98w4rxn',
             algorithm: (id === '1' ? 'sha1' : 'sha256'),
@@ -35,21 +36,21 @@ describe('Uri', function () {
         return callback(null, credentials);
     };
 
-    it('should generate a bewit then successfully authenticate it', function (done) {
+    it('should generate a bewit then successfully authenticate it', (done) => {
 
-        var req = {
+        const req = {
             method: 'GET',
             url: '/resource/4?a=1&b=2',
             host: 'example.com',
             port: 80
         };
 
-        credentialsFunc('123456', function (err, credentials1) {
+        credentialsFunc('123456', (err, credentials1) => {
 
-            var bewit = Hawk.uri.getBewit('http://example.com/resource/4?a=1&b=2', { credentials: credentials1, ttlSec: 60 * 60 * 24 * 365 * 100, ext: 'some-app-data' });
+            const bewit = Hawk.uri.getBewit('http://example.com/resource/4?a=1&b=2', { credentials: credentials1, ttlSec: 60 * 60 * 24 * 365 * 100, ext: 'some-app-data' });
             req.url += '&bewit=' + bewit;
 
-            Hawk.uri.authenticate(req, credentialsFunc, {}, function (err, credentials2, attributes) {
+            Hawk.uri.authenticate(req, credentialsFunc, {}, (err, credentials2, attributes) => {
 
                 expect(err).to.not.exist();
                 expect(credentials2.user).to.equal('steve');
@@ -59,21 +60,21 @@ describe('Uri', function () {
         });
     });
 
-    it('should generate a bewit then successfully authenticate it (no ext)', function (done) {
+    it('should generate a bewit then successfully authenticate it (no ext)', (done) => {
 
-        var req = {
+        const req = {
             method: 'GET',
             url: '/resource/4?a=1&b=2',
             host: 'example.com',
             port: 80
         };
 
-        credentialsFunc('123456', function (err, credentials1) {
+        credentialsFunc('123456', (err, credentials1) => {
 
-            var bewit = Hawk.uri.getBewit('http://example.com/resource/4?a=1&b=2', { credentials: credentials1, ttlSec: 60 * 60 * 24 * 365 * 100 });
+            const bewit = Hawk.uri.getBewit('http://example.com/resource/4?a=1&b=2', { credentials: credentials1, ttlSec: 60 * 60 * 24 * 365 * 100 });
             req.url += '&bewit=' + bewit;
 
-            Hawk.uri.authenticate(req, credentialsFunc, {}, function (err, credentials2, attributes) {
+            Hawk.uri.authenticate(req, credentialsFunc, {}, (err, credentials2, attributes) => {
 
                 expect(err).to.not.exist();
                 expect(credentials2.user).to.equal('steve');
@@ -82,16 +83,16 @@ describe('Uri', function () {
         });
     });
 
-    it('should successfully authenticate a request (last param)', function (done) {
+    it('should successfully authenticate a request (last param)', (done) => {
 
-        var req = {
+        const req = {
             method: 'GET',
             url: '/resource/4?a=1&b=2&bewit=MTIzNDU2XDQ1MTE0ODQ2MjFcMzFjMmNkbUJFd1NJRVZDOVkva1NFb2c3d3YrdEVNWjZ3RXNmOGNHU2FXQT1cc29tZS1hcHAtZGF0YQ',
             host: 'example.com',
             port: 8080
         };
 
-        Hawk.uri.authenticate(req, credentialsFunc, {}, function (err, credentials, attributes) {
+        Hawk.uri.authenticate(req, credentialsFunc, {}, (err, credentials, attributes) => {
 
             expect(err).to.not.exist();
             expect(credentials.user).to.equal('steve');
@@ -100,16 +101,16 @@ describe('Uri', function () {
         });
     });
 
-    it('should successfully authenticate a request (first param)', function (done) {
+    it('should successfully authenticate a request (first param)', (done) => {
 
-        var req = {
+        const req = {
             method: 'GET',
             url: '/resource/4?bewit=MTIzNDU2XDQ1MTE0ODQ2MjFcMzFjMmNkbUJFd1NJRVZDOVkva1NFb2c3d3YrdEVNWjZ3RXNmOGNHU2FXQT1cc29tZS1hcHAtZGF0YQ&a=1&b=2',
             host: 'example.com',
             port: 8080
         };
 
-        Hawk.uri.authenticate(req, credentialsFunc, {}, function (err, credentials, attributes) {
+        Hawk.uri.authenticate(req, credentialsFunc, {}, (err, credentials, attributes) => {
 
             expect(err).to.not.exist();
             expect(credentials.user).to.equal('steve');
@@ -118,16 +119,16 @@ describe('Uri', function () {
         });
     });
 
-    it('should successfully authenticate a request (only param)', function (done) {
+    it('should successfully authenticate a request (only param)', (done) => {
 
-        var req = {
+        const req = {
             method: 'GET',
             url: '/resource/4?bewit=MTIzNDU2XDQ1MTE0ODQ2NDFcZm1CdkNWT3MvcElOTUUxSTIwbWhrejQ3UnBwTmo4Y1VrSHpQd3Q5OXJ1cz1cc29tZS1hcHAtZGF0YQ',
             host: 'example.com',
             port: 8080
         };
 
-        Hawk.uri.authenticate(req, credentialsFunc, {}, function (err, credentials, attributes) {
+        Hawk.uri.authenticate(req, credentialsFunc, {}, (err, credentials, attributes) => {
 
             expect(err).to.not.exist();
             expect(credentials.user).to.equal('steve');
@@ -136,9 +137,9 @@ describe('Uri', function () {
         });
     });
 
-    it('should fail on multiple authentication', function (done) {
+    it('should fail on multiple authentication', (done) => {
 
-        var req = {
+        const req = {
             method: 'GET',
             url: '/resource/4?bewit=MTIzNDU2XDQ1MTE0ODQ2NDFcZm1CdkNWT3MvcElOTUUxSTIwbWhrejQ3UnBwTmo4Y1VrSHpQd3Q5OXJ1cz1cc29tZS1hcHAtZGF0YQ',
             host: 'example.com',
@@ -146,7 +147,7 @@ describe('Uri', function () {
             authorization: 'Basic asdasdasdasd'
         };
 
-        Hawk.uri.authenticate(req, credentialsFunc, {}, function (err, credentials, attributes) {
+        Hawk.uri.authenticate(req, credentialsFunc, {}, (err, credentials, attributes) => {
 
             expect(err).to.exist();
             expect(err.output.payload.message).to.equal('Multiple authentications');
@@ -154,20 +155,20 @@ describe('Uri', function () {
         });
     });
 
-    it('should fail on method other than GET', function (done) {
+    it('should fail on method other than GET', (done) => {
 
-        credentialsFunc('123456', function (err, credentials1) {
+        credentialsFunc('123456', (err, credentials1) => {
 
-            var req = {
+            const req = {
                 method: 'POST',
                 url: '/resource/4?filter=a',
                 host: 'example.com',
                 port: 8080
             };
 
-            var exp = Math.floor(Hawk.utils.now() / 1000) + 60;
-            var ext = 'some-app-data';
-            var mac = Hawk.crypto.calculateMac('bewit', credentials1, {
+            const exp = Math.floor(Hawk.utils.now() / 1000) + 60;
+            const ext = 'some-app-data';
+            const mac = Hawk.crypto.calculateMac('bewit', credentials1, {
                 timestamp: exp,
                 nonce: '',
                 method: req.method,
@@ -177,11 +178,11 @@ describe('Uri', function () {
                 ext: ext
             });
 
-            var bewit = credentials1.id + '\\' + exp + '\\' + mac + '\\' + ext;
+            const bewit = credentials1.id + '\\' + exp + '\\' + mac + '\\' + ext;
 
             req.url += '&bewit=' + Hoek.base64urlEncode(bewit);
 
-            Hawk.uri.authenticate(req, credentialsFunc, {}, function (err, credentials2, attributes) {
+            Hawk.uri.authenticate(req, credentialsFunc, {}, (err, credentials2, attributes) => {
 
                 expect(err).to.exist();
                 expect(err.output.payload.message).to.equal('Invalid method');
@@ -190,9 +191,9 @@ describe('Uri', function () {
         });
     });
 
-    it('should fail on invalid host header', function (done) {
+    it('should fail on invalid host header', (done) => {
 
-        var req = {
+        const req = {
             method: 'GET',
             url: '/resource/4?bewit=MTIzNDU2XDQ1MDk5OTE3MTlcTUE2eWkwRWRwR0pEcWRwb0JkYVdvVDJrL0hDSzA1T0Y3MkhuZlVmVy96Zz1cc29tZS1hcHAtZGF0YQ',
             headers: {
@@ -200,7 +201,7 @@ describe('Uri', function () {
             }
         };
 
-        Hawk.uri.authenticate(req, credentialsFunc, {}, function (err, credentials, attributes) {
+        Hawk.uri.authenticate(req, credentialsFunc, {}, (err, credentials, attributes) => {
 
             expect(err).to.exist();
             expect(err.output.payload.message).to.equal('Invalid Host header');
@@ -208,16 +209,16 @@ describe('Uri', function () {
         });
     });
 
-    it('should fail on empty bewit', function (done) {
+    it('should fail on empty bewit', (done) => {
 
-        var req = {
+        const req = {
             method: 'GET',
             url: '/resource/4?bewit=',
             host: 'example.com',
             port: 8080
         };
 
-        Hawk.uri.authenticate(req, credentialsFunc, {}, function (err, credentials, attributes) {
+        Hawk.uri.authenticate(req, credentialsFunc, {}, (err, credentials, attributes) => {
 
             expect(err).to.exist();
             expect(err.output.payload.message).to.equal('Empty bewit');
@@ -226,16 +227,16 @@ describe('Uri', function () {
         });
     });
 
-    it('should fail on invalid bewit', function (done) {
+    it('should fail on invalid bewit', (done) => {
 
-        var req = {
+        const req = {
             method: 'GET',
             url: '/resource/4?bewit=*',
             host: 'example.com',
             port: 8080
         };
 
-        Hawk.uri.authenticate(req, credentialsFunc, {}, function (err, credentials, attributes) {
+        Hawk.uri.authenticate(req, credentialsFunc, {}, (err, credentials, attributes) => {
 
             expect(err).to.exist();
             expect(err.output.payload.message).to.equal('Invalid bewit encoding');
@@ -244,16 +245,16 @@ describe('Uri', function () {
         });
     });
 
-    it('should fail on missing bewit', function (done) {
+    it('should fail on missing bewit', (done) => {
 
-        var req = {
+        const req = {
             method: 'GET',
             url: '/resource/4',
             host: 'example.com',
             port: 8080
         };
 
-        Hawk.uri.authenticate(req, credentialsFunc, {}, function (err, credentials, attributes) {
+        Hawk.uri.authenticate(req, credentialsFunc, {}, (err, credentials, attributes) => {
 
             expect(err).to.exist();
             expect(err.output.payload.message).to.not.exist();
@@ -262,16 +263,16 @@ describe('Uri', function () {
         });
     });
 
-    it('should fail on invalid bewit structure', function (done) {
+    it('should fail on invalid bewit structure', (done) => {
 
-        var req = {
+        const req = {
             method: 'GET',
             url: '/resource/4?bewit=abc',
             host: 'example.com',
             port: 8080
         };
 
-        Hawk.uri.authenticate(req, credentialsFunc, {}, function (err, credentials, attributes) {
+        Hawk.uri.authenticate(req, credentialsFunc, {}, (err, credentials, attributes) => {
 
             expect(err).to.exist();
             expect(err.output.payload.message).to.equal('Invalid bewit structure');
@@ -279,16 +280,16 @@ describe('Uri', function () {
         });
     });
 
-    it('should fail on empty bewit attribute', function (done) {
+    it('should fail on empty bewit attribute', (done) => {
 
-        var req = {
+        const req = {
             method: 'GET',
             url: '/resource/4?bewit=YVxcY1xk',
             host: 'example.com',
             port: 8080
         };
 
-        Hawk.uri.authenticate(req, credentialsFunc, {}, function (err, credentials, attributes) {
+        Hawk.uri.authenticate(req, credentialsFunc, {}, (err, credentials, attributes) => {
 
             expect(err).to.exist();
             expect(err.output.payload.message).to.equal('Missing bewit attributes');
@@ -296,16 +297,16 @@ describe('Uri', function () {
         });
     });
 
-    it('should fail on missing bewit id attribute', function (done) {
+    it('should fail on missing bewit id attribute', (done) => {
 
-        var req = {
+        const req = {
             method: 'GET',
             url: '/resource/4?bewit=XDQ1NTIxNDc2MjJcK0JFbFhQMXhuWjcvd1Nrbm1ldGhlZm5vUTNHVjZNSlFVRHk4NWpTZVJ4VT1cc29tZS1hcHAtZGF0YQ',
             host: 'example.com',
             port: 8080
         };
 
-        Hawk.uri.authenticate(req, credentialsFunc, {}, function (err, credentials, attributes) {
+        Hawk.uri.authenticate(req, credentialsFunc, {}, (err, credentials, attributes) => {
 
             expect(err).to.exist();
             expect(err.output.payload.message).to.equal('Missing bewit attributes');
@@ -313,16 +314,16 @@ describe('Uri', function () {
         });
     });
 
-    it('should fail on expired access', function (done) {
+    it('should fail on expired access', (done) => {
 
-        var req = {
+        const req = {
             method: 'GET',
             url: '/resource/4?a=1&b=2&bewit=MTIzNDU2XDEzNTY0MTg1ODNcWk1wZlMwWU5KNHV0WHpOMmRucTRydEk3NXNXTjFjeWVITTcrL0tNZFdVQT1cc29tZS1hcHAtZGF0YQ',
             host: 'example.com',
             port: 8080
         };
 
-        Hawk.uri.authenticate(req, credentialsFunc, {}, function (err, credentials, attributes) {
+        Hawk.uri.authenticate(req, credentialsFunc, {}, (err, credentials, attributes) => {
 
             expect(err).to.exist();
             expect(err.output.payload.message).to.equal('Access expired');
@@ -330,19 +331,19 @@ describe('Uri', function () {
         });
     });
 
-    it('should fail on credentials function error', function (done) {
+    it('should fail on credentials function error', (done) => {
 
-        var req = {
+        const req = {
             method: 'GET',
             url: '/resource/4?bewit=MTIzNDU2XDQ1MDk5OTE3MTlcTUE2eWkwRWRwR0pEcWRwb0JkYVdvVDJrL0hDSzA1T0Y3MkhuZlVmVy96Zz1cc29tZS1hcHAtZGF0YQ',
             host: 'example.com',
             port: 8080
         };
 
-        Hawk.uri.authenticate(req, function (id, callback) {
+        Hawk.uri.authenticate(req, (id, callback) => {
 
             callback(Hawk.error.badRequest('Boom'));
-        }, {}, function (err, credentials, attributes) {
+        }, {}, (err, credentials, attributes) => {
 
             expect(err).to.exist();
             expect(err.output.payload.message).to.equal('Boom');
@@ -350,19 +351,19 @@ describe('Uri', function () {
         });
     });
 
-    it('should fail on credentials function error with credentials', function (done) {
+    it('should fail on credentials function error with credentials', (done) => {
 
-        var req = {
+        const req = {
             method: 'GET',
             url: '/resource/4?bewit=MTIzNDU2XDQ1MDk5OTE3MTlcTUE2eWkwRWRwR0pEcWRwb0JkYVdvVDJrL0hDSzA1T0Y3MkhuZlVmVy96Zz1cc29tZS1hcHAtZGF0YQ',
             host: 'example.com',
             port: 8080
         };
 
-        Hawk.uri.authenticate(req, function (id, callback) {
+        Hawk.uri.authenticate(req, (id, callback) => {
 
             callback(Hawk.error.badRequest('Boom'), { some: 'value' });
-        }, {}, function (err, credentials, attributes) {
+        }, {}, (err, credentials, attributes) => {
 
             expect(err).to.exist();
             expect(err.output.payload.message).to.equal('Boom');
@@ -371,19 +372,19 @@ describe('Uri', function () {
         });
     });
 
-    it('should fail on null credentials function response', function (done) {
+    it('should fail on null credentials function response', (done) => {
 
-        var req = {
+        const req = {
             method: 'GET',
             url: '/resource/4?bewit=MTIzNDU2XDQ1MDk5OTE3MTlcTUE2eWkwRWRwR0pEcWRwb0JkYVdvVDJrL0hDSzA1T0Y3MkhuZlVmVy96Zz1cc29tZS1hcHAtZGF0YQ',
             host: 'example.com',
             port: 8080
         };
 
-        Hawk.uri.authenticate(req, function (id, callback) {
+        Hawk.uri.authenticate(req, (id, callback) => {
 
             callback(null, null);
-        }, {}, function (err, credentials, attributes) {
+        }, {}, (err, credentials, attributes) => {
 
             expect(err).to.exist();
             expect(err.output.payload.message).to.equal('Unknown credentials');
@@ -391,19 +392,19 @@ describe('Uri', function () {
         });
     });
 
-    it('should fail on invalid credentials function response', function (done) {
+    it('should fail on invalid credentials function response', (done) => {
 
-        var req = {
+        const req = {
             method: 'GET',
             url: '/resource/4?bewit=MTIzNDU2XDQ1MDk5OTE3MTlcTUE2eWkwRWRwR0pEcWRwb0JkYVdvVDJrL0hDSzA1T0Y3MkhuZlVmVy96Zz1cc29tZS1hcHAtZGF0YQ',
             host: 'example.com',
             port: 8080
         };
 
-        Hawk.uri.authenticate(req, function (id, callback) {
+        Hawk.uri.authenticate(req, (id, callback) => {
 
             callback(null, {});
-        }, {}, function (err, credentials, attributes) {
+        }, {}, (err, credentials, attributes) => {
 
             expect(err).to.exist();
             expect(err.message).to.equal('Invalid credentials');
@@ -411,19 +412,19 @@ describe('Uri', function () {
         });
     });
 
-    it('should fail on invalid credentials function response (unknown algorithm)', function (done) {
+    it('should fail on invalid credentials function response (unknown algorithm)', (done) => {
 
-        var req = {
+        const req = {
             method: 'GET',
             url: '/resource/4?bewit=MTIzNDU2XDQ1MDk5OTE3MTlcTUE2eWkwRWRwR0pEcWRwb0JkYVdvVDJrL0hDSzA1T0Y3MkhuZlVmVy96Zz1cc29tZS1hcHAtZGF0YQ',
             host: 'example.com',
             port: 8080
         };
 
-        Hawk.uri.authenticate(req, function (id, callback) {
+        Hawk.uri.authenticate(req, (id, callback) => {
 
             callback(null, { key: 'xxx', algorithm: 'xxx' });
-        }, {}, function (err, credentials, attributes) {
+        }, {}, (err, credentials, attributes) => {
 
             expect(err).to.exist();
             expect(err.message).to.equal('Unknown algorithm');
@@ -431,19 +432,19 @@ describe('Uri', function () {
         });
     });
 
-    it('should fail on expired access', function (done) {
+    it('should fail on expired access', (done) => {
 
-        var req = {
+        const req = {
             method: 'GET',
             url: '/resource/4?bewit=MTIzNDU2XDQ1MDk5OTE3MTlcTUE2eWkwRWRwR0pEcWRwb0JkYVdvVDJrL0hDSzA1T0Y3MkhuZlVmVy96Zz1cc29tZS1hcHAtZGF0YQ',
             host: 'example.com',
             port: 8080
         };
 
-        Hawk.uri.authenticate(req, function (id, callback) {
+        Hawk.uri.authenticate(req, (id, callback) => {
 
             callback(null, { key: 'xxx', algorithm: 'sha256' });
-        }, {}, function (err, credentials, attributes) {
+        }, {}, (err, credentials, attributes) => {
 
             expect(err).to.exist();
             expect(err.output.payload.message).to.equal('Bad mac');
@@ -451,167 +452,155 @@ describe('Uri', function () {
         });
     });
 
-    describe('getBewit()', function () {
+    describe('getBewit()', () => {
 
-        it('returns a valid bewit value', function (done) {
+        it('returns a valid bewit value', (done) => {
 
-            var credentials = {
+            const credentials = {
                 id: '123456',
                 key: '2983d45yun89q',
                 algorithm: 'sha256'
             };
 
-            var bewit = Hawk.uri.getBewit('https://example.com/somewhere/over/the/rainbow', { credentials: credentials, ttlSec: 300, localtimeOffsetMsec: 1356420407232 - Hawk.utils.now(), ext: 'xandyandz' });
+            const bewit = Hawk.uri.getBewit('https://example.com/somewhere/over/the/rainbow', { credentials: credentials, ttlSec: 300, localtimeOffsetMsec: 1356420407232 - Hawk.utils.now(), ext: 'xandyandz' });
             expect(bewit).to.equal('MTIzNDU2XDEzNTY0MjA3MDdca3NjeHdOUjJ0SnBQMVQxekRMTlBiQjVVaUtJVTl0T1NKWFRVZEc3WDloOD1ceGFuZHlhbmR6');
             done();
         });
 
-        it('returns a valid bewit value (explicit port)', function (done) {
+        it('returns a valid bewit value (explicit port)', (done) => {
 
-            var credentials = {
+            const credentials = {
                 id: '123456',
                 key: '2983d45yun89q',
                 algorithm: 'sha256'
             };
 
-            var bewit = Hawk.uri.getBewit('https://example.com:8080/somewhere/over/the/rainbow', { credentials: credentials, ttlSec: 300, localtimeOffsetMsec: 1356420407232 - Hawk.utils.now(), ext: 'xandyandz' });
+            const bewit = Hawk.uri.getBewit('https://example.com:8080/somewhere/over/the/rainbow', { credentials: credentials, ttlSec: 300, localtimeOffsetMsec: 1356420407232 - Hawk.utils.now(), ext: 'xandyandz' });
             expect(bewit).to.equal('MTIzNDU2XDEzNTY0MjA3MDdcaFpiSjNQMmNLRW80a3kwQzhqa1pBa1J5Q1p1ZWc0V1NOYnhWN3ZxM3hIVT1ceGFuZHlhbmR6');
             done();
         });
 
-        it('returns a valid bewit value (null ext)', function (done) {
+        it('returns a valid bewit value (null ext)', (done) => {
 
-            var credentials = {
+            const credentials = {
                 id: '123456',
                 key: '2983d45yun89q',
                 algorithm: 'sha256'
             };
 
-            var bewit = Hawk.uri.getBewit('https://example.com/somewhere/over/the/rainbow', { credentials: credentials, ttlSec: 300, localtimeOffsetMsec: 1356420407232 - Hawk.utils.now(), ext: null });
+            const bewit = Hawk.uri.getBewit('https://example.com/somewhere/over/the/rainbow', { credentials: credentials, ttlSec: 300, localtimeOffsetMsec: 1356420407232 - Hawk.utils.now(), ext: null });
             expect(bewit).to.equal('MTIzNDU2XDEzNTY0MjA3MDdcSUdZbUxnSXFMckNlOEN4dktQczRKbFdJQStValdKSm91d2dBUmlWaENBZz1c');
             done();
         });
 
-        it('returns a valid bewit value (parsed uri)', function (done) {
+        it('returns a valid bewit value (parsed uri)', (done) => {
 
-            var credentials = {
+            const credentials = {
                 id: '123456',
                 key: '2983d45yun89q',
                 algorithm: 'sha256'
             };
 
-            var bewit = Hawk.uri.getBewit(Url.parse('https://example.com/somewhere/over/the/rainbow'), { credentials: credentials, ttlSec: 300, localtimeOffsetMsec: 1356420407232 - Hawk.utils.now(), ext: 'xandyandz' });
+            const bewit = Hawk.uri.getBewit(Url.parse('https://example.com/somewhere/over/the/rainbow'), { credentials: credentials, ttlSec: 300, localtimeOffsetMsec: 1356420407232 - Hawk.utils.now(), ext: 'xandyandz' });
             expect(bewit).to.equal('MTIzNDU2XDEzNTY0MjA3MDdca3NjeHdOUjJ0SnBQMVQxekRMTlBiQjVVaUtJVTl0T1NKWFRVZEc3WDloOD1ceGFuZHlhbmR6');
             done();
         });
 
-        it('errors on invalid options', function (done) {
+        it('errors on invalid options', (done) => {
 
-            var credentials = {
+            const bewit = Hawk.uri.getBewit('https://example.com/somewhere/over/the/rainbow', 4);
+            expect(bewit).to.equal('');
+            done();
+        });
+
+        it('errors on missing uri', (done) => {
+
+            const credentials = {
                 id: '123456',
                 key: '2983d45yun89q',
                 algorithm: 'sha256'
             };
 
-            var bewit = Hawk.uri.getBewit('https://example.com/somewhere/over/the/rainbow', 4);
+            const bewit = Hawk.uri.getBewit('', { credentials: credentials, ttlSec: 300, localtimeOffsetMsec: 1356420407232 - Hawk.utils.now(), ext: 'xandyandz' });
             expect(bewit).to.equal('');
             done();
         });
 
-        it('errors on missing uri', function (done) {
+        it('errors on invalid uri', (done) => {
 
-            var credentials = {
+            const credentials = {
                 id: '123456',
                 key: '2983d45yun89q',
                 algorithm: 'sha256'
             };
 
-            var bewit = Hawk.uri.getBewit('', { credentials: credentials, ttlSec: 300, localtimeOffsetMsec: 1356420407232 - Hawk.utils.now(), ext: 'xandyandz' });
+            const bewit = Hawk.uri.getBewit(5, { credentials: credentials, ttlSec: 300, localtimeOffsetMsec: 1356420407232 - Hawk.utils.now(), ext: 'xandyandz' });
             expect(bewit).to.equal('');
             done();
         });
 
-        it('errors on invalid uri', function (done) {
+        it('errors on invalid credentials (id)', (done) => {
 
-            var credentials = {
-                id: '123456',
+            const credentials = {
                 key: '2983d45yun89q',
                 algorithm: 'sha256'
             };
 
-            var bewit = Hawk.uri.getBewit(5, { credentials: credentials, ttlSec: 300, localtimeOffsetMsec: 1356420407232 - Hawk.utils.now(), ext: 'xandyandz' });
+            const bewit = Hawk.uri.getBewit('https://example.com/somewhere/over/the/rainbow', { credentials: credentials, ttlSec: 3000, ext: 'xandyandz' });
             expect(bewit).to.equal('');
             done();
         });
 
-        it('errors on invalid credentials (id)', function (done) {
+        it('errors on missing credentials', (done) => {
 
-            var credentials = {
-                key: '2983d45yun89q',
-                algorithm: 'sha256'
-            };
-
-            var bewit = Hawk.uri.getBewit('https://example.com/somewhere/over/the/rainbow', { credentials: credentials, ttlSec: 3000, ext: 'xandyandz' });
+            const bewit = Hawk.uri.getBewit('https://example.com/somewhere/over/the/rainbow', { ttlSec: 3000, ext: 'xandyandz' });
             expect(bewit).to.equal('');
             done();
         });
 
-        it('errors on missing credentials', function (done) {
+        it('errors on invalid credentials (key)', (done) => {
 
-            var bewit = Hawk.uri.getBewit('https://example.com/somewhere/over/the/rainbow', { ttlSec: 3000, ext: 'xandyandz' });
-            expect(bewit).to.equal('');
-            done();
-        });
-
-        it('errors on invalid credentials (key)', function (done) {
-
-            var credentials = {
+            const credentials = {
                 id: '123456',
                 algorithm: 'sha256'
             };
 
-            var bewit = Hawk.uri.getBewit('https://example.com/somewhere/over/the/rainbow', { credentials: credentials, ttlSec: 3000, ext: 'xandyandz' });
+            const bewit = Hawk.uri.getBewit('https://example.com/somewhere/over/the/rainbow', { credentials: credentials, ttlSec: 3000, ext: 'xandyandz' });
             expect(bewit).to.equal('');
             done();
         });
 
-        it('errors on invalid algorithm', function (done) {
+        it('errors on invalid algorithm', (done) => {
 
-            var credentials = {
+            const credentials = {
                 id: '123456',
                 key: '2983d45yun89q',
                 algorithm: 'hmac-sha-0'
             };
 
-            var bewit = Hawk.uri.getBewit('https://example.com/somewhere/over/the/rainbow', { credentials: credentials, ttlSec: 300, ext: 'xandyandz' });
+            const bewit = Hawk.uri.getBewit('https://example.com/somewhere/over/the/rainbow', { credentials: credentials, ttlSec: 300, ext: 'xandyandz' });
             expect(bewit).to.equal('');
             done();
         });
 
-        it('errors on missing options', function (done) {
+        it('errors on missing options', (done) => {
 
-            var credentials = {
-                id: '123456',
-                key: '2983d45yun89q',
-                algorithm: 'hmac-sha-0'
-            };
-
-            var bewit = Hawk.uri.getBewit('https://example.com/somewhere/over/the/rainbow');
+            const bewit = Hawk.uri.getBewit('https://example.com/somewhere/over/the/rainbow');
             expect(bewit).to.equal('');
             done();
         });
     });
 
-    describe('authenticateMessage()', function () {
+    describe('authenticateMessage()', () => {
 
-        it('should generate an authorization then successfully parse it', function (done) {
+        it('should generate an authorization then successfully parse it', (done) => {
 
-            credentialsFunc('123456', function (err, credentials1) {
+            credentialsFunc('123456', (err, credentials1) => {
 
-                var auth = Hawk.client.message('example.com', 8080, 'some message', { credentials: credentials1 });
+                const auth = Hawk.client.message('example.com', 8080, 'some message', { credentials: credentials1 });
                 expect(auth).to.exist();
 
-                Hawk.server.authenticateMessage('example.com', 8080, 'some message', auth, credentialsFunc, {}, function (err, credentials2) {
+                Hawk.server.authenticateMessage('example.com', 8080, 'some message', auth, credentialsFunc, {}, (err, credentials2) => {
 
                     expect(err).to.not.exist();
                     expect(credentials2.user).to.equal('steve');
@@ -620,14 +609,14 @@ describe('Uri', function () {
             });
         });
 
-        it('should fail authorization on mismatching host', function (done) {
+        it('should fail authorization on mismatching host', (done) => {
 
-            credentialsFunc('123456', function (err, credentials1) {
+            credentialsFunc('123456', (err, credentials1) => {
 
-                var auth = Hawk.client.message('example.com', 8080, 'some message', { credentials: credentials1 });
+                const auth = Hawk.client.message('example.com', 8080, 'some message', { credentials: credentials1 });
                 expect(auth).to.exist();
 
-                Hawk.server.authenticateMessage('example1.com', 8080, 'some message', auth, credentialsFunc, {}, function (err, credentials2) {
+                Hawk.server.authenticateMessage('example1.com', 8080, 'some message', auth, credentialsFunc, {}, (err, credentials2) => {
 
                     expect(err).to.exist();
                     expect(err.message).to.equal('Bad mac');
@@ -636,14 +625,14 @@ describe('Uri', function () {
             });
         });
 
-        it('should fail authorization on stale timestamp', function (done) {
+        it('should fail authorization on stale timestamp', (done) => {
 
-            credentialsFunc('123456', function (err, credentials1) {
+            credentialsFunc('123456', (err, credentials1) => {
 
-                var auth = Hawk.client.message('example.com', 8080, 'some message', { credentials: credentials1 });
+                const auth = Hawk.client.message('example.com', 8080, 'some message', { credentials: credentials1 });
                 expect(auth).to.exist();
 
-                Hawk.server.authenticateMessage('example.com', 8080, 'some message', auth, credentialsFunc, { localtimeOffsetMsec: 100000 }, function (err, credentials2) {
+                Hawk.server.authenticateMessage('example.com', 8080, 'some message', auth, credentialsFunc, { localtimeOffsetMsec: 100000 }, (err, credentials2) => {
 
                     expect(err).to.exist();
                     expect(err.message).to.equal('Stale timestamp');
@@ -652,14 +641,14 @@ describe('Uri', function () {
             });
         });
 
-        it('overrides timestampSkewSec', function (done) {
+        it('overrides timestampSkewSec', (done) => {
 
-            credentialsFunc('123456', function (err, credentials1) {
+            credentialsFunc('123456', (err, credentials1) => {
 
-                var auth = Hawk.client.message('example.com', 8080, 'some message', { credentials: credentials1, localtimeOffsetMsec: 100000 });
+                const auth = Hawk.client.message('example.com', 8080, 'some message', { credentials: credentials1, localtimeOffsetMsec: 100000 });
                 expect(auth).to.exist();
 
-                Hawk.server.authenticateMessage('example.com', 8080, 'some message', auth, credentialsFunc, { timestampSkewSec: 500 }, function (err, credentials2) {
+                Hawk.server.authenticateMessage('example.com', 8080, 'some message', auth, credentialsFunc, { timestampSkewSec: 500 }, (err, credentials2) => {
 
                     expect(err).to.not.exist();
                     done();
@@ -667,15 +656,15 @@ describe('Uri', function () {
             });
         });
 
-        it('should fail authorization on invalid authorization', function (done) {
+        it('should fail authorization on invalid authorization', (done) => {
 
-            credentialsFunc('123456', function (err, credentials1) {
+            credentialsFunc('123456', (err, credentials1) => {
 
-                var auth = Hawk.client.message('example.com', 8080, 'some message', { credentials: credentials1 });
+                const auth = Hawk.client.message('example.com', 8080, 'some message', { credentials: credentials1 });
                 expect(auth).to.exist();
                 delete auth.id;
 
-                Hawk.server.authenticateMessage('example.com', 8080, 'some message', auth, credentialsFunc, {}, function (err, credentials2) {
+                Hawk.server.authenticateMessage('example.com', 8080, 'some message', auth, credentialsFunc, {}, (err, credentials2) => {
 
                     expect(err).to.exist();
                     expect(err.message).to.equal('Invalid authorization');
@@ -684,14 +673,14 @@ describe('Uri', function () {
             });
         });
 
-        it('should fail authorization on bad hash', function (done) {
+        it('should fail authorization on bad hash', (done) => {
 
-            credentialsFunc('123456', function (err, credentials1) {
+            credentialsFunc('123456', (err, credentials1) => {
 
-                var auth = Hawk.client.message('example.com', 8080, 'some message', { credentials: credentials1 });
+                const auth = Hawk.client.message('example.com', 8080, 'some message', { credentials: credentials1 });
                 expect(auth).to.exist();
 
-                Hawk.server.authenticateMessage('example.com', 8080, 'some message1', auth, credentialsFunc, {}, function (err, credentials2) {
+                Hawk.server.authenticateMessage('example.com', 8080, 'some message1', auth, credentialsFunc, {}, (err, credentials2) => {
 
                     expect(err).to.exist();
                     expect(err.message).to.equal('Bad message hash');
@@ -700,11 +689,11 @@ describe('Uri', function () {
             });
         });
 
-        it('should fail authorization on nonce error', function (done) {
+        it('should fail authorization on nonce error', (done) => {
 
-            credentialsFunc('123456', function (err, credentials1) {
+            credentialsFunc('123456', (err, credentials1) => {
 
-                var auth = Hawk.client.message('example.com', 8080, 'some message', { credentials: credentials1 });
+                const auth = Hawk.client.message('example.com', 8080, 'some message', { credentials: credentials1 });
                 expect(auth).to.exist();
 
                 Hawk.server.authenticateMessage('example.com', 8080, 'some message', auth, credentialsFunc, {
@@ -712,7 +701,7 @@ describe('Uri', function () {
 
                         callback(new Error('kaboom'));
                     }
-                }, function (err, credentials2) {
+                }, (err, credentials2) => {
 
                     expect(err).to.exist();
                     expect(err.message).to.equal('Invalid nonce');
@@ -721,19 +710,19 @@ describe('Uri', function () {
             });
         });
 
-        it('should fail authorization on credentials error', function (done) {
+        it('should fail authorization on credentials error', (done) => {
 
-            credentialsFunc('123456', function (err, credentials1) {
+            credentialsFunc('123456', (err, credentials1) => {
 
-                var auth = Hawk.client.message('example.com', 8080, 'some message', { credentials: credentials1 });
+                const auth = Hawk.client.message('example.com', 8080, 'some message', { credentials: credentials1 });
                 expect(auth).to.exist();
 
-                var errFunc = function (id, callback) {
+                const errFunc = function (id, callback) {
 
                     callback(new Error('kablooey'));
                 };
 
-                Hawk.server.authenticateMessage('example.com', 8080, 'some message', auth, errFunc, {}, function (err, credentials2) {
+                Hawk.server.authenticateMessage('example.com', 8080, 'some message', auth, errFunc, {}, (err, credentials2) => {
 
                     expect(err).to.exist();
                     expect(err.message).to.equal('kablooey');
@@ -742,19 +731,19 @@ describe('Uri', function () {
             });
         });
 
-        it('should fail authorization on missing credentials', function (done) {
+        it('should fail authorization on missing credentials', (done) => {
 
-            credentialsFunc('123456', function (err, credentials1) {
+            credentialsFunc('123456', (err, credentials1) => {
 
-                var auth = Hawk.client.message('example.com', 8080, 'some message', { credentials: credentials1 });
+                const auth = Hawk.client.message('example.com', 8080, 'some message', { credentials: credentials1 });
                 expect(auth).to.exist();
 
-                var errFunc = function (id, callback) {
+                const errFunc = function (id, callback) {
 
                     callback();
                 };
 
-                Hawk.server.authenticateMessage('example.com', 8080, 'some message', auth, errFunc, {}, function (err, credentials2) {
+                Hawk.server.authenticateMessage('example.com', 8080, 'some message', auth, errFunc, {}, (err, credentials2) => {
 
                     expect(err).to.exist();
                     expect(err.message).to.equal('Unknown credentials');
@@ -763,19 +752,19 @@ describe('Uri', function () {
             });
         });
 
-        it('should fail authorization on invalid credentials', function (done) {
+        it('should fail authorization on invalid credentials', (done) => {
 
-            credentialsFunc('123456', function (err, credentials1) {
+            credentialsFunc('123456', (err, credentials1) => {
 
-                var auth = Hawk.client.message('example.com', 8080, 'some message', { credentials: credentials1 });
+                const auth = Hawk.client.message('example.com', 8080, 'some message', { credentials: credentials1 });
                 expect(auth).to.exist();
 
-                var errFunc = function (id, callback) {
+                const errFunc = function (id, callback) {
 
                     callback(null, {});
                 };
 
-                Hawk.server.authenticateMessage('example.com', 8080, 'some message', auth, errFunc, {}, function (err, credentials2) {
+                Hawk.server.authenticateMessage('example.com', 8080, 'some message', auth, errFunc, {}, (err, credentials2) => {
 
                     expect(err).to.exist();
                     expect(err.message).to.equal('Invalid credentials');
@@ -784,19 +773,19 @@ describe('Uri', function () {
             });
         });
 
-        it('should fail authorization on invalid credentials algorithm', function (done) {
+        it('should fail authorization on invalid credentials algorithm', (done) => {
 
-            credentialsFunc('123456', function (err, credentials1) {
+            credentialsFunc('123456', (err, credentials1) => {
 
-                var auth = Hawk.client.message('example.com', 8080, 'some message', { credentials: credentials1 });
+                const auth = Hawk.client.message('example.com', 8080, 'some message', { credentials: credentials1 });
                 expect(auth).to.exist();
 
-                var errFunc = function (id, callback) {
+                const errFunc = function (id, callback) {
 
                     callback(null, { key: '123', algorithm: '456' });
                 };
 
-                Hawk.server.authenticateMessage('example.com', 8080, 'some message', auth, errFunc, {}, function (err, credentials2) {
+                Hawk.server.authenticateMessage('example.com', 8080, 'some message', auth, errFunc, {}, (err, credentials2) => {
 
                     expect(err).to.exist();
                     expect(err.message).to.equal('Unknown algorithm');
@@ -805,30 +794,30 @@ describe('Uri', function () {
             });
         });
 
-        it('should fail on missing host', function (done) {
+        it('should fail on missing host', (done) => {
 
-            credentialsFunc('123456', function (err, credentials1) {
+            credentialsFunc('123456', (err, credentials1) => {
 
-                var auth = Hawk.client.message(null, 8080, 'some message', { credentials: credentials1 });
+                const auth = Hawk.client.message(null, 8080, 'some message', { credentials: credentials1 });
                 expect(auth).to.not.exist();
                 done();
             });
         });
 
-        it('should fail on missing credentials', function (done) {
+        it('should fail on missing credentials', (done) => {
 
-            var auth = Hawk.client.message('example.com', 8080, 'some message', {});
+            const auth = Hawk.client.message('example.com', 8080, 'some message', {});
             expect(auth).to.not.exist();
             done();
         });
 
-        it('should fail on invalid algorithm', function (done) {
+        it('should fail on invalid algorithm', (done) => {
 
-            credentialsFunc('123456', function (err, credentials1) {
+            credentialsFunc('123456', (err, credentials1) => {
 
-                var creds = Hoek.clone(credentials1);
+                const creds = Hoek.clone(credentials1);
                 creds.algorithm = 'blah';
-                var auth = Hawk.client.message('example.com', 8080, 'some message', { credentials: creds });
+                const auth = Hawk.client.message('example.com', 8080, 'some message', { credentials: creds });
                 expect(auth).to.not.exist();
                 done();
             });

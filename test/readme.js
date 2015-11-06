@@ -1,52 +1,54 @@
+'use strict';
+
 // Load modules
 
-var Code = require('code');
-var Hawk = require('../lib');
-var Hoek = require('hoek');
-var Lab = require('lab');
+const Code = require('code');
+const Hawk = require('../lib');
+const Hoek = require('hoek');
+const Lab = require('lab');
 
 
 // Declare internals
 
-var internals = {};
+const internals = {};
 
 
 // Test shortcuts
 
-var lab = exports.lab = Lab.script();
-var describe = lab.experiment;
-var it = lab.test;
-var expect = Code.expect;
+const lab = exports.lab = Lab.script();
+const describe = lab.experiment;
+const it = lab.test;
+const expect = Code.expect;
 
 
-describe('README', function () {
+describe('README', () => {
 
-    describe('core', function () {
+    describe('core', () => {
 
-        var credentials = {
+        const credentials = {
             id: 'dh37fgj492je',
             key: 'werxhqb98rpaxn39848xrunpaw3489ruxnpa98w4rxn',
             algorithm: 'sha256'
         };
 
-        var options = {
+        const options = {
             credentials: credentials,
             timestamp: 1353832234,
             nonce: 'j4h3g2',
             ext: 'some-app-ext-data'
         };
 
-        it('should generate a header protocol example', function (done) {
+        it('should generate a header protocol example', (done) => {
 
-            var header = Hawk.client.header('http://example.com:8000/resource/1?b=1&a=2', 'GET', options).field;
+            const header = Hawk.client.header('http://example.com:8000/resource/1?b=1&a=2', 'GET', options).field;
 
             expect(header).to.equal('Hawk id="dh37fgj492je", ts="1353832234", nonce="j4h3g2", ext="some-app-ext-data", mac="6R4rV5iE+NPoym+WwjeHzjAGXUtLNIxmo1vpMofpLAE="');
             done();
         });
 
-        it('should generate a normalized string protocol example', function (done) {
+        it('should generate a normalized string protocol example', (done) => {
 
-            var normalized = Hawk.crypto.generateNormalizedString('header', {
+            const normalized = Hawk.crypto.generateNormalizedString('header', {
                 credentials: credentials,
                 ts: options.timestamp,
                 nonce: options.nonce,
@@ -61,21 +63,21 @@ describe('README', function () {
             done();
         });
 
-        var payloadOptions = Hoek.clone(options);
+        const payloadOptions = Hoek.clone(options);
         payloadOptions.payload = 'Thank you for flying Hawk';
         payloadOptions.contentType = 'text/plain';
 
-        it('should generate a header protocol example (with payload)', function (done) {
+        it('should generate a header protocol example (with payload)', (done) => {
 
-            var header = Hawk.client.header('http://example.com:8000/resource/1?b=1&a=2', 'POST', payloadOptions).field;
+            const header = Hawk.client.header('http://example.com:8000/resource/1?b=1&a=2', 'POST', payloadOptions).field;
 
             expect(header).to.equal('Hawk id="dh37fgj492je", ts="1353832234", nonce="j4h3g2", hash="Yi9LfIIFRtBEPt74PVmbTF/xVAwPn7ub15ePICfgnuY=", ext="some-app-ext-data", mac="aSe1DERmZuRl3pI36/9BdZmnErTw3sNzOOAUlfeKjVw="');
             done();
         });
 
-        it('should generate a normalized string protocol example (with payload)', function (done) {
+        it('should generate a normalized string protocol example (with payload)', (done) => {
 
-            var normalized = Hawk.crypto.generateNormalizedString('header', {
+            const normalized = Hawk.crypto.generateNormalizedString('header', {
                 credentials: credentials,
                 ts: options.timestamp,
                 nonce: options.nonce,

@@ -1,13 +1,15 @@
+'use strict';
+
 // Load modules
 
-var Http = require('http');
-var Request = require('request');
-var Hawk = require('../lib');
+const Http = require('http');
+const Request = require('request');
+const Hawk = require('../lib');
 
 
 // Declare internals
 
-var internals = {
+const internals = {
     credentials: {
         dh37fgj492je: {
             id: 'dh37fgj492je',                                             // Required by Hawk.client.header
@@ -21,7 +23,7 @@ var internals = {
 
 // Credentials lookup function
 
-var credentialsFunc = function (id, callback) {
+const credentialsFunc = function (id, callback) {
 
     return callback(null, internals.credentials[id]);
 };
@@ -29,12 +31,12 @@ var credentialsFunc = function (id, callback) {
 
 // Create HTTP server
 
-var handler = function (req, res) {
+const handler = function (req, res) {
 
-    Hawk.server.authenticate(req, credentialsFunc, {}, function (err, credentials, artifacts) {
+    Hawk.server.authenticate(req, credentialsFunc, {}, (err, credentials, artifacts) => {
 
-        var payload = (!err ? 'Hello ' + credentials.user + ' ' + artifacts.ext : 'Shoosh!');
-        var headers = {
+        const payload = (!err ? 'Hello ' + credentials.user + ' ' + artifacts.ext : 'Shoosh!');
+        const headers = {
             'Content-Type': 'text/plain',
             'Server-Authorization': Hawk.server.header(credentials, artifacts, { payload: payload, contentType: 'text/plain' })
         };
@@ -49,7 +51,7 @@ Http.createServer(handler).listen(8000, '127.0.0.1');
 
 // Send unauthenticated request
 
-Request('http://127.0.0.1:8000/resource/1?b=1&a=2', function (error, response, body) {
+Request('http://127.0.0.1:8000/resource/1?b=1&a=2', (error, response, body) => {
 
     console.log(response.statusCode + ': ' + body);
 });
@@ -57,10 +59,10 @@ Request('http://127.0.0.1:8000/resource/1?b=1&a=2', function (error, response, b
 
 // Send authenticated request
 
-credentialsFunc('dh37fgj492je', function (err, credentials) {
+credentialsFunc('dh37fgj492je', (err, credentials) => {
 
-    var header = Hawk.client.header('http://127.0.0.1:8000/resource/1?b=1&a=2', 'GET', { credentials: credentials, ext: 'and welcome!' });
-    var options = {
+    const header = Hawk.client.header('http://127.0.0.1:8000/resource/1?b=1&a=2', 'GET', { credentials: credentials, ext: 'and welcome!' });
+    const options = {
         uri: 'http://127.0.0.1:8000/resource/1?b=1&a=2',
         method: 'GET',
         headers: {
@@ -68,9 +70,9 @@ credentialsFunc('dh37fgj492je', function (err, credentials) {
         }
     };
 
-    Request(options, function (error, response, body) {
+    Request(options, (error, response, body) => {
 
-        var isValid = Hawk.client.authenticate(response, credentials, header.artifacts, { payload: body });
+        const isValid = Hawk.client.authenticate(response, credentials, header.artifacts, { payload: body });
         console.log(response.statusCode + ': ' + body + (isValid ? ' (valid)' : ' (invalid)'));
         process.exit(0);
     });

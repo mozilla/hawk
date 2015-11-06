@@ -1,31 +1,33 @@
+'use strict';
+
 // Load modules
 
-var Code = require('code');
-var Hawk = require('../lib');
-var Lab = require('lab');
-var Package = require('../package.json');
+const Code = require('code');
+const Hawk = require('../lib');
+const Lab = require('lab');
+const Package = require('../package.json');
 
 
 // Declare internals
 
-var internals = {};
+const internals = {};
 
 
 // Test shortcuts
 
-var lab = exports.lab = Lab.script();
-var describe = lab.experiment;
-var it = lab.test;
-var expect = Code.expect;
+const lab = exports.lab = Lab.script();
+const describe = lab.experiment;
+const it = lab.test;
+const expect = Code.expect;
 
 
-describe('Utils', function () {
+describe('Utils', () => {
 
-    describe('parseHost()', function () {
+    describe('parseHost()', () => {
 
-        it('returns port 80 for non tls node request', function (done) {
+        it('returns port 80 for non tls node request', (done) => {
 
-            var req = {
+            const req = {
                 method: 'POST',
                 url: '/resource/4?filter=a',
                 headers: {
@@ -38,9 +40,9 @@ describe('Utils', function () {
             done();
         });
 
-        it('returns port 443 for non tls node request', function (done) {
+        it('returns port 443 for non tls node request', (done) => {
 
-            var req = {
+            const req = {
                 method: 'POST',
                 url: '/resource/4?filter=a',
                 headers: {
@@ -56,9 +58,9 @@ describe('Utils', function () {
             done();
         });
 
-        it('returns port 443 for non tls node request (IPv6)', function (done) {
+        it('returns port 443 for non tls node request (IPv6)', (done) => {
 
-            var req = {
+            const req = {
                 method: 'POST',
                 url: '/resource/4?filter=a',
                 headers: {
@@ -74,9 +76,9 @@ describe('Utils', function () {
             done();
         });
 
-        it('parses IPv6 headers', function (done) {
+        it('parses IPv6 headers', (done) => {
 
-            var req = {
+            const req = {
                 method: 'POST',
                 url: '/resource/4?filter=a',
                 headers: {
@@ -88,31 +90,31 @@ describe('Utils', function () {
                 }
             };
 
-            var host = Hawk.utils.parseHost(req, 'Host');
+            const host = Hawk.utils.parseHost(req, 'Host');
             expect(host.port).to.equal('8000');
             expect(host.name).to.equal('[123:123:123]');
             done();
         });
     });
 
-    describe('version()', function () {
+    describe('version()', () => {
 
-        it('returns the correct package version number', function (done) {
+        it('returns the correct package version number', (done) => {
 
             expect(Hawk.utils.version()).to.equal(Package.version);
             done();
         });
     });
 
-    describe('unauthorized()', function () {
+    describe('unauthorized()', () => {
 
-        it('returns a hawk 401', function (done) {
+        it('returns a hawk 401', (done) => {
 
             expect(Hawk.utils.unauthorized('kaboom').output.headers['WWW-Authenticate']).to.equal('Hawk error="kaboom"');
             done();
         });
 
-        it('supports attributes', function (done) {
+        it('supports attributes', (done) => {
 
             expect(Hawk.utils.unauthorized('kaboom', { a: 'b' }).output.headers['WWW-Authenticate']).to.equal('Hawk a="b", error="kaboom"');
             done();
