@@ -7,7 +7,10 @@ Current version: **4.x**
 
 Note: 4.x, 3.x, and 2.x are the same exact protocol as 1.1. The version increments reflect changes in the node API.
 
-[![Build Status](https://secure.travis-ci.org/hueniverse/hawk.png)](http://travis-ci.org/hueniverse/hawk)
+[![npm](https://img.shields.io/npm/v/hawk.svg)](https://www.npmjs.com/package/hawk)
+[![npm](https://img.shields.io/npm/dm/hawk.svg)](https://www.npmjs.com/package/hawk)
+[![Dependency Status](https://david-dm.org/hueniverse/hawk.svg)](https://david-dm.org/hueniverse/hawk)
+[![Build Status](https://travis-ci.org/hueniverse/hawk.svg?branch=master)](https://travis-ci.org/hueniverse/hawk)
 
 # Table of Content
 
