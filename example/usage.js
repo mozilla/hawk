@@ -51,7 +51,11 @@ Http.createServer(handler).listen(8000, '127.0.0.1');
 
 // Send unauthenticated request
 
-Request('http://127.0.0.1:8000/resource/1?b=1&a=2', (error, response, body) => {
+Request('http://127.0.0.1:8000/resource/1?b=1&a=2', (err, response, body) => {
+
+    if (err) {
+        console.log(err);
+    }
 
     console.log(response.statusCode + ': ' + body);
 });
@@ -60,6 +64,10 @@ Request('http://127.0.0.1:8000/resource/1?b=1&a=2', (error, response, body) => {
 // Send authenticated request
 
 credentialsFunc('dh37fgj492je', (err, credentials) => {
+
+    if (err) {
+        process.exit(1);
+    }
 
     const header = Hawk.client.header('http://127.0.0.1:8000/resource/1?b=1&a=2', 'GET', { credentials: credentials, ext: 'and welcome!' });
     const options = {
@@ -70,7 +78,11 @@ credentialsFunc('dh37fgj492je', (err, credentials) => {
         }
     };
 
-    Request(options, (error, response, body) => {
+    Request(options, (err, response, body) => {
+
+        if (err) {
+            process.exit(1);
+        }
 
         const isValid = Hawk.client.authenticate(response, credentials, header.artifacts, { payload: body });
         console.log(response.statusCode + ': ' + body + (isValid ? ' (valid)' : ' (invalid)'));

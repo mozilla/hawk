@@ -977,6 +977,8 @@ describe('Server', () => {
 
             credentialsFunc('123456', (err, credentials1) => {
 
+                expect(err).to.not.exist();
+
                 const auth = Hawk.client.message('example.com', 8080, 'some message', { credentials: credentials1 });
                 delete auth.ts;
 
@@ -992,6 +994,8 @@ describe('Server', () => {
         it('errors on invalid authorization (nonce)', (done) => {
 
             credentialsFunc('123456', (err, credentials1) => {
+
+                expect(err).to.not.exist();
 
                 const auth = Hawk.client.message('example.com', 8080, 'some message', { credentials: credentials1 });
                 delete auth.nonce;
@@ -1009,6 +1013,8 @@ describe('Server', () => {
 
             credentialsFunc('123456', (err, credentials1) => {
 
+                expect(err).to.not.exist();
+
                 const auth = Hawk.client.message('example.com', 8080, 'some message', { credentials: credentials1 });
                 delete auth.hash;
 
@@ -1024,6 +1030,8 @@ describe('Server', () => {
         it('errors with credentials', (done) => {
 
             credentialsFunc('123456', (err, credentials1) => {
+
+                expect(err).to.not.exist();
 
                 const auth = Hawk.client.message('example.com', 8080, 'some message', { credentials: credentials1 });
 
@@ -1044,6 +1052,8 @@ describe('Server', () => {
 
             credentialsFunc('123456', (err, credentials1) => {
 
+                expect(err).to.not.exist();
+
                 const auth = Hawk.client.message('example.com', 8080, 'some message', { credentials: credentials1 });
                 Hawk.server.authenticateMessage('example.com', 8080, 'some message', auth, credentialsFunc, {
                     nonceFunc: function (key, nonce, ts, nonceCallback) {
@@ -1063,6 +1073,8 @@ describe('Server', () => {
 
             credentialsFunc('123456', (err, credentials1) => {
 
+                expect(err).to.not.exist();
+
                 const auth = Hawk.client.message('example.com', 8080, 'some message', { credentials: credentials1 });
                 expect(auth).to.exist();
 
@@ -1078,6 +1090,8 @@ describe('Server', () => {
         it('should fail authorization on mismatching host', (done) => {
 
             credentialsFunc('123456', (err, credentials1) => {
+
+                expect(err).to.not.exist();
 
                 const auth = Hawk.client.message('example.com', 8080, 'some message', { credentials: credentials1 });
                 expect(auth).to.exist();
@@ -1095,6 +1109,8 @@ describe('Server', () => {
 
             credentialsFunc('123456', (err, credentials1) => {
 
+                expect(err).to.not.exist();
+
                 const auth = Hawk.client.message('example.com', 8080, 'some message', { credentials: credentials1 });
                 expect(auth).to.exist();
 
@@ -1111,6 +1127,8 @@ describe('Server', () => {
 
             credentialsFunc('123456', (err, credentials1) => {
 
+                expect(err).to.not.exist();
+
                 const auth = Hawk.client.message('example.com', 8080, 'some message', { credentials: credentials1, localtimeOffsetMsec: 100000 });
                 expect(auth).to.exist();
 
@@ -1125,6 +1143,8 @@ describe('Server', () => {
         it('should fail authorization on invalid authorization', (done) => {
 
             credentialsFunc('123456', (err, credentials1) => {
+
+                expect(err).to.not.exist();
 
                 const auth = Hawk.client.message('example.com', 8080, 'some message', { credentials: credentials1 });
                 expect(auth).to.exist();
@@ -1143,6 +1163,8 @@ describe('Server', () => {
 
             credentialsFunc('123456', (err, credentials1) => {
 
+                expect(err).to.not.exist();
+
                 const auth = Hawk.client.message('example.com', 8080, 'some message', { credentials: credentials1 });
                 expect(auth).to.exist();
 
@@ -1158,6 +1180,8 @@ describe('Server', () => {
         it('should fail authorization on nonce error', (done) => {
 
             credentialsFunc('123456', (err, credentials1) => {
+
+                expect(err).to.not.exist();
 
                 const auth = Hawk.client.message('example.com', 8080, 'some message', { credentials: credentials1 });
                 expect(auth).to.exist();
@@ -1180,6 +1204,8 @@ describe('Server', () => {
 
             credentialsFunc('123456', (err, credentials1) => {
 
+                expect(err).to.not.exist();
+
                 const auth = Hawk.client.message('example.com', 8080, 'some message', { credentials: credentials1 });
                 expect(auth).to.exist();
 
@@ -1200,6 +1226,8 @@ describe('Server', () => {
         it('should fail authorization on missing credentials', (done) => {
 
             credentialsFunc('123456', (err, credentials1) => {
+
+                expect(err).to.not.exist();
 
                 const auth = Hawk.client.message('example.com', 8080, 'some message', { credentials: credentials1 });
                 expect(auth).to.exist();
@@ -1222,6 +1250,8 @@ describe('Server', () => {
 
             credentialsFunc('123456', (err, credentials1) => {
 
+                expect(err).to.not.exist();
+
                 const auth = Hawk.client.message('example.com', 8080, 'some message', { credentials: credentials1 });
                 expect(auth).to.exist();
 
@@ -1242,6 +1272,8 @@ describe('Server', () => {
         it('should fail authorization on invalid credentials algorithm', (done) => {
 
             credentialsFunc('123456', (err, credentials1) => {
+
+                expect(err).to.not.exist();
 
                 const auth = Hawk.client.message('example.com', 8080, 'some message', { credentials: credentials1 });
                 expect(auth).to.exist();
@@ -1264,6 +1296,8 @@ describe('Server', () => {
 
             credentialsFunc('123456', (err, credentials) => {
 
+                expect(err).to.not.exist();
+
                 const auth = Hawk.client.message(null, 8080, 'some message', { credentials: credentials });
                 expect(auth).to.not.exist();
                 done();
@@ -1280,6 +1314,8 @@ describe('Server', () => {
         it('should fail on invalid algorithm', (done) => {
 
             credentialsFunc('123456', (err, credentials) => {
+
+                expect(err).to.not.exist();
 
                 const creds = Hoek.clone(credentials);
                 creds.algorithm = 'blah';
