@@ -207,6 +207,22 @@ describe('Client', () => {
             done();
         });
 
+        it('returns false on invalid header (callback)', (done) => {
+
+            const res = {
+                headers: {
+                    'server-authorization': 'Hawk mac="abc", bad="xyz"'
+                }
+            };
+
+            Hawk.client.authenticate(res, {}, null, null, (err) => {
+
+                expect(err).to.exist();
+                expect(err.message).to.equal('Invalid Server-Authorization header');
+                done();
+            });
+        });
+
         it('returns false on invalid mac', (done) => {
 
             const res = {
@@ -274,6 +290,128 @@ describe('Client', () => {
             };
 
             expect(Hawk.client.authenticate(res, credentials, artifacts)).to.equal(true);
+            done();
+        });
+
+        it('validates response payload', (done) => {
+
+            const payload = 'some reply';
+
+            const res = {
+                headers: {
+                    'content-type': 'text/plain',
+                    'server-authorization': 'Hawk mac="odsVGUq0rCoITaiNagW22REIpqkwP9zt5FyqqOW9Zj8=", hash="f9cDF/TDm7TkYRLnGwRMfeDzT6LixQVLvrIKhh0vgmM=", ext="response-specific"'
+                }
+            };
+
+            const credentials = {
+                id: '123456',
+                key: 'werxhqb98rpaxn39848xrunpaw3489ruxnpa98w4rxn',
+                algorithm: 'sha256',
+                user: 'steve'
+            };
+
+            const artifacts = {
+                method: 'POST',
+                host: 'example.com',
+                port: '8080',
+                resource: '/resource/4?filter=a',
+                ts: '1453070933',
+                nonce: '3hOHpR',
+                hash: 'nJjkVtBE5Y/Bk38Aiokwn0jiJxt/0S2WRSUwWLCf5xk=',
+                ext: 'some-app-data',
+                app: undefined,
+                dlg: undefined,
+                mac: '/DitzeD66F2f7O535SERbX9p+oh9ZnNLqSNHG+c7/vs=',
+                id: '123456'
+            };
+
+            expect(Hawk.client.authenticate(res, credentials, artifacts, { payload: payload })).to.equal(true);
+            done();
+        });
+
+        it('validates response payload (callback)', (done) => {
+
+            const payload = 'some reply';
+
+            const res = {
+                headers: {
+                    'content-type': 'text/plain',
+                    'server-authorization': 'Hawk mac="odsVGUq0rCoITaiNagW22REIpqkwP9zt5FyqqOW9Zj8=", hash="f9cDF/TDm7TkYRLnGwRMfeDzT6LixQVLvrIKhh0vgmM=", ext="response-specific"'
+                }
+            };
+
+            const credentials = {
+                id: '123456',
+                key: 'werxhqb98rpaxn39848xrunpaw3489ruxnpa98w4rxn',
+                algorithm: 'sha256',
+                user: 'steve'
+            };
+
+            const artifacts = {
+                method: 'POST',
+                host: 'example.com',
+                port: '8080',
+                resource: '/resource/4?filter=a',
+                ts: '1453070933',
+                nonce: '3hOHpR',
+                hash: 'nJjkVtBE5Y/Bk38Aiokwn0jiJxt/0S2WRSUwWLCf5xk=',
+                ext: 'some-app-data',
+                app: undefined,
+                dlg: undefined,
+                mac: '/DitzeD66F2f7O535SERbX9p+oh9ZnNLqSNHG+c7/vs=',
+                id: '123456'
+            };
+
+            Hawk.client.authenticate(res, credentials, artifacts, { payload: payload }, (err, headers) => {
+
+                expect(err).to.not.exist();
+                expect(headers).to.deep.equal({
+                    'www-authenticate': null,
+                    'server-authorization': {
+                        mac: 'odsVGUq0rCoITaiNagW22REIpqkwP9zt5FyqqOW9Zj8=',
+                        hash: 'f9cDF/TDm7TkYRLnGwRMfeDzT6LixQVLvrIKhh0vgmM=',
+                        ext: 'response-specific'
+                    }
+                });
+                done();
+            });
+        });
+
+        it('errors on invalid response payload', (done) => {
+
+            const payload = 'wrong reply';
+
+            const res = {
+                headers: {
+                    'content-type': 'text/plain',
+                    'server-authorization': 'Hawk mac="odsVGUq0rCoITaiNagW22REIpqkwP9zt5FyqqOW9Zj8=", hash="f9cDF/TDm7TkYRLnGwRMfeDzT6LixQVLvrIKhh0vgmM=", ext="response-specific"'
+                }
+            };
+
+            const credentials = {
+                id: '123456',
+                key: 'werxhqb98rpaxn39848xrunpaw3489ruxnpa98w4rxn',
+                algorithm: 'sha256',
+                user: 'steve'
+            };
+
+            const artifacts = {
+                method: 'POST',
+                host: 'example.com',
+                port: '8080',
+                resource: '/resource/4?filter=a',
+                ts: '1453070933',
+                nonce: '3hOHpR',
+                hash: 'nJjkVtBE5Y/Bk38Aiokwn0jiJxt/0S2WRSUwWLCf5xk=',
+                ext: 'some-app-data',
+                app: undefined,
+                dlg: undefined,
+                mac: '/DitzeD66F2f7O535SERbX9p+oh9ZnNLqSNHG+c7/vs=',
+                id: '123456'
+            };
+
+            expect(Hawk.client.authenticate(res, credentials, artifacts, { payload: payload })).to.equal(false);
             done();
         });
 
