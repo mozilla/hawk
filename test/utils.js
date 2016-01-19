@@ -95,6 +95,34 @@ describe('Utils', () => {
             expect(host.name).to.equal('[123:123:123]');
             done();
         });
+
+        it('errors on header too long', (done) => {
+
+            let long = '';
+            for (let i = 0; i < 5000; ++i) {
+                long += 'x';
+            }
+
+            expect(Hawk.utils.parseHost({ headers: { host: long } })).to.be.null();
+            done();
+        });
+    });
+
+    describe('parseAuthorizationHeader()', () => {
+
+        it('errors on header too long', (done) => {
+
+            let long = 'Scheme a="';
+            for (let i = 0; i < 5000; ++i) {
+                long += 'x';
+            }
+            long += '"';
+
+            const err = Hawk.utils.parseAuthorizationHeader(long, ['a']);
+            expect(err).to.be.instanceof(Error);
+            expect(err.message).to.equal('Header length too long');
+            done();
+        });
     });
 
     describe('version()', () => {
