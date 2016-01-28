@@ -495,7 +495,7 @@ describe('Client', () => {
                 algorithm: 'sha1'
             };
 
-            const auth = Hawk.client.message('example.com', 0, 'I am the boodyman', { credentials: credentials, timestamp: 1353809207, nonce: 'abc123' });
+            const auth = Hawk.client.message(null, 0, 'I am the boodyman', { credentials: credentials, timestamp: 1353809207, nonce: 'abc123' });
             expect(auth).to.not.exist();
             done();
         });

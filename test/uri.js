@@ -438,7 +438,7 @@ describe('Uri', () => {
         });
     });
 
-    it('should fail on expired access', (done) => {
+    it('should fail on invalid credentials function response (bad mac)', (done) => {
 
         const req = {
             method: 'GET',
