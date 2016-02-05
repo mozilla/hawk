@@ -3,7 +3,15 @@
   "main": "dist/browser.js",
   "license": "./LICENSE",
   "ignore": [
-    "lib/*",
+    "example",
+    "images",
+    "lib",
+    "test",
+    ".eslintignore",
+    ".gitignore",
+    ".npmignore",
+    ".travis.yml",
+    "client.js",
     "!dist",
     "!dist/browser.js"
   ],
