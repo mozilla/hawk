@@ -18,10 +18,8 @@ Note: 4.x, 3.x, and 2.x are the same exact protocol as 1.1. The version incremen
     - [Payload Validation](#payload-validation)
     - [Response Payload Validation](#response-payload-validation)
   - [Browser Support and Considerations](#browser-support-and-considerations)
-<p></p>
 - [**Single URI Authorization**](#single-uri-authorization)
   - [Usage Example](#bewit-usage-example)
-<p></p>
 - [**Security Considerations**](#security-considerations)
   - [MAC Keys Transmission](#mac-keys-transmission)
   - [Confidentiality of Requests](#confidentiality-of-requests)
@@ -33,9 +31,7 @@ Note: 4.x, 3.x, and 2.x are the same exact protocol as 1.1. The version incremen
   - [Client Clock Poisoning](#client-clock-poisoning)
   - [Bewit Limitations](#bewit-limitations)
   - [Host Header Forgery](#host-header-forgery)
-<p></p>
 - [**Frequently Asked Questions**](#frequently-asked-questions)
-<p></p>
 - [**Implementations**](#implementations)
 - [**Acknowledgements**](#acknowledgements)
 
