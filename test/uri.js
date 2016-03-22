@@ -36,6 +36,18 @@ describe('Uri', () => {
         return callback(null, credentials);
     };
 
+    const credentialsFuncWithReq = function (req, id, callback) {
+
+        const credentials = {
+            id: id,
+            key: 'werxhqb98rpaxn39848xrunpaw3489ruxnpa98w4rxn',
+            algorithm: (id === '1' ? 'sha1' : 'sha256'),
+            user: 'steve'
+        };
+
+        return callback(null, credentials);
+    };
+
     it('should generate a bewit then successfully authenticate it', (done) => {
 
         const req = {
@@ -79,6 +91,31 @@ describe('Uri', () => {
             req.url += '&bewit=' + bewit;
 
             Hawk.uri.authenticate(req, credentialsFunc, {}, (err, credentials2, attributes) => {
+
+                expect(err).to.not.exist();
+                expect(credentials2.user).to.equal('steve');
+                done();
+            });
+        });
+    });
+
+    it('should generate a bewit then successfully authenticate it (passReqToCallback)', (done) => {
+
+        const req = {
+            method: 'GET',
+            url: '/resource/4?a=1&b=2',
+            host: 'example.com',
+            port: 80
+        };
+
+        credentialsFunc('123456', (err, credentials1) => {
+
+            expect(err).to.not.exist();
+
+            const bewit = Hawk.uri.getBewit('http://example.com/resource/4?a=1&b=2', { credentials: credentials1, ttlSec: 60 * 60 * 24 * 365 * 100 });
+            req.url += '&bewit=' + bewit;
+
+            Hawk.uri.authenticate(req, credentialsFuncWithReq, { passReqToCallback: true }, (err, credentials2, attributes) => {
 
                 expect(err).to.not.exist();
                 expect(credentials2.user).to.equal('steve');
@@ -357,6 +394,26 @@ describe('Uri', () => {
         });
     });
 
+    it('should fail on credentials function error (passReqToCallback)', (done) => {
+
+        const req = {
+            method: 'GET',
+            url: '/resource/4?bewit=MTIzNDU2XDQ1MDk5OTE3MTlcTUE2eWkwRWRwR0pEcWRwb0JkYVdvVDJrL0hDSzA1T0Y3MkhuZlVmVy96Zz1cc29tZS1hcHAtZGF0YQ',
+            host: 'example.com',
+            port: 8080
+        };
+
+        Hawk.uri.authenticate(req, (request, id, callback) => {
+
+            callback(Hawk.error.badRequest('Boom'));
+        }, { passReqToCallback: true }, (err, credentials, attributes) => {
+
+            expect(err).to.exist();
+            expect(err.output.payload.message).to.equal('Boom');
+            done();
+        });
+    });
+
     it('should fail on credentials function error with credentials', (done) => {
 
         const req = {
@@ -370,6 +427,27 @@ describe('Uri', () => {
 
             callback(Hawk.error.badRequest('Boom'), { some: 'value' });
         }, {}, (err, credentials, attributes) => {
+
+            expect(err).to.exist();
+            expect(err.output.payload.message).to.equal('Boom');
+            expect(credentials.some).to.equal('value');
+            done();
+        });
+    });
+
+    it('should fail on credentials function error with credentials (passReqToCallback)', (done) => {
+
+        const req = {
+            method: 'GET',
+            url: '/resource/4?bewit=MTIzNDU2XDQ1MDk5OTE3MTlcTUE2eWkwRWRwR0pEcWRwb0JkYVdvVDJrL0hDSzA1T0Y3MkhuZlVmVy96Zz1cc29tZS1hcHAtZGF0YQ',
+            host: 'example.com',
+            port: 8080
+        };
+
+        Hawk.uri.authenticate(req, (request, id, callback) => {
+
+            callback(Hawk.error.badRequest('Boom'), { some: 'value' });
+        }, { passReqToCallback: true }, (err, credentials, attributes) => {
 
             expect(err).to.exist();
             expect(err.output.payload.message).to.equal('Boom');
@@ -398,6 +476,26 @@ describe('Uri', () => {
         });
     });
 
+    it('should fail on null credentials function response (passReqToCallback)', (done) => {
+
+        const req = {
+            method: 'GET',
+            url: '/resource/4?bewit=MTIzNDU2XDQ1MDk5OTE3MTlcTUE2eWkwRWRwR0pEcWRwb0JkYVdvVDJrL0hDSzA1T0Y3MkhuZlVmVy96Zz1cc29tZS1hcHAtZGF0YQ',
+            host: 'example.com',
+            port: 8080
+        };
+
+        Hawk.uri.authenticate(req, (request, id, callback) => {
+
+            callback(null, null);
+        }, { passReqToCallback: true }, (err, credentials, attributes) => {
+
+            expect(err).to.exist();
+            expect(err.output.payload.message).to.equal('Unknown credentials');
+            done();
+        });
+    });
+
     it('should fail on invalid credentials function response', (done) => {
 
         const req = {
@@ -411,6 +509,26 @@ describe('Uri', () => {
 
             callback(null, {});
         }, {}, (err, credentials, attributes) => {
+
+            expect(err).to.exist();
+            expect(err.message).to.equal('Invalid credentials');
+            done();
+        });
+    });
+
+    it('should fail on invalid credentials function response (passReqToCallback)', (done) => {
+
+        const req = {
+            method: 'GET',
+            url: '/resource/4?bewit=MTIzNDU2XDQ1MDk5OTE3MTlcTUE2eWkwRWRwR0pEcWRwb0JkYVdvVDJrL0hDSzA1T0Y3MkhuZlVmVy96Zz1cc29tZS1hcHAtZGF0YQ',
+            host: 'example.com',
+            port: 8080
+        };
+
+        Hawk.uri.authenticate(req, (request, id, callback) => {
+
+            callback(null, {});
+        }, { passReqToCallback: true }, (err, credentials, attributes) => {
 
             expect(err).to.exist();
             expect(err.message).to.equal('Invalid credentials');
@@ -434,6 +552,46 @@ describe('Uri', () => {
 
             expect(err).to.exist();
             expect(err.message).to.equal('Unknown algorithm');
+            done();
+        });
+    });
+
+    it('should fail on invalid credentials function response (unknown algorithm) with passReqToCallback', (done) => {
+
+        const req = {
+            method: 'GET',
+            url: '/resource/4?bewit=MTIzNDU2XDQ1MDk5OTE3MTlcTUE2eWkwRWRwR0pEcWRwb0JkYVdvVDJrL0hDSzA1T0Y3MkhuZlVmVy96Zz1cc29tZS1hcHAtZGF0YQ',
+            host: 'example.com',
+            port: 8080
+        };
+
+        Hawk.uri.authenticate(req, (request, id, callback) => {
+
+            callback(null, { key: 'xxx', algorithm: 'xxx' });
+        }, { passReqToCallback: true }, (err, credentials, attributes) => {
+
+            expect(err).to.exist();
+            expect(err.message).to.equal('Unknown algorithm');
+            done();
+        });
+    });
+
+    it('should fail on expired access (passReqToCallback)', (done) => {
+
+        const req = {
+            method: 'GET',
+            url: '/resource/4?bewit=MTIzNDU2XDQ1MDk5OTE3MTlcTUE2eWkwRWRwR0pEcWRwb0JkYVdvVDJrL0hDSzA1T0Y3MkhuZlVmVy96Zz1cc29tZS1hcHAtZGF0YQ',
+            host: 'example.com',
+            port: 8080
+        };
+
+        Hawk.uri.authenticate(req, (request, id, callback) => {
+
+            callback(null, { key: 'xxx', algorithm: 'sha256' });
+        }, { passReqToCallback: true }, (err, credentials, attributes) => {
+
+            expect(err).to.exist();
+            expect(err.output.payload.message).to.equal('Bad mac');
             done();
         });
     });
