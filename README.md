@@ -189,7 +189,7 @@ Request(requestOptions, function (error, response, body) {
 ```
 
 **Hawk** utilized the [**SNTP**](https://github.com/hueniverse/sntp) module for time sync management. By default, the local
-machine time is used. To automatically retrieve and synchronice the clock within the application, use the SNTP 'start()' method.
+machine time is used. To automatically retrieve and synchronize the clock within the application, use the SNTP 'start()' method.
 
 ```javascript
 Hawk.sntp.start();
