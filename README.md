@@ -619,6 +619,7 @@ of delegating access to a third party. If you are looking for an OAuth alternati
 - [Tent Hawk in Ruby](https://github.com/tent/hawk-ruby)
 - [Wealdtech in Java](https://github.com/wealdtech/hawk)
 - [Kumar's Mohawk in Python](https://github.com/kumar303/mohawk/)
+- [Hiyosi in Go](https://github.com/hiyosi/hawk)
 
 # Acknowledgements
 
