@@ -472,7 +472,7 @@ describe('Browser', () => {
 
             expect(err).to.not.exist();
 
-            Browser.utils.setNtpOffset(60 * 60 * 1000);
+            Browser.utils.setNtpSecOffset(60 * 60 * 1000);
             const header = Browser.client.header('http://example.com:8080/resource/4?filter=a', req.method, { credentials: credentials1, ext: 'some-app-data' });
             req.authorization = header.field;
             expect(req.authorization).to.exist();
@@ -492,9 +492,9 @@ describe('Browser', () => {
                     }
                 };
 
-                expect(Browser.utils.getNtpOffset()).to.equal(60 * 60 * 1000);
+                expect(Browser.utils.getNtpSecOffset()).to.equal(60 * 60 * 1000);
                 expect(Browser.client.authenticate(res, credentials2, header.artifacts)).to.equal(true);
-                expect(Browser.utils.getNtpOffset()).to.equal(0);
+                expect(Browser.utils.getNtpSecOffset()).to.equal(0);
 
                 req.authorization = Browser.client.header('http://example.com:8080/resource/4?filter=a', req.method, { credentials: credentials2, ext: 'some-app-data' }).field;
                 expect(req.authorization).to.exist();
@@ -527,7 +527,7 @@ describe('Browser', () => {
 
             Browser.utils.setStorage(localStorage);
 
-            Browser.utils.setNtpOffset(60 * 60 * 1000);
+            Browser.utils.setNtpSecOffset(60 * 60 * 1000);
             const header = Browser.client.header('http://example.com:8080/resource/4?filter=a', req.method, { credentials: credentials1, ext: 'some-app-data' });
             req.authorization = header.field;
             expect(req.authorization).to.exist();
@@ -548,9 +548,9 @@ describe('Browser', () => {
                 };
 
                 expect(parseInt(localStorage.getItem('hawk_ntp_offset'))).to.equal(60 * 60 * 1000);
-                expect(Browser.utils.getNtpOffset()).to.equal(60 * 60 * 1000);
+                expect(Browser.utils.getNtpSecOffset()).to.equal(60 * 60 * 1000);
                 expect(Browser.client.authenticate(res, credentials2, header.artifacts)).to.equal(true);
-                expect(Browser.utils.getNtpOffset()).to.equal(0);
+                expect(Browser.utils.getNtpSecOffset()).to.equal(0);
                 expect(parseInt(localStorage.getItem('hawk_ntp_offset'))).to.equal(0);
 
                 req.authorization = Browser.client.header('http://example.com:8080/resource/4?filter=a', req.method, { credentials: credentials2, ext: 'some-app-data' }).field;
@@ -1337,10 +1337,10 @@ describe('Browser', () => {
 
                     expect(err).to.not.exist();
 
-                    const offset = Browser.utils.getNtpOffset();
+                    const offset = Browser.utils.getNtpSecOffset();
                     const tsm = Hawk.crypto.timestampMessage(credentials, 10000);
                     expect(Browser.client.authenticateTimestamp(tsm, credentials, false)).to.equal(true);
-                    expect(offset).to.equal(Browser.utils.getNtpOffset());
+                    expect(offset).to.equal(Browser.utils.getNtpSecOffset());
                     done();
                 });
             });
@@ -1411,7 +1411,7 @@ describe('Browser', () => {
             });
         });
 
-        describe('setNtpOffset()', (done) => {
+        describe('setNtpSecOffset()', (done) => {
 
             it('catches localStorage errors', { parallel: false }, (done) => {
 
@@ -1434,7 +1434,7 @@ describe('Browser', () => {
 
                 expect(() => {
 
-                    Browser.utils.setNtpOffset(100);
+                    Browser.utils.setNtpSecOffset(100);
                 }).not.to.throw();
 
                 done();
@@ -1485,7 +1485,7 @@ describe('Browser', () => {
             it('returns empty object on invalid', (done) => {
 
                 const uri = Browser.utils.parseUri('ftp');
-                expect(uri).to.deep.equal({ host: '', port: '', resource: '' });
+                expect(uri).to.equal({ host: '', port: '', resource: '' });
                 done();
             });
 

@@ -366,7 +366,7 @@ describe('Client', () => {
             Hawk.client.authenticate(res, credentials, artifacts, { payload: payload }, (err, headers) => {
 
                 expect(err).to.not.exist();
-                expect(headers).to.deep.equal({
+                expect(headers).to.equal({
                     'www-authenticate': null,
                     'server-authorization': {
                         mac: 'odsVGUq0rCoITaiNagW22REIpqkwP9zt5FyqqOW9Zj8=',
