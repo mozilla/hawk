@@ -1528,6 +1528,18 @@ describe('Browser', () => {
                 expect(uri.resource).to.equal(parts.pathname + '?' + parts.query);
                 done();
             });
+
+            it('handles email address in path', (done) => {
+
+                const uri = Browser.utils.parseUri('https://example.com/some/email@example.com');
+                expect(uri).to.equal({
+                    host: 'example.com',
+                    port: '443',
+                    resource: '/some/email@example.com'
+                });
+
+                done();
+            });
         });
 
         const str = 'https://www.google.ca/webhp?sourceid=chrome-instant&ion=1&espv=2&ie=UTF-8#q=url';
