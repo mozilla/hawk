@@ -1554,4 +1554,16 @@ describe('Browser', () => {
             });
         });
     });
+
+    describe('crypto', () => {
+
+        describe('utils', () => {
+
+            it('exposes hash methods', (done) => {
+
+                expect(Browser.crypto.utils.SHA256('some message').toString(Browser.crypto.utils.enc.Base64)).to.equal('xHdXq+QCC5Fo0HdvbJFhf5KQ55CsL2zivWeHx0rYgZk=');
+                done();
+            });
+        });
+    });
 });
