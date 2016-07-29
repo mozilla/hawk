@@ -1,3 +1,5 @@
 *
 !lib/**
+!dist/**
+!client.js
 !.npmignore
