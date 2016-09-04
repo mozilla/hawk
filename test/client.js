@@ -495,7 +495,20 @@ describe('Client', () => {
                 algorithm: 'sha1'
             };
 
-            const auth = Hawk.client.message('example.com', 0, 'I am the boodyman', { credentials: credentials, timestamp: 1353809207, nonce: 'abc123' });
+            const auth = Hawk.client.message(undefined, 0, 'I am the boodyman', { credentials: credentials, timestamp: 1353809207, nonce: 'abc123' });
+            expect(auth).to.not.exist();
+            done();
+        });
+
+        it('errors on missing port', (done) => {
+
+            const credentials = {
+                id: '123456',
+                key: '2983d45yun89q',
+                algorithm: 'sha1'
+            };
+
+            const auth = Hawk.client.message('example.com', undefined, 'I am the boodyman', { credentials: credentials, timestamp: 1353809207, nonce: 'abc123' });
             expect(auth).to.not.exist();
             done();
         });
