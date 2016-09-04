@@ -26,7 +26,7 @@ describe('Server', () => {
     const credentialsFunc = function (id, callback) {
 
         const credentials = {
-            id: id,
+            id,
             key: 'werxhqb98rpaxn39848xrunpaw3489ruxnpa98w4rxn',
             algorithm: (id === '1' ? 'sha1' : 'sha256'),
             user: 'steve'
@@ -237,13 +237,13 @@ describe('Server', () => {
 
                 const credentials = {
                     '123': {
-                        id: id,
+                        id,
                         key: 'werxhqb98rpaxn39848xrunpaw3489ruxnpa98w4rxn',
                         algorithm: (id === '1' ? 'sha1' : 'sha256'),
                         user: 'steve'
                     },
                     '456': {
-                        id: id,
+                        id,
                         key: 'xrunpaw3489ruxnpa98w4rxnwerxhqb98rpaxn39848',
                         algorithm: (id === '1' ? 'sha1' : 'sha256'),
                         user: 'bob'
@@ -1325,7 +1325,7 @@ describe('Server', () => {
 
                 expect(err).to.not.exist();
 
-                const auth = Hawk.client.message(null, 8080, 'some message', { credentials: credentials });
+                const auth = Hawk.client.message(null, 8080, 'some message', { credentials });
                 expect(auth).to.not.exist();
                 done();
             });

@@ -32,7 +32,7 @@ describe('README', () => {
         };
 
         const options = {
-            credentials: credentials,
+            credentials,
             timestamp: 1353832234,
             nonce: 'j4h3g2',
             ext: 'some-app-ext-data'
@@ -49,7 +49,7 @@ describe('README', () => {
         it('should generate a normalized string protocol example', (done) => {
 
             const normalized = Hawk.crypto.generateNormalizedString('header', {
-                credentials: credentials,
+                credentials,
                 ts: options.timestamp,
                 nonce: options.nonce,
                 method: 'GET',
@@ -78,7 +78,7 @@ describe('README', () => {
         it('should generate a normalized string protocol example (with payload)', (done) => {
 
             const normalized = Hawk.crypto.generateNormalizedString('header', {
-                credentials: credentials,
+                credentials,
                 ts: options.timestamp,
                 nonce: options.nonce,
                 method: 'POST',

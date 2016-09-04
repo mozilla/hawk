@@ -32,7 +32,7 @@ describe('Client', () => {
                 algorithm: 'sha1'
             };
 
-            const header = Hawk.client.header('http://example.net/somewhere/over/the/rainbow', 'POST', { credentials: credentials, ext: 'Bazinga!', timestamp: 1353809207, nonce: 'Ygvqdz', payload: 'something to write about' }).field;
+            const header = Hawk.client.header('http://example.net/somewhere/over/the/rainbow', 'POST', { credentials, ext: 'Bazinga!', timestamp: 1353809207, nonce: 'Ygvqdz', payload: 'something to write about' }).field;
             expect(header).to.equal('Hawk id="123456", ts="1353809207", nonce="Ygvqdz", hash="bsvY3IfUllw6V5rvk4tStEvpBhE=", ext="Bazinga!", mac="qbf1ZPG/r/e06F4ht+T77LXi5vw="');
             done();
         });
@@ -45,7 +45,7 @@ describe('Client', () => {
                 algorithm: 'sha256'
             };
 
-            const header = Hawk.client.header('https://example.net/somewhere/over/the/rainbow', 'POST', { credentials: credentials, ext: 'Bazinga!', timestamp: 1353809207, nonce: 'Ygvqdz', payload: 'something to write about', contentType: 'text/plain' }).field;
+            const header = Hawk.client.header('https://example.net/somewhere/over/the/rainbow', 'POST', { credentials, ext: 'Bazinga!', timestamp: 1353809207, nonce: 'Ygvqdz', payload: 'something to write about', contentType: 'text/plain' }).field;
             expect(header).to.equal('Hawk id="123456", ts="1353809207", nonce="Ygvqdz", hash="2QfCt3GuY9HQnHWyWD3wX68ZOKbynqlfYmuO2ZBRqtY=", ext="Bazinga!", mac="q1CwFoSHzPZSkbIvl0oYlD+91rBUEvFk763nMjMndj8="');
             done();
         });
@@ -58,7 +58,7 @@ describe('Client', () => {
                 algorithm: 'sha256'
             };
 
-            const header = Hawk.client.header('https://example.net/somewhere/over/the/rainbow', 'POST', { credentials: credentials, timestamp: 1353809207, nonce: 'Ygvqdz', payload: 'something to write about', contentType: 'text/plain' }).field;
+            const header = Hawk.client.header('https://example.net/somewhere/over/the/rainbow', 'POST', { credentials, timestamp: 1353809207, nonce: 'Ygvqdz', payload: 'something to write about', contentType: 'text/plain' }).field;
             expect(header).to.equal('Hawk id="123456", ts="1353809207", nonce="Ygvqdz", hash="2QfCt3GuY9HQnHWyWD3wX68ZOKbynqlfYmuO2ZBRqtY=", mac="HTgtd0jPI6E4izx8e4OHdO36q00xFCU0FolNq3RiCYs="');
             done();
         });
@@ -71,7 +71,7 @@ describe('Client', () => {
                 algorithm: 'sha256'
             };
 
-            const header = Hawk.client.header('https://example.net/somewhere/over/the/rainbow', 'POST', { credentials: credentials, timestamp: 1353809207, nonce: 'Ygvqdz', payload: 'something to write about', contentType: 'text/plain', ext: null }).field;
+            const header = Hawk.client.header('https://example.net/somewhere/over/the/rainbow', 'POST', { credentials, timestamp: 1353809207, nonce: 'Ygvqdz', payload: 'something to write about', contentType: 'text/plain', ext: null }).field;
             expect(header).to.equal('Hawk id="123456", ts="1353809207", nonce="Ygvqdz", hash="2QfCt3GuY9HQnHWyWD3wX68ZOKbynqlfYmuO2ZBRqtY=", mac="HTgtd0jPI6E4izx8e4OHdO36q00xFCU0FolNq3RiCYs="');
             done();
         });
@@ -84,7 +84,7 @@ describe('Client', () => {
                 algorithm: 'sha256'
             };
 
-            const header = Hawk.client.header('https://example.net/somewhere/over/the/rainbow', 'POST', { credentials: credentials, timestamp: 1353809207, nonce: 'Ygvqdz', payload: '', contentType: 'text/plain' }).field;
+            const header = Hawk.client.header('https://example.net/somewhere/over/the/rainbow', 'POST', { credentials, timestamp: 1353809207, nonce: 'Ygvqdz', payload: '', contentType: 'text/plain' }).field;
             expect(header).to.equal('Hawk id=\"123456\", ts=\"1353809207\", nonce=\"Ygvqdz\", hash=\"q/t+NNAkQZNlq/aAD6PlexImwQTxwgT2MahfTa9XRLA=\", mac=\"U5k16YEzn3UnBHKeBzsDXn067Gu3R4YaY6xOt9PYRZM=\"');
             done();
         });
@@ -97,7 +97,7 @@ describe('Client', () => {
                 algorithm: 'sha256'
             };
 
-            const options = { credentials: credentials, timestamp: 1353809207, nonce: 'Ygvqdz', payload: 'something to write about', contentType: 'text/plain' };
+            const options = { credentials, timestamp: 1353809207, nonce: 'Ygvqdz', payload: 'something to write about', contentType: 'text/plain' };
             options.hash = Hawk.crypto.calculatePayloadHash(options.payload, credentials.algorithm, options.contentType);
             const header = Hawk.client.header('https://example.net/somewhere/over/the/rainbow', 'POST', options).field;
             expect(header).to.equal('Hawk id="123456", ts="1353809207", nonce="Ygvqdz", hash="2QfCt3GuY9HQnHWyWD3wX68ZOKbynqlfYmuO2ZBRqtY=", mac="HTgtd0jPI6E4izx8e4OHdO36q00xFCU0FolNq3RiCYs="');
@@ -151,7 +151,7 @@ describe('Client', () => {
                 algorithm: 'sha256'
             };
 
-            const header = Hawk.client.header('https://example.net/somewhere/over/the/rainbow', 'POST', { credentials: credentials, ext: 'Bazinga!', timestamp: 1353809207 });
+            const header = Hawk.client.header('https://example.net/somewhere/over/the/rainbow', 'POST', { credentials, ext: 'Bazinga!', timestamp: 1353809207 });
             expect(header.field).to.equal('');
             expect(header.err).to.equal('Invalid credential object');
             done();
@@ -172,7 +172,7 @@ describe('Client', () => {
                 algorithm: 'sha256'
             };
 
-            const header = Hawk.client.header('https://example.net/somewhere/over/the/rainbow', 'POST', { credentials: credentials, ext: 'Bazinga!', timestamp: 1353809207 });
+            const header = Hawk.client.header('https://example.net/somewhere/over/the/rainbow', 'POST', { credentials, ext: 'Bazinga!', timestamp: 1353809207 });
             expect(header.field).to.equal('');
             expect(header.err).to.equal('Invalid credential object');
             done();
@@ -186,7 +186,7 @@ describe('Client', () => {
                 algorithm: 'hmac-sha-0'
             };
 
-            const header = Hawk.client.header('https://example.net/somewhere/over/the/rainbow', 'POST', { credentials: credentials, payload: 'something, anything!', ext: 'Bazinga!', timestamp: 1353809207 });
+            const header = Hawk.client.header('https://example.net/somewhere/over/the/rainbow', 'POST', { credentials, payload: 'something, anything!', ext: 'Bazinga!', timestamp: 1353809207 });
             expect(header.field).to.equal('');
             expect(header.err).to.equal('Unknown algorithm');
             done();
@@ -326,7 +326,7 @@ describe('Client', () => {
                 id: '123456'
             };
 
-            expect(Hawk.client.authenticate(res, credentials, artifacts, { payload: payload })).to.equal(true);
+            expect(Hawk.client.authenticate(res, credentials, artifacts, { payload })).to.equal(true);
             done();
         });
 
@@ -363,7 +363,7 @@ describe('Client', () => {
                 id: '123456'
             };
 
-            Hawk.client.authenticate(res, credentials, artifacts, { payload: payload }, (err, headers) => {
+            Hawk.client.authenticate(res, credentials, artifacts, { payload }, (err, headers) => {
 
                 expect(err).to.not.exist();
                 expect(headers).to.equal({
@@ -411,7 +411,7 @@ describe('Client', () => {
                 id: '123456'
             };
 
-            expect(Hawk.client.authenticate(res, credentials, artifacts, { payload: payload })).to.equal(false);
+            expect(Hawk.client.authenticate(res, credentials, artifacts, { payload })).to.equal(false);
             done();
         });
 
@@ -454,7 +454,7 @@ describe('Client', () => {
                 algorithm: 'sha1'
             };
 
-            const auth = Hawk.client.message('example.com', 80, 'I am the boodyman', { credentials: credentials, timestamp: 1353809207, nonce: 'abc123' });
+            const auth = Hawk.client.message('example.com', 80, 'I am the boodyman', { credentials, timestamp: 1353809207, nonce: 'abc123' });
             expect(auth).to.exist();
             expect(auth.ts).to.equal(1353809207);
             expect(auth.nonce).to.equal('abc123');
@@ -469,7 +469,7 @@ describe('Client', () => {
                 algorithm: 'sha1'
             };
 
-            const auth = Hawk.client.message(5, 80, 'I am the boodyman', { credentials: credentials, timestamp: 1353809207, nonce: 'abc123' });
+            const auth = Hawk.client.message(5, 80, 'I am the boodyman', { credentials, timestamp: 1353809207, nonce: 'abc123' });
             expect(auth).to.not.exist();
             done();
         });
@@ -482,7 +482,7 @@ describe('Client', () => {
                 algorithm: 'sha1'
             };
 
-            const auth = Hawk.client.message('example.com', '80', 'I am the boodyman', { credentials: credentials, timestamp: 1353809207, nonce: 'abc123' });
+            const auth = Hawk.client.message('example.com', '80', 'I am the boodyman', { credentials, timestamp: 1353809207, nonce: 'abc123' });
             expect(auth).to.not.exist();
             done();
         });
@@ -495,7 +495,7 @@ describe('Client', () => {
                 algorithm: 'sha1'
             };
 
-            const auth = Hawk.client.message(undefined, 0, 'I am the boodyman', { credentials: credentials, timestamp: 1353809207, nonce: 'abc123' });
+            const auth = Hawk.client.message(undefined, 0, 'I am the boodyman', { credentials, timestamp: 1353809207, nonce: 'abc123' });
             expect(auth).to.not.exist();
             done();
         });
@@ -508,7 +508,7 @@ describe('Client', () => {
                 algorithm: 'sha1'
             };
 
-            const auth = Hawk.client.message('example.com', undefined, 'I am the boodyman', { credentials: credentials, timestamp: 1353809207, nonce: 'abc123' });
+            const auth = Hawk.client.message('example.com', undefined, 'I am the boodyman', { credentials, timestamp: 1353809207, nonce: 'abc123' });
             expect(auth).to.not.exist();
             done();
         });
@@ -521,7 +521,7 @@ describe('Client', () => {
                 algorithm: 'sha1'
             };
 
-            const auth = Hawk.client.message('example.com', 80, null, { credentials: credentials, timestamp: 1353809207, nonce: 'abc123' });
+            const auth = Hawk.client.message('example.com', 80, null, { credentials, timestamp: 1353809207, nonce: 'abc123' });
             expect(auth).to.not.exist();
             done();
         });
@@ -534,7 +534,7 @@ describe('Client', () => {
                 algorithm: 'sha1'
             };
 
-            const auth = Hawk.client.message('example.com', 80, undefined, { credentials: credentials, timestamp: 1353809207, nonce: 'abc123' });
+            const auth = Hawk.client.message('example.com', 80, undefined, { credentials, timestamp: 1353809207, nonce: 'abc123' });
             expect(auth).to.not.exist();
             done();
         });
@@ -547,7 +547,7 @@ describe('Client', () => {
                 algorithm: 'sha1'
             };
 
-            const auth = Hawk.client.message('example.com', 80, 5, { credentials: credentials, timestamp: 1353809207, nonce: 'abc123' });
+            const auth = Hawk.client.message('example.com', 80, 5, { credentials, timestamp: 1353809207, nonce: 'abc123' });
             expect(auth).to.not.exist();
             done();
         });
@@ -566,7 +566,7 @@ describe('Client', () => {
                 algorithm: 'sha1'
             };
 
-            const auth = Hawk.client.message('example.com', 80, 'I am the boodyman', { credentials: credentials, timestamp: 1353809207, nonce: 'abc123' });
+            const auth = Hawk.client.message('example.com', 80, 'I am the boodyman', { credentials, timestamp: 1353809207, nonce: 'abc123' });
             expect(auth).to.not.exist();
             done();
         });
@@ -578,7 +578,7 @@ describe('Client', () => {
                 algorithm: 'sha1'
             };
 
-            const auth = Hawk.client.message('example.com', 80, 'I am the boodyman', { credentials: credentials, timestamp: 1353809207, nonce: 'abc123' });
+            const auth = Hawk.client.message('example.com', 80, 'I am the boodyman', { credentials, timestamp: 1353809207, nonce: 'abc123' });
             expect(auth).to.not.exist();
             done();
         });

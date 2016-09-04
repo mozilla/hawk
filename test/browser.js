@@ -27,7 +27,7 @@ describe('Browser', () => {
     const credentialsFunc = function (id, callback) {
 
         const credentials = {
-            id: id,
+            id,
             key: 'werxhqb98rpaxn39848xrunpaw3489ruxnpa98w4rxn',
             algorithm: (id === '1' ? 'sha1' : 'sha256'),
             user: 'steve'
@@ -83,7 +83,7 @@ describe('Browser', () => {
 
                     expect(err).to.not.exist();
 
-                    const reqHeader = Browser.client.header('http://example.com:8080/resource/4?filter=a', req.method, { credentials: credentials1, ext: 'some-app-data', payload: payload, contentType: req.headers['content-type'] });
+                    const reqHeader = Browser.client.header('http://example.com:8080/resource/4?filter=a', req.method, { credentials: credentials1, ext: 'some-app-data', payload, contentType: req.headers['content-type'] });
                     req.headers.authorization = reqHeader.field;
 
                     Hawk.server.authenticate(req, credentialsFunc, {}, (err, credentials2, artifacts) => {
@@ -140,7 +140,7 @@ describe('Browser', () => {
 
                     expect(err).to.not.exist();
 
-                    const reqHeader = Browser.client.header('http://example.com:8080/resource/4?filter=a', req.method, { credentials: credentials1, ext: 'some-app-data', payload: payload, contentType: req.headers['content-type'] });
+                    const reqHeader = Browser.client.header('http://example.com:8080/resource/4?filter=a', req.method, { credentials: credentials1, ext: 'some-app-data', payload, contentType: req.headers['content-type'] });
                     req.headers.authorization = reqHeader.field;
 
                     Hawk.server.authenticate(req, credentialsFunc, {}, (err, credentials2, artifacts) => {
@@ -186,7 +186,7 @@ describe('Browser', () => {
 
                     expect(err).to.not.exist();
 
-                    const reqHeader = Browser.client.header('http://example.com:8080/resource/4?filter=a', req.method, { credentials: credentials1, ext: 'some-app-data', payload: payload, contentType: req.headers['content-type'] });
+                    const reqHeader = Browser.client.header('http://example.com:8080/resource/4?filter=a', req.method, { credentials: credentials1, ext: 'some-app-data', payload, contentType: req.headers['content-type'] });
                     req.headers.authorization = reqHeader.field;
 
                     Hawk.server.authenticate(req, credentialsFunc, {}, (err, credentials2, artifacts) => {
@@ -337,7 +337,7 @@ describe('Browser', () => {
 
                     expect(err).to.not.exist();
 
-                    const reqHeader = Browser.client.header('http://example.com:8080/resource/4?filter=a', req.method, { credentials: credentials1, ext: 'some-app-data', payload: payload, contentType: req.headers['content-type'] });
+                    const reqHeader = Browser.client.header('http://example.com:8080/resource/4?filter=a', req.method, { credentials: credentials1, ext: 'some-app-data', payload, contentType: req.headers['content-type'] });
                     req.headers.authorization = reqHeader.field;
 
                     Hawk.server.authenticate(req, credentialsFunc, {}, (err, credentials2, artifacts) => {
@@ -523,7 +523,7 @@ describe('Browser', () => {
                     algorithm: 'sha1'
                 };
 
-                const header = Browser.client.header('http://example.net/somewhere/over/the/rainbow', 'POST', { credentials: credentials, ext: 'Bazinga!', timestamp: 1353809207, nonce: 'Ygvqdz', payload: 'something to write about' }).field;
+                const header = Browser.client.header('http://example.net/somewhere/over/the/rainbow', 'POST', { credentials, ext: 'Bazinga!', timestamp: 1353809207, nonce: 'Ygvqdz', payload: 'something to write about' }).field;
                 expect(header).to.equal('Hawk id="123456", ts="1353809207", nonce="Ygvqdz", hash="bsvY3IfUllw6V5rvk4tStEvpBhE=", ext="Bazinga!", mac="qbf1ZPG/r/e06F4ht+T77LXi5vw="');
                 done();
             });
@@ -536,7 +536,7 @@ describe('Browser', () => {
                     algorithm: 'sha256'
                 };
 
-                const header = Browser.client.header('https://example.net/somewhere/over/the/rainbow', 'POST', { credentials: credentials, ext: 'Bazinga!', timestamp: 1353809207, nonce: 'Ygvqdz', payload: 'something to write about', contentType: 'text/plain' }).field;
+                const header = Browser.client.header('https://example.net/somewhere/over/the/rainbow', 'POST', { credentials, ext: 'Bazinga!', timestamp: 1353809207, nonce: 'Ygvqdz', payload: 'something to write about', contentType: 'text/plain' }).field;
                 expect(header).to.equal('Hawk id="123456", ts="1353809207", nonce="Ygvqdz", hash="2QfCt3GuY9HQnHWyWD3wX68ZOKbynqlfYmuO2ZBRqtY=", ext="Bazinga!", mac="q1CwFoSHzPZSkbIvl0oYlD+91rBUEvFk763nMjMndj8="');
                 done();
             });
@@ -549,7 +549,7 @@ describe('Browser', () => {
                     algorithm: 'sha1'
                 };
 
-                const header = Browser.client.header('http://example.net/somewhere/over/the/rainbow', 'POST', { credentials: credentials, ext: 'Bazinga!', timestamp: 1353809207, nonce: 'Ygvqdz', payload: '' }).field;
+                const header = Browser.client.header('http://example.net/somewhere/over/the/rainbow', 'POST', { credentials, ext: 'Bazinga!', timestamp: 1353809207, nonce: 'Ygvqdz', payload: '' }).field;
                 expect(header).to.equal('Hawk id=\"123456\", ts=\"1353809207\", nonce=\"Ygvqdz\", hash=\"404ghL7K+hfyhByKKejFBRGgTjU=\", ext=\"Bazinga!\", mac=\"Bh1sj1DOfFRWOdi3ww52nLCJdBE=\"');
                 done();
             });
@@ -562,7 +562,7 @@ describe('Browser', () => {
                     algorithm: 'sha256'
                 };
 
-                const header = Browser.client.header('https://example.net/somewhere/over/the/rainbow', 'POST', { credentials: credentials, timestamp: 1353809207, nonce: 'Ygvqdz', payload: 'something to write about', contentType: 'text/plain' }).field;
+                const header = Browser.client.header('https://example.net/somewhere/over/the/rainbow', 'POST', { credentials, timestamp: 1353809207, nonce: 'Ygvqdz', payload: 'something to write about', contentType: 'text/plain' }).field;
                 expect(header).to.equal('Hawk id="123456", ts="1353809207", nonce="Ygvqdz", hash="2QfCt3GuY9HQnHWyWD3wX68ZOKbynqlfYmuO2ZBRqtY=", mac="HTgtd0jPI6E4izx8e4OHdO36q00xFCU0FolNq3RiCYs="');
                 done();
             });
@@ -575,7 +575,7 @@ describe('Browser', () => {
                     algorithm: 'sha256'
                 };
 
-                const header = Browser.client.header('https://example.net/somewhere/over/the/rainbow', 'POST', { credentials: credentials, timestamp: 1353809207, nonce: 'Ygvqdz', payload: 'something to write about', contentType: 'text/plain', ext: null }).field;
+                const header = Browser.client.header('https://example.net/somewhere/over/the/rainbow', 'POST', { credentials, timestamp: 1353809207, nonce: 'Ygvqdz', payload: 'something to write about', contentType: 'text/plain', ext: null }).field;
                 expect(header).to.equal('Hawk id="123456", ts="1353809207", nonce="Ygvqdz", hash="2QfCt3GuY9HQnHWyWD3wX68ZOKbynqlfYmuO2ZBRqtY=", mac="HTgtd0jPI6E4izx8e4OHdO36q00xFCU0FolNq3RiCYs="');
                 done();
             });
@@ -589,7 +589,7 @@ describe('Browser', () => {
                 };
 
                 const uri = Browser.utils.parseUri('https://example.net/somewhere/over/the/rainbow');
-                const header = Browser.client.header(uri, 'POST', { credentials: credentials, timestamp: 1353809207, nonce: 'Ygvqdz', payload: 'something to write about', contentType: 'text/plain' }).field;
+                const header = Browser.client.header(uri, 'POST', { credentials, timestamp: 1353809207, nonce: 'Ygvqdz', payload: 'something to write about', contentType: 'text/plain' }).field;
                 expect(header).to.equal('Hawk id="123456", ts="1353809207", nonce="Ygvqdz", hash="2QfCt3GuY9HQnHWyWD3wX68ZOKbynqlfYmuO2ZBRqtY=", mac="HTgtd0jPI6E4izx8e4OHdO36q00xFCU0FolNq3RiCYs="');
                 done();
             });
@@ -610,7 +610,7 @@ describe('Browser', () => {
                     algorithm: 'sha256'
                 };
 
-                const header = Browser.client.header('', 'POST', { credentials: credentials, timestamp: 1353809207, nonce: 'Ygvqdz', payload: 'something to write about', contentType: 'text/plain' });
+                const header = Browser.client.header('', 'POST', { credentials, timestamp: 1353809207, nonce: 'Ygvqdz', payload: 'something to write about', contentType: 'text/plain' });
                 expect(header.field).to.equal('');
                 expect(header.err).to.equal('Invalid argument type');
                 done();
@@ -624,7 +624,7 @@ describe('Browser', () => {
                     algorithm: 'sha256'
                 };
 
-                const header = Browser.client.header(4, 'POST', { credentials: credentials, timestamp: 1353809207, nonce: 'Ygvqdz', payload: 'something to write about', contentType: 'text/plain' });
+                const header = Browser.client.header(4, 'POST', { credentials, timestamp: 1353809207, nonce: 'Ygvqdz', payload: 'something to write about', contentType: 'text/plain' });
                 expect(header.field).to.equal('');
                 expect(header.err).to.equal('Invalid argument type');
                 done();
@@ -638,7 +638,7 @@ describe('Browser', () => {
                     algorithm: 'sha256'
                 };
 
-                const header = Browser.client.header('https://example.net/somewhere/over/the/rainbow', '', { credentials: credentials, timestamp: 1353809207, nonce: 'Ygvqdz', payload: 'something to write about', contentType: 'text/plain' });
+                const header = Browser.client.header('https://example.net/somewhere/over/the/rainbow', '', { credentials, timestamp: 1353809207, nonce: 'Ygvqdz', payload: 'something to write about', contentType: 'text/plain' });
                 expect(header.field).to.equal('');
                 expect(header.err).to.equal('Invalid argument type');
                 done();
@@ -652,7 +652,7 @@ describe('Browser', () => {
                     algorithm: 'sha256'
                 };
 
-                const header = Browser.client.header('https://example.net/somewhere/over/the/rainbow', 5, { credentials: credentials, timestamp: 1353809207, nonce: 'Ygvqdz', payload: 'something to write about', contentType: 'text/plain' });
+                const header = Browser.client.header('https://example.net/somewhere/over/the/rainbow', 5, { credentials, timestamp: 1353809207, nonce: 'Ygvqdz', payload: 'something to write about', contentType: 'text/plain' });
                 expect(header.field).to.equal('');
                 expect(header.err).to.equal('Invalid argument type');
                 done();
@@ -673,7 +673,7 @@ describe('Browser', () => {
                     algorithm: 'sha256'
                 };
 
-                const header = Browser.client.header('https://example.net/somewhere/over/the/rainbow', 'POST', { credentials: credentials, ext: 'Bazinga!', timestamp: 1353809207 });
+                const header = Browser.client.header('https://example.net/somewhere/over/the/rainbow', 'POST', { credentials, ext: 'Bazinga!', timestamp: 1353809207 });
                 expect(header.field).to.equal('');
                 expect(header.err).to.equal('Invalid credentials object');
                 done();
@@ -686,7 +686,7 @@ describe('Browser', () => {
                     algorithm: 'sha256'
                 };
 
-                const header = Browser.client.header('https://example.net/somewhere/over/the/rainbow', 'POST', { credentials: credentials, ext: 'Bazinga!', timestamp: 1353809207 });
+                const header = Browser.client.header('https://example.net/somewhere/over/the/rainbow', 'POST', { credentials, ext: 'Bazinga!', timestamp: 1353809207 });
                 expect(header.field).to.equal('');
                 expect(header.err).to.equal('Invalid credentials object');
                 done();
@@ -700,7 +700,7 @@ describe('Browser', () => {
                     algorithm: 'hmac-sha-0'
                 };
 
-                const header = Browser.client.header('https://example.net/somewhere/over/the/rainbow', 'POST', { credentials: credentials, payload: 'something, anything!', ext: 'Bazinga!', timestamp: 1353809207 });
+                const header = Browser.client.header('https://example.net/somewhere/over/the/rainbow', 'POST', { credentials, payload: 'something, anything!', ext: 'Bazinga!', timestamp: 1353809207 });
                 expect(header.field).to.equal('');
                 expect(header.err).to.equal('Unknown algorithm');
                 done();
@@ -714,7 +714,7 @@ describe('Browser', () => {
                     algorithm: 'sha256'
                 };
 
-                const options = { credentials: credentials, ext: 'Bazinga!', timestamp: 1353809207, nonce: 'Ygvqdz', payload: 'something to write about', contentType: 'text/plain' };
+                const options = { credentials, ext: 'Bazinga!', timestamp: 1353809207, nonce: 'Ygvqdz', payload: 'something to write about', contentType: 'text/plain' };
                 options.hash = Browser.crypto.calculatePayloadHash(options.payload, credentials.algorithm, options.contentType);
                 const header = Browser.client.header('https://example.net/somewhere/over/the/rainbow', 'POST', options).field;
                 expect(header).to.equal('Hawk id="123456", ts="1353809207", nonce="Ygvqdz", hash="2QfCt3GuY9HQnHWyWD3wX68ZOKbynqlfYmuO2ZBRqtY=", ext="Bazinga!", mac="q1CwFoSHzPZSkbIvl0oYlD+91rBUEvFk763nMjMndj8="');
@@ -783,7 +783,7 @@ describe('Browser', () => {
                     algorithm: 'sha256'
                 };
 
-                const bewit = Browser.client.bewit('https://example.com/somewhere/over/the/rainbow', { credentials: credentials, ttlSec: 300, localtimeOffsetMsec: 1356420407232 - Hawk.utils.now(), ext: 'xandyandz' });
+                const bewit = Browser.client.bewit('https://example.com/somewhere/over/the/rainbow', { credentials, ttlSec: 300, localtimeOffsetMsec: 1356420407232 - Hawk.utils.now(), ext: 'xandyandz' });
                 expect(bewit).to.equal('MTIzNDU2XDEzNTY0MjA3MDdca3NjeHdOUjJ0SnBQMVQxekRMTlBiQjVVaUtJVTl0T1NKWFRVZEc3WDloOD1ceGFuZHlhbmR6');
                 done();
             });
@@ -796,7 +796,7 @@ describe('Browser', () => {
                     algorithm: 'sha256'
                 };
 
-                const bewit = Browser.client.bewit('http://example.com:8080/somewhere/over/the/rainbow', { credentials: credentials, ttlSec: 300, localtimeOffsetMsec: 1356420407232 - Hawk.utils.now(), ext: 'xandyandz' });
+                const bewit = Browser.client.bewit('http://example.com:8080/somewhere/over/the/rainbow', { credentials, ttlSec: 300, localtimeOffsetMsec: 1356420407232 - Hawk.utils.now(), ext: 'xandyandz' });
                 expect(bewit).to.equal('MTIzNDU2XDEzNTY0MjA3MDdcaFpiSjNQMmNLRW80a3kwQzhqa1pBa1J5Q1p1ZWc0V1NOYnhWN3ZxM3hIVT1ceGFuZHlhbmR6');
                 done();
             });
@@ -809,7 +809,7 @@ describe('Browser', () => {
                     algorithm: 'sha256'
                 };
 
-                const bewit = Browser.client.bewit('https://example.com:8043/somewhere/over/the/rainbow', { credentials: credentials, ttlSec: 300, localtimeOffsetMsec: 1356420407232 - Hawk.utils.now(), ext: 'xandyandz' });
+                const bewit = Browser.client.bewit('https://example.com:8043/somewhere/over/the/rainbow', { credentials, ttlSec: 300, localtimeOffsetMsec: 1356420407232 - Hawk.utils.now(), ext: 'xandyandz' });
                 expect(bewit).to.equal('MTIzNDU2XDEzNTY0MjA3MDdcL2t4UjhwK0xSaTdvQTRnUXc3cWlxa3BiVHRKYkR4OEtRMC9HRUwvVytTUT1ceGFuZHlhbmR6');
                 done();
             });
@@ -822,7 +822,7 @@ describe('Browser', () => {
                     algorithm: 'sha256'
                 };
 
-                const bewit = Browser.client.bewit('https://example.com/somewhere/over/the/rainbow', { credentials: credentials, ttlSec: 300, localtimeOffsetMsec: 1356420407232 - Hawk.utils.now(), ext: null });
+                const bewit = Browser.client.bewit('https://example.com/somewhere/over/the/rainbow', { credentials, ttlSec: 300, localtimeOffsetMsec: 1356420407232 - Hawk.utils.now(), ext: null });
                 expect(bewit).to.equal('MTIzNDU2XDEzNTY0MjA3MDdcSUdZbUxnSXFMckNlOEN4dktQczRKbFdJQStValdKSm91d2dBUmlWaENBZz1c');
                 done();
             });
@@ -842,7 +842,7 @@ describe('Browser', () => {
                     algorithm: 'sha256'
                 };
 
-                const bewit = Browser.client.bewit('', { credentials: credentials, ttlSec: 300, localtimeOffsetMsec: 1356420407232 - Hawk.utils.now(), ext: 'xandyandz' });
+                const bewit = Browser.client.bewit('', { credentials, ttlSec: 300, localtimeOffsetMsec: 1356420407232 - Hawk.utils.now(), ext: 'xandyandz' });
                 expect(bewit).to.equal('');
                 done();
             });
@@ -855,7 +855,7 @@ describe('Browser', () => {
                     algorithm: 'sha256'
                 };
 
-                const bewit = Browser.client.bewit(5, { credentials: credentials, ttlSec: 300, localtimeOffsetMsec: 1356420407232 - Hawk.utils.now(), ext: 'xandyandz' });
+                const bewit = Browser.client.bewit(5, { credentials, ttlSec: 300, localtimeOffsetMsec: 1356420407232 - Hawk.utils.now(), ext: 'xandyandz' });
                 expect(bewit).to.equal('');
                 done();
             });
@@ -867,7 +867,7 @@ describe('Browser', () => {
                     algorithm: 'sha256'
                 };
 
-                const bewit = Browser.client.bewit('https://example.com/somewhere/over/the/rainbow', { credentials: credentials, ttlSec: 3000, ext: 'xandyandz' });
+                const bewit = Browser.client.bewit('https://example.com/somewhere/over/the/rainbow', { credentials, ttlSec: 3000, ext: 'xandyandz' });
                 expect(bewit).to.equal('');
                 done();
             });
@@ -886,7 +886,7 @@ describe('Browser', () => {
                     algorithm: 'sha256'
                 };
 
-                const bewit = Browser.client.bewit('https://example.com/somewhere/over/the/rainbow', { credentials: credentials, ttlSec: 3000, ext: 'xandyandz' });
+                const bewit = Browser.client.bewit('https://example.com/somewhere/over/the/rainbow', { credentials, ttlSec: 3000, ext: 'xandyandz' });
                 expect(bewit).to.equal('');
                 done();
             });
@@ -899,7 +899,7 @@ describe('Browser', () => {
                     algorithm: 'hmac-sha-0'
                 };
 
-                const bewit = Browser.client.bewit('https://example.com/somewhere/over/the/rainbow', { credentials: credentials, ttlSec: 300, ext: 'xandyandz' });
+                const bewit = Browser.client.bewit('https://example.com/somewhere/over/the/rainbow', { credentials, ttlSec: 300, ext: 'xandyandz' });
                 expect(bewit).to.equal('');
                 done();
             });
@@ -931,7 +931,7 @@ describe('Browser', () => {
 
                     expect(err).to.not.exist();
 
-                    const reqHeader = Browser.client.header('http://example.com:8080/resource/4?filter=a', req.method, { credentials: credentials1, ext: 'some-app-data', payload: payload, contentType: req.headers['content-type'] });
+                    const reqHeader = Browser.client.header('http://example.com:8080/resource/4?filter=a', req.method, { credentials: credentials1, ext: 'some-app-data', payload, contentType: req.headers['content-type'] });
                     req.headers.authorization = reqHeader.field;
 
                     Hawk.server.authenticate(req, credentialsFunc, {}, (err, credentials2, artifacts) => {
@@ -977,7 +977,7 @@ describe('Browser', () => {
 
                     expect(err).to.not.exist();
 
-                    const reqHeader = Browser.client.header('http://example.com:8080/resource/4?filter=a', req.method, { credentials: credentials1, ext: 'some-app-data', payload: payload, contentType: req.headers['content-type'] });
+                    const reqHeader = Browser.client.header('http://example.com:8080/resource/4?filter=a', req.method, { credentials: credentials1, ext: 'some-app-data', payload, contentType: req.headers['content-type'] });
                     req.headers.authorization = reqHeader.field;
 
                     Hawk.server.authenticate(req, credentialsFunc, {}, (err, credentials2, artifacts) => {
@@ -1023,7 +1023,7 @@ describe('Browser', () => {
 
                     expect(err).to.not.exist();
 
-                    const reqHeader = Browser.client.header('http://example.com:8080/resource/4?filter=a', req.method, { credentials: credentials1, ext: 'some-app-data', payload: payload, contentType: req.headers['content-type'] });
+                    const reqHeader = Browser.client.header('http://example.com:8080/resource/4?filter=a', req.method, { credentials: credentials1, ext: 'some-app-data', payload, contentType: req.headers['content-type'] });
                     req.headers.authorization = reqHeader.field;
 
                     Hawk.server.authenticate(req, credentialsFunc, {}, (err, credentials2, artifacts) => {
@@ -1065,7 +1065,7 @@ describe('Browser', () => {
 
                     expect(err).to.not.exist();
 
-                    const reqHeader = Browser.client.header('http://example.com:8080/resource/4?filter=a', req.method, { credentials: credentials1, ext: 'some-app-data', payload: payload, contentType: req.headers['content-type'] });
+                    const reqHeader = Browser.client.header('http://example.com:8080/resource/4?filter=a', req.method, { credentials: credentials1, ext: 'some-app-data', payload, contentType: req.headers['content-type'] });
                     req.headers.authorization = reqHeader.field;
 
                     Hawk.server.authenticate(req, credentialsFunc, {}, (err, credentials2, artifacts) => {
@@ -1284,7 +1284,7 @@ describe('Browser', () => {
 
                     expect(err).to.not.exist();
 
-                    const auth = Browser.client.message('example.com', 8080, 'some message', { credentials: credentials, nonce: 'abc123', timestamp: 1398536270957 });
+                    const auth = Browser.client.message('example.com', 8080, 'some message', { credentials, nonce: 'abc123', timestamp: 1398536270957 });
                     expect(auth).to.exist();
                     expect(auth.nonce).to.equal('abc123');
                     expect(auth.ts).to.equal(1398536270957);
@@ -1298,7 +1298,7 @@ describe('Browser', () => {
 
                     expect(err).to.not.exist();
 
-                    const auth = Browser.client.message(null, 8080, 'some message', { credentials: credentials });
+                    const auth = Browser.client.message(null, 8080, 'some message', { credentials });
                     expect(auth).to.not.exist();
                     done();
                 });
@@ -1310,7 +1310,7 @@ describe('Browser', () => {
 
                     expect(err).to.not.exist();
 
-                    const auth = Browser.client.message(5, 8080, 'some message', { credentials: credentials });
+                    const auth = Browser.client.message(5, 8080, 'some message', { credentials });
                     expect(auth).to.not.exist();
                     done();
                 });
@@ -1322,7 +1322,7 @@ describe('Browser', () => {
 
                     expect(err).to.not.exist();
 
-                    const auth = Browser.client.message('example.com', 0, 'some message', { credentials: credentials });
+                    const auth = Browser.client.message('example.com', 0, 'some message', { credentials });
                     expect(auth).to.not.exist();
                     done();
                 });
@@ -1334,7 +1334,7 @@ describe('Browser', () => {
 
                     expect(err).to.not.exist();
 
-                    const auth = Browser.client.message('example.com', 'a', 'some message', { credentials: credentials });
+                    const auth = Browser.client.message('example.com', 'a', 'some message', { credentials });
                     expect(auth).to.not.exist();
                     done();
                 });
@@ -1346,7 +1346,7 @@ describe('Browser', () => {
 
                     expect(err).to.not.exist();
 
-                    const auth = Browser.client.message('example.com', 8080, undefined, { credentials: credentials });
+                    const auth = Browser.client.message('example.com', 8080, undefined, { credentials });
                     expect(auth).to.not.exist();
                     done();
                 });
@@ -1358,7 +1358,7 @@ describe('Browser', () => {
 
                     expect(err).to.not.exist();
 
-                    const auth = Browser.client.message('example.com', 8080, null, { credentials: credentials });
+                    const auth = Browser.client.message('example.com', 8080, null, { credentials });
                     expect(auth).to.not.exist();
                     done();
                 });
@@ -1370,7 +1370,7 @@ describe('Browser', () => {
 
                     expect(err).to.not.exist();
 
-                    const auth = Browser.client.message('example.com', 8080, 5, { credentials: credentials });
+                    const auth = Browser.client.message('example.com', 8080, 5, { credentials });
                     expect(auth).to.not.exist();
                     done();
                 });

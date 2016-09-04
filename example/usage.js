@@ -38,7 +38,7 @@ const handler = function (req, res) {
         const payload = (!err ? 'Hello ' + credentials.user + ' ' + artifacts.ext : 'Shoosh!');
         const headers = {
             'Content-Type': 'text/plain',
-            'Server-Authorization': Hawk.server.header(credentials, artifacts, { payload: payload, contentType: 'text/plain' })
+            'Server-Authorization': Hawk.server.header(credentials, artifacts, { payload, contentType: 'text/plain' })
         };
 
         res.writeHead(!err ? 200 : 401, headers);
@@ -69,7 +69,7 @@ credentialsFunc('dh37fgj492je', (err, credentials) => {
         process.exit(1);
     }
 
-    const header = Hawk.client.header('http://127.0.0.1:8000/resource/1?b=1&a=2', 'GET', { credentials: credentials, ext: 'and welcome!' });
+    const header = Hawk.client.header('http://127.0.0.1:8000/resource/1?b=1&a=2', 'GET', { credentials, ext: 'and welcome!' });
     const options = {
         uri: 'http://127.0.0.1:8000/resource/1?b=1&a=2',
         method: 'GET',

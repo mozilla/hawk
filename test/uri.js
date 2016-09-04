@@ -27,7 +27,7 @@ describe('Uri', () => {
     const credentialsFunc = function (id, callback) {
 
         const credentials = {
-            id: id,
+            id,
             key: 'werxhqb98rpaxn39848xrunpaw3489ruxnpa98w4rxn',
             algorithm: (id === '1' ? 'sha1' : 'sha256'),
             user: 'steve'
@@ -181,7 +181,7 @@ describe('Uri', () => {
                 resource: req.url,
                 host: req.host,
                 port: req.port,
-                ext: ext
+                ext
             });
 
             const bewit = credentials1.id + '\\' + exp + '\\' + mac + '\\' + ext;
@@ -468,7 +468,7 @@ describe('Uri', () => {
                 algorithm: 'sha256'
             };
 
-            const bewit = Hawk.uri.getBewit('https://example.com/somewhere/over/the/rainbow', { credentials: credentials, ttlSec: 300, localtimeOffsetMsec: 1356420407232 - Hawk.utils.now(), ext: 'xandyandz' });
+            const bewit = Hawk.uri.getBewit('https://example.com/somewhere/over/the/rainbow', { credentials, ttlSec: 300, localtimeOffsetMsec: 1356420407232 - Hawk.utils.now(), ext: 'xandyandz' });
             expect(bewit).to.equal('MTIzNDU2XDEzNTY0MjA3MDdca3NjeHdOUjJ0SnBQMVQxekRMTlBiQjVVaUtJVTl0T1NKWFRVZEc3WDloOD1ceGFuZHlhbmR6');
             done();
         });
@@ -481,7 +481,7 @@ describe('Uri', () => {
                 algorithm: 'sha256'
             };
 
-            const bewit = Hawk.uri.getBewit('https://example.com:8080/somewhere/over/the/rainbow', { credentials: credentials, ttlSec: 300, localtimeOffsetMsec: 1356420407232 - Hawk.utils.now(), ext: 'xandyandz' });
+            const bewit = Hawk.uri.getBewit('https://example.com:8080/somewhere/over/the/rainbow', { credentials, ttlSec: 300, localtimeOffsetMsec: 1356420407232 - Hawk.utils.now(), ext: 'xandyandz' });
             expect(bewit).to.equal('MTIzNDU2XDEzNTY0MjA3MDdcaFpiSjNQMmNLRW80a3kwQzhqa1pBa1J5Q1p1ZWc0V1NOYnhWN3ZxM3hIVT1ceGFuZHlhbmR6');
             done();
         });
@@ -494,7 +494,7 @@ describe('Uri', () => {
                 algorithm: 'sha256'
             };
 
-            const bewit = Hawk.uri.getBewit('https://example.com/somewhere/over/the/rainbow', { credentials: credentials, ttlSec: 300, localtimeOffsetMsec: 1356420407232 - Hawk.utils.now(), ext: null });
+            const bewit = Hawk.uri.getBewit('https://example.com/somewhere/over/the/rainbow', { credentials, ttlSec: 300, localtimeOffsetMsec: 1356420407232 - Hawk.utils.now(), ext: null });
             expect(bewit).to.equal('MTIzNDU2XDEzNTY0MjA3MDdcSUdZbUxnSXFMckNlOEN4dktQczRKbFdJQStValdKSm91d2dBUmlWaENBZz1c');
             done();
         });
@@ -507,7 +507,7 @@ describe('Uri', () => {
                 algorithm: 'sha256'
             };
 
-            const bewit = Hawk.uri.getBewit(Url.parse('https://example.com/somewhere/over/the/rainbow'), { credentials: credentials, ttlSec: 300, localtimeOffsetMsec: 1356420407232 - Hawk.utils.now(), ext: 'xandyandz' });
+            const bewit = Hawk.uri.getBewit(Url.parse('https://example.com/somewhere/over/the/rainbow'), { credentials, ttlSec: 300, localtimeOffsetMsec: 1356420407232 - Hawk.utils.now(), ext: 'xandyandz' });
             expect(bewit).to.equal('MTIzNDU2XDEzNTY0MjA3MDdca3NjeHdOUjJ0SnBQMVQxekRMTlBiQjVVaUtJVTl0T1NKWFRVZEc3WDloOD1ceGFuZHlhbmR6');
             done();
         });
@@ -527,7 +527,7 @@ describe('Uri', () => {
                 algorithm: 'sha256'
             };
 
-            const bewit = Hawk.uri.getBewit('', { credentials: credentials, ttlSec: 300, localtimeOffsetMsec: 1356420407232 - Hawk.utils.now(), ext: 'xandyandz' });
+            const bewit = Hawk.uri.getBewit('', { credentials, ttlSec: 300, localtimeOffsetMsec: 1356420407232 - Hawk.utils.now(), ext: 'xandyandz' });
             expect(bewit).to.equal('');
             done();
         });
@@ -540,7 +540,7 @@ describe('Uri', () => {
                 algorithm: 'sha256'
             };
 
-            const bewit = Hawk.uri.getBewit(5, { credentials: credentials, ttlSec: 300, localtimeOffsetMsec: 1356420407232 - Hawk.utils.now(), ext: 'xandyandz' });
+            const bewit = Hawk.uri.getBewit(5, { credentials, ttlSec: 300, localtimeOffsetMsec: 1356420407232 - Hawk.utils.now(), ext: 'xandyandz' });
             expect(bewit).to.equal('');
             done();
         });
@@ -552,7 +552,7 @@ describe('Uri', () => {
                 algorithm: 'sha256'
             };
 
-            const bewit = Hawk.uri.getBewit('https://example.com/somewhere/over/the/rainbow', { credentials: credentials, ttlSec: 3000, ext: 'xandyandz' });
+            const bewit = Hawk.uri.getBewit('https://example.com/somewhere/over/the/rainbow', { credentials, ttlSec: 3000, ext: 'xandyandz' });
             expect(bewit).to.equal('');
             done();
         });
@@ -571,7 +571,7 @@ describe('Uri', () => {
                 algorithm: 'sha256'
             };
 
-            const bewit = Hawk.uri.getBewit('https://example.com/somewhere/over/the/rainbow', { credentials: credentials, ttlSec: 3000, ext: 'xandyandz' });
+            const bewit = Hawk.uri.getBewit('https://example.com/somewhere/over/the/rainbow', { credentials, ttlSec: 3000, ext: 'xandyandz' });
             expect(bewit).to.equal('');
             done();
         });
@@ -584,7 +584,7 @@ describe('Uri', () => {
                 algorithm: 'hmac-sha-0'
             };
 
-            const bewit = Hawk.uri.getBewit('https://example.com/somewhere/over/the/rainbow', { credentials: credentials, ttlSec: 300, ext: 'xandyandz' });
+            const bewit = Hawk.uri.getBewit('https://example.com/somewhere/over/the/rainbow', { credentials, ttlSec: 300, ext: 'xandyandz' });
             expect(bewit).to.equal('');
             done();
         });
