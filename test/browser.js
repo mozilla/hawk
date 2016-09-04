@@ -36,735 +36,484 @@ describe('Browser', () => {
         return callback(null, credentials);
     };
 
-    it('should generate a bewit then successfully authenticate it', (done) => {
-
-        const req = {
-            method: 'GET',
-            url: '/resource/4?a=1&b=2',
-            host: 'example.com',
-            port: 80
-        };
-
-        credentialsFunc('123456', (err, credentials1) => {
-
-            expect(err).to.not.exist();
-
-            const bewit = Browser.client.bewit('http://example.com/resource/4?a=1&b=2', { credentials: credentials1, ttlSec: 60 * 60 * 24 * 365 * 100, ext: 'some-app-data' });
-            req.url += '&bewit=' + bewit;
-
-            Hawk.uri.authenticate(req, credentialsFunc, {}, (err, credentials2, attributes) => {
-
-                expect(err).to.not.exist();
-                expect(credentials2.user).to.equal('steve');
-                expect(attributes.ext).to.equal('some-app-data');
-                done();
-            });
-        });
-    });
-
-    it('should generate a bewit then successfully authenticate it (no ext)', (done) => {
-
-        const req = {
-            method: 'GET',
-            url: '/resource/4?a=1&b=2',
-            host: 'example.com',
-            port: 80
-        };
-
-        credentialsFunc('123456', (err, credentials1) => {
-
-            expect(err).to.not.exist();
-
-            const bewit = Browser.client.bewit('http://example.com/resource/4?a=1&b=2', { credentials: credentials1, ttlSec: 60 * 60 * 24 * 365 * 100 });
-            req.url += '&bewit=' + bewit;
-
-            Hawk.uri.authenticate(req, credentialsFunc, {}, (err, credentials2, attributes) => {
-
-                expect(err).to.not.exist();
-                expect(credentials2.user).to.equal('steve');
-                done();
-            });
-        });
-    });
-
-    describe('bewit()', () => {
-
-        it('returns a valid bewit value', (done) => {
-
-            const credentials = {
-                id: '123456',
-                key: '2983d45yun89q',
-                algorithm: 'sha256'
-            };
-
-            const bewit = Browser.client.bewit('https://example.com/somewhere/over/the/rainbow', { credentials: credentials, ttlSec: 300, localtimeOffsetMsec: 1356420407232 - Hawk.utils.now(), ext: 'xandyandz' });
-            expect(bewit).to.equal('MTIzNDU2XDEzNTY0MjA3MDdca3NjeHdOUjJ0SnBQMVQxekRMTlBiQjVVaUtJVTl0T1NKWFRVZEc3WDloOD1ceGFuZHlhbmR6');
-            done();
-        });
-
-        it('returns a valid bewit value (explicit HTTP port)', (done) => {
-
-            const credentials = {
-                id: '123456',
-                key: '2983d45yun89q',
-                algorithm: 'sha256'
-            };
-
-            const bewit = Browser.client.bewit('http://example.com:8080/somewhere/over/the/rainbow', { credentials: credentials, ttlSec: 300, localtimeOffsetMsec: 1356420407232 - Hawk.utils.now(), ext: 'xandyandz' });
-            expect(bewit).to.equal('MTIzNDU2XDEzNTY0MjA3MDdcaFpiSjNQMmNLRW80a3kwQzhqa1pBa1J5Q1p1ZWc0V1NOYnhWN3ZxM3hIVT1ceGFuZHlhbmR6');
-            done();
-        });
-
-        it('returns a valid bewit value (explicit HTTPS port)', (done) => {
-
-            const credentials = {
-                id: '123456',
-                key: '2983d45yun89q',
-                algorithm: 'sha256'
-            };
-
-            const bewit = Browser.client.bewit('https://example.com:8043/somewhere/over/the/rainbow', { credentials: credentials, ttlSec: 300, localtimeOffsetMsec: 1356420407232 - Hawk.utils.now(), ext: 'xandyandz' });
-            expect(bewit).to.equal('MTIzNDU2XDEzNTY0MjA3MDdcL2t4UjhwK0xSaTdvQTRnUXc3cWlxa3BiVHRKYkR4OEtRMC9HRUwvVytTUT1ceGFuZHlhbmR6');
-            done();
-        });
-
-        it('returns a valid bewit value (null ext)', (done) => {
-
-            const credentials = {
-                id: '123456',
-                key: '2983d45yun89q',
-                algorithm: 'sha256'
-            };
-
-            const bewit = Browser.client.bewit('https://example.com/somewhere/over/the/rainbow', { credentials: credentials, ttlSec: 300, localtimeOffsetMsec: 1356420407232 - Hawk.utils.now(), ext: null });
-            expect(bewit).to.equal('MTIzNDU2XDEzNTY0MjA3MDdcSUdZbUxnSXFMckNlOEN4dktQczRKbFdJQStValdKSm91d2dBUmlWaENBZz1c');
-            done();
-        });
-
-        it('errors on invalid options', (done) => {
-
-            const bewit = Browser.client.bewit('https://example.com/somewhere/over/the/rainbow', 4);
-            expect(bewit).to.equal('');
-            done();
-        });
-
-        it('errors on missing uri', (done) => {
-
-            const credentials = {
-                id: '123456',
-                key: '2983d45yun89q',
-                algorithm: 'sha256'
-            };
-
-            const bewit = Browser.client.bewit('', { credentials: credentials, ttlSec: 300, localtimeOffsetMsec: 1356420407232 - Hawk.utils.now(), ext: 'xandyandz' });
-            expect(bewit).to.equal('');
-            done();
-        });
-
-        it('errors on invalid uri', (done) => {
-
-            const credentials = {
-                id: '123456',
-                key: '2983d45yun89q',
-                algorithm: 'sha256'
-            };
-
-            const bewit = Browser.client.bewit(5, { credentials: credentials, ttlSec: 300, localtimeOffsetMsec: 1356420407232 - Hawk.utils.now(), ext: 'xandyandz' });
-            expect(bewit).to.equal('');
-            done();
-        });
-
-        it('errors on invalid credentials (id)', (done) => {
-
-            const credentials = {
-                key: '2983d45yun89q',
-                algorithm: 'sha256'
-            };
-
-            const bewit = Browser.client.bewit('https://example.com/somewhere/over/the/rainbow', { credentials: credentials, ttlSec: 3000, ext: 'xandyandz' });
-            expect(bewit).to.equal('');
-            done();
-        });
-
-        it('errors on missing credentials', (done) => {
-
-            const bewit = Browser.client.bewit('https://example.com/somewhere/over/the/rainbow', { ttlSec: 3000, ext: 'xandyandz' });
-            expect(bewit).to.equal('');
-            done();
-        });
-
-        it('errors on invalid credentials (key)', (done) => {
-
-            const credentials = {
-                id: '123456',
-                algorithm: 'sha256'
-            };
-
-            const bewit = Browser.client.bewit('https://example.com/somewhere/over/the/rainbow', { credentials: credentials, ttlSec: 3000, ext: 'xandyandz' });
-            expect(bewit).to.equal('');
-            done();
-        });
-
-        it('errors on invalid algorithm', (done) => {
-
-            const credentials = {
-                id: '123456',
-                key: '2983d45yun89q',
-                algorithm: 'hmac-sha-0'
-            };
-
-            const bewit = Browser.client.bewit('https://example.com/somewhere/over/the/rainbow', { credentials: credentials, ttlSec: 300, ext: 'xandyandz' });
-            expect(bewit).to.equal('');
-            done();
-        });
-
-        it('errors on missing options', (done) => {
-
-            const bewit = Browser.client.bewit('https://example.com/somewhere/over/the/rainbow');
-            expect(bewit).to.equal('');
-            done();
-        });
-    });
-
-    it('generates a header then successfully parse it (configuration)', (done) => {
-
-        const req = {
-            method: 'GET',
-            url: '/resource/4?filter=a',
-            host: 'example.com',
-            port: 8080
-        };
-
-        credentialsFunc('123456', (err, credentials1) => {
-
-            expect(err).to.not.exist();
-
-            req.authorization = Browser.client.header('http://example.com:8080/resource/4?filter=a', req.method, { credentials: credentials1, ext: 'some-app-data' }).field;
-            expect(req.authorization).to.exist();
-
-            Hawk.server.authenticate(req, credentialsFunc, {}, (err, credentials2, artifacts) => {
-
-                expect(err).to.not.exist();
-                expect(credentials2.user).to.equal('steve');
-                expect(artifacts.ext).to.equal('some-app-data');
-                done();
-            });
-        });
-    });
-
-    it('generates a header then successfully parse it (node request)', (done) => {
-
-        const req = {
-            method: 'POST',
-            url: '/resource/4?filter=a',
-            headers: {
-                host: 'example.com:8080',
-                'content-type': 'text/plain;x=y'
-            }
-        };
-
-        const payload = 'some not so random text';
-
-        credentialsFunc('123456', (err, credentials1) => {
-
-            expect(err).to.not.exist();
-
-            const reqHeader = Browser.client.header('http://example.com:8080/resource/4?filter=a', req.method, { credentials: credentials1, ext: 'some-app-data', payload: payload, contentType: req.headers['content-type'] });
-            req.headers.authorization = reqHeader.field;
-
-            Hawk.server.authenticate(req, credentialsFunc, {}, (err, credentials2, artifacts) => {
-
-                expect(err).to.not.exist();
-                expect(credentials2.user).to.equal('steve');
-                expect(artifacts.ext).to.equal('some-app-data');
-                expect(Hawk.server.authenticatePayload(payload, credentials2, artifacts, req.headers['content-type'])).to.equal(true);
-
-                const res = {
-                    headers: {
-                        'content-type': 'text/plain'
-                    },
-                    getResponseHeader: function (header) {
-
-                        return res.headers[header.toLowerCase()];
-                    }
-                };
-
-                res.headers['server-authorization'] = Hawk.server.header(credentials2, artifacts, { payload: 'some reply', contentType: 'text/plain', ext: 'response-specific' });
-                expect(res.headers['server-authorization']).to.exist();
-
-                expect(Browser.client.authenticate(res, credentials2, artifacts, { payload: 'some reply' })).to.equal(true);
-                done();
-            });
-        });
-    });
-
-    it('generates a header then successfully parse it (browserify)', (done) => {
-
-        const req = {
-            method: 'POST',
-            url: '/resource/4?filter=a',
-            headers: {
-                host: 'example.com:8080',
-                'content-type': 'text/plain;x=y'
-            }
-        };
-
-        const payload = 'some not so random text';
-
-        credentialsFunc('123456', (err, credentials1) => {
-
-            expect(err).to.not.exist();
-
-            const reqHeader = Browser.client.header('http://example.com:8080/resource/4?filter=a', req.method, { credentials: credentials1, ext: 'some-app-data', payload: payload, contentType: req.headers['content-type'] });
-            req.headers.authorization = reqHeader.field;
-
-            Hawk.server.authenticate(req, credentialsFunc, {}, (err, credentials2, artifacts) => {
-
-                expect(err).to.not.exist();
-                expect(credentials2.user).to.equal('steve');
-                expect(artifacts.ext).to.equal('some-app-data');
-                expect(Hawk.server.authenticatePayload(payload, credentials2, artifacts, req.headers['content-type'])).to.equal(true);
-
-                const res = {
-                    headers: {
-                        'content-type': 'text/plain'
-                    },
-                    getHeader: function (header) {
-
-                        return res.headers[header.toLowerCase()];
-                    }
-                };
-
-                res.headers['server-authorization'] = Hawk.server.header(credentials2, artifacts, { payload: 'some reply', contentType: 'text/plain', ext: 'response-specific' });
-                expect(res.headers['server-authorization']).to.exist();
-
-                expect(Browser.client.authenticate(res, credentials2, artifacts, { payload: 'some reply' })).to.equal(true);
-                done();
-            });
-        });
-    });
-
-    it('generates a header then successfully parse it (time offset)', (done) => {
-
-        const req = {
-            method: 'GET',
-            url: '/resource/4?filter=a',
-            host: 'example.com',
-            port: 8080
-        };
-
-        credentialsFunc('123456', (err, credentials1) => {
-
-            expect(err).to.not.exist();
-
-            req.authorization = Browser.client.header('http://example.com:8080/resource/4?filter=a', req.method, { credentials: credentials1, ext: 'some-app-data', localtimeOffsetMsec: 100000 }).field;
-            expect(req.authorization).to.exist();
-
-            Hawk.server.authenticate(req, credentialsFunc, { localtimeOffsetMsec: 100000 }, (err, credentials2, artifacts) => {
-
-                expect(err).to.not.exist();
-                expect(credentials2.user).to.equal('steve');
-                expect(artifacts.ext).to.equal('some-app-data');
-                done();
-            });
-        });
-    });
-
-    it('generates a header then successfully parse it (no server header options)', (done) => {
-
-        const req = {
-            method: 'POST',
-            url: '/resource/4?filter=a',
-            headers: {
-                host: 'example.com:8080',
-                'content-type': 'text/plain;x=y'
-            }
-        };
-
-        const payload = 'some not so random text';
-
-        credentialsFunc('123456', (err, credentials1) => {
-
-            expect(err).to.not.exist();
-
-            const reqHeader = Browser.client.header('http://example.com:8080/resource/4?filter=a', req.method, { credentials: credentials1, ext: 'some-app-data', payload: payload, contentType: req.headers['content-type'] });
-            req.headers.authorization = reqHeader.field;
-
-            Hawk.server.authenticate(req, credentialsFunc, {}, (err, credentials2, artifacts) => {
-
-                expect(err).to.not.exist();
-                expect(credentials2.user).to.equal('steve');
-                expect(artifacts.ext).to.equal('some-app-data');
-                expect(Hawk.server.authenticatePayload(payload, credentials2, artifacts, req.headers['content-type'])).to.equal(true);
-
-                const res = {
-                    headers: {
-                        'content-type': 'text/plain'
-                    },
-                    getResponseHeader: function (header) {
-
-                        return res.headers[header.toLowerCase()];
-                    }
-                };
-
-                res.headers['server-authorization'] = Hawk.server.header(credentials2, artifacts);
-                expect(res.headers['server-authorization']).to.exist();
-
-                expect(Browser.client.authenticate(res, credentials2, artifacts)).to.equal(true);
-                done();
-            });
-        });
-    });
-
-    it('generates a header then successfully parse it (no server header)', (done) => {
-
-        const req = {
-            method: 'POST',
-            url: '/resource/4?filter=a',
-            headers: {
-                host: 'example.com:8080',
-                'content-type': 'text/plain;x=y'
-            }
-        };
-
-        const payload = 'some not so random text';
-
-        credentialsFunc('123456', (err, credentials1) => {
-
-            expect(err).to.not.exist();
-
-            const reqHeader = Browser.client.header('http://example.com:8080/resource/4?filter=a', req.method, { credentials: credentials1, ext: 'some-app-data', payload: payload, contentType: req.headers['content-type'] });
-            req.headers.authorization = reqHeader.field;
-
-            Hawk.server.authenticate(req, credentialsFunc, {}, (err, credentials2, artifacts) => {
-
-                expect(err).to.not.exist();
-                expect(credentials2.user).to.equal('steve');
-                expect(artifacts.ext).to.equal('some-app-data');
-                expect(Hawk.server.authenticatePayload(payload, credentials2, artifacts, req.headers['content-type'])).to.equal(true);
-
-                const res = {
-                    headers: {
-                        'content-type': 'text/plain'
-                    },
-                    getResponseHeader: function (header) {
-
-                        return res.headers[header.toLowerCase()];
-                    }
-                };
-
-                expect(Browser.client.authenticate(res, credentials2, artifacts)).to.equal(true);
-                done();
-            });
-        });
-    });
-
-    it('generates a header with stale ts and successfully authenticate on second call', (done) => {
-
-        const req = {
-            method: 'GET',
-            url: '/resource/4?filter=a',
-            host: 'example.com',
-            port: 8080
-        };
-
-        credentialsFunc('123456', (err, credentials1) => {
-
-            expect(err).to.not.exist();
-
-            Browser.utils.setNtpSecOffset(60 * 60 * 1000);
-            const header = Browser.client.header('http://example.com:8080/resource/4?filter=a', req.method, { credentials: credentials1, ext: 'some-app-data' });
-            req.authorization = header.field;
-            expect(req.authorization).to.exist();
-
-            Hawk.server.authenticate(req, credentialsFunc, {}, (err, credentials2, artifacts2) => {
-
-                expect(err).to.exist();
-                expect(err.message).to.equal('Stale timestamp');
-
-                const res = {
-                    headers: {
-                        'www-authenticate': err.output.headers['WWW-Authenticate']
-                    },
-                    getResponseHeader: function (lookup) {
-
-                        return res.headers[lookup.toLowerCase()];
-                    }
-                };
-
-                expect(Browser.utils.getNtpSecOffset()).to.equal(60 * 60 * 1000);
-                expect(Browser.client.authenticate(res, credentials2, header.artifacts)).to.equal(true);
-                expect(Browser.utils.getNtpSecOffset()).to.equal(0);
-
-                req.authorization = Browser.client.header('http://example.com:8080/resource/4?filter=a', req.method, { credentials: credentials2, ext: 'some-app-data' }).field;
-                expect(req.authorization).to.exist();
-
-                Hawk.server.authenticate(req, credentialsFunc, {}, (err, credentials3, artifacts3) => {
-
-                    expect(err).to.not.exist();
-                    expect(credentials3.user).to.equal('steve');
-                    expect(artifacts3.ext).to.equal('some-app-data');
-                    done();
-                });
-            });
-        });
-    });
-
-    it('generates a header with stale ts and successfully authenticate on second call (manual localStorage)', (done) => {
-
-        const req = {
-            method: 'GET',
-            url: '/resource/4?filter=a',
-            host: 'example.com',
-            port: 8080
-        };
-
-        credentialsFunc('123456', (err, credentials1) => {
-
-            expect(err).to.not.exist();
-
-            const localStorage = new Browser.internals.LocalStorage();
-
-            Browser.utils.setStorage(localStorage);
-
-            Browser.utils.setNtpSecOffset(60 * 60 * 1000);
-            const header = Browser.client.header('http://example.com:8080/resource/4?filter=a', req.method, { credentials: credentials1, ext: 'some-app-data' });
-            req.authorization = header.field;
-            expect(req.authorization).to.exist();
-
-            Hawk.server.authenticate(req, credentialsFunc, {}, (err, credentials2, artifacts2) => {
-
-                expect(err).to.exist();
-                expect(err.message).to.equal('Stale timestamp');
-
-                const res = {
-                    headers: {
-                        'www-authenticate': err.output.headers['WWW-Authenticate']
-                    },
-                    getResponseHeader: function (lookup) {
-
-                        return res.headers[lookup.toLowerCase()];
-                    }
-                };
-
-                expect(parseInt(localStorage.getItem('hawk_ntp_offset'))).to.equal(60 * 60 * 1000);
-                expect(Browser.utils.getNtpSecOffset()).to.equal(60 * 60 * 1000);
-                expect(Browser.client.authenticate(res, credentials2, header.artifacts)).to.equal(true);
-                expect(Browser.utils.getNtpSecOffset()).to.equal(0);
-                expect(parseInt(localStorage.getItem('hawk_ntp_offset'))).to.equal(0);
-
-                req.authorization = Browser.client.header('http://example.com:8080/resource/4?filter=a', req.method, { credentials: credentials2, ext: 'some-app-data' }).field;
-                expect(req.authorization).to.exist();
-
-                Hawk.server.authenticate(req, credentialsFunc, {}, (err, credentials3, artifacts3) => {
-
-                    expect(err).to.not.exist();
-                    expect(credentials3.user).to.equal('steve');
-                    expect(artifacts3.ext).to.equal('some-app-data');
-                    done();
-                });
-            });
-        });
-    });
-
-    it('generates a header then fails to parse it (missing server header hash)', (done) => {
-
-        const req = {
-            method: 'POST',
-            url: '/resource/4?filter=a',
-            headers: {
-                host: 'example.com:8080',
-                'content-type': 'text/plain;x=y'
-            }
-        };
-
-        const payload = 'some not so random text';
-
-        credentialsFunc('123456', (err, credentials1) => {
-
-            expect(err).to.not.exist();
-
-            const reqHeader = Browser.client.header('http://example.com:8080/resource/4?filter=a', req.method, { credentials: credentials1, ext: 'some-app-data', payload: payload, contentType: req.headers['content-type'] });
-            req.headers.authorization = reqHeader.field;
-
-            Hawk.server.authenticate(req, credentialsFunc, {}, (err, credentials2, artifacts) => {
-
-                expect(err).to.not.exist();
-                expect(credentials2.user).to.equal('steve');
-                expect(artifacts.ext).to.equal('some-app-data');
-                expect(Hawk.server.authenticatePayload(payload, credentials2, artifacts, req.headers['content-type'])).to.equal(true);
-
-                const res = {
-                    headers: {
-                        'content-type': 'text/plain'
-                    },
-                    getResponseHeader: function (header) {
-
-                        return res.headers[header.toLowerCase()];
-                    }
-                };
-
-                res.headers['server-authorization'] = Hawk.server.header(credentials2, artifacts);
-                expect(res.headers['server-authorization']).to.exist();
-
-                expect(Browser.client.authenticate(res, credentials2, artifacts, { payload: 'some reply' })).to.equal(false);
-                done();
-            });
-        });
-    });
-
-    it('generates a header then successfully parse it (with hash)', (done) => {
-
-        const req = {
-            method: 'GET',
-            url: '/resource/4?filter=a',
-            host: 'example.com',
-            port: 8080
-        };
-
-        credentialsFunc('123456', (err, credentials1) => {
-
-            expect(err).to.not.exist();
-
-            req.authorization = Browser.client.header('http://example.com:8080/resource/4?filter=a', req.method, { credentials: credentials1, payload: 'hola!', ext: 'some-app-data' }).field;
-            Hawk.server.authenticate(req, credentialsFunc, {}, (err, credentials2, artifacts) => {
-
-                expect(err).to.not.exist();
-                expect(credentials2.user).to.equal('steve');
-                expect(artifacts.ext).to.equal('some-app-data');
-                done();
-            });
-        });
-    });
-
-    it('generates a header then successfully parse it then validate payload', (done) => {
-
-        const req = {
-            method: 'GET',
-            url: '/resource/4?filter=a',
-            host: 'example.com',
-            port: 8080
-        };
-
-        credentialsFunc('123456', (err, credentials1) => {
-
-            expect(err).to.not.exist();
-
-            req.authorization = Browser.client.header('http://example.com:8080/resource/4?filter=a', req.method, { credentials: credentials1, payload: 'hola!', ext: 'some-app-data' }).field;
-            Hawk.server.authenticate(req, credentialsFunc, {}, (err, credentials2, artifacts) => {
-
-                expect(err).to.not.exist();
-                expect(credentials2.user).to.equal('steve');
-                expect(artifacts.ext).to.equal('some-app-data');
-                expect(Hawk.server.authenticatePayload('hola!', credentials2, artifacts)).to.be.true();
-                expect(Hawk.server.authenticatePayload('hello!', credentials2, artifacts)).to.be.false();
-                done();
-            });
-        });
-    });
-
-    it('generates a header then successfully parse it (app)', (done) => {
-
-        const req = {
-            method: 'GET',
-            url: '/resource/4?filter=a',
-            host: 'example.com',
-            port: 8080
-        };
-
-        credentialsFunc('123456', (err, credentials1) => {
-
-            expect(err).to.not.exist();
-
-            req.authorization = Browser.client.header('http://example.com:8080/resource/4?filter=a', req.method, { credentials: credentials1, ext: 'some-app-data', app: 'asd23ased' }).field;
-            Hawk.server.authenticate(req, credentialsFunc, {}, (err, credentials2, artifacts) => {
-
-                expect(err).to.not.exist();
-                expect(credentials2.user).to.equal('steve');
-                expect(artifacts.ext).to.equal('some-app-data');
-                expect(artifacts.app).to.equal('asd23ased');
-                done();
-            });
-        });
-    });
-
-    it('generates a header then successfully parse it (app, dlg)', (done) => {
-
-        const req = {
-            method: 'GET',
-            url: '/resource/4?filter=a',
-            host: 'example.com',
-            port: 8080
-        };
-
-        credentialsFunc('123456', (err, credentials1) => {
-
-            expect(err).to.not.exist();
-
-            req.authorization = Browser.client.header('http://example.com:8080/resource/4?filter=a', req.method, { credentials: credentials1, ext: 'some-app-data', app: 'asd23ased', dlg: '23434szr3q4d' }).field;
-            Hawk.server.authenticate(req, credentialsFunc, {}, (err, credentials2, artifacts) => {
-
-                expect(err).to.not.exist();
-                expect(credentials2.user).to.equal('steve');
-                expect(artifacts.ext).to.equal('some-app-data');
-                expect(artifacts.app).to.equal('asd23ased');
-                expect(artifacts.dlg).to.equal('23434szr3q4d');
-                done();
-            });
-        });
-    });
-
-    it('generates a header then fail authentication due to bad hash', (done) => {
-
-        const req = {
-            method: 'GET',
-            url: '/resource/4?filter=a',
-            host: 'example.com',
-            port: 8080
-        };
-
-        credentialsFunc('123456', (err, credentials1) => {
-
-            expect(err).to.not.exist();
-
-            req.authorization = Browser.client.header('http://example.com:8080/resource/4?filter=a', req.method, { credentials: credentials1, payload: 'hola!', ext: 'some-app-data' }).field;
-            Hawk.server.authenticate(req, credentialsFunc, { payload: 'byebye!' }, (err, credentials2, artifacts) => {
-
-                expect(err).to.exist();
-                expect(err.output.payload.message).to.equal('Bad payload hash');
-                done();
-            });
-        });
-    });
-
-    it('generates a header for one resource then fail to authenticate another', (done) => {
-
-        const req = {
-            method: 'GET',
-            url: '/resource/4?filter=a',
-            host: 'example.com',
-            port: 8080
-        };
-
-        credentialsFunc('123456', (err, credentials1) => {
-
-            expect(err).to.not.exist();
-
-            req.authorization = Browser.client.header('http://example.com:8080/resource/4?filter=a', req.method, { credentials: credentials1, ext: 'some-app-data' }).field;
-            req.url = '/something/else';
-
-            Hawk.server.authenticate(req, credentialsFunc, {}, (err, credentials2, artifacts) => {
-
-                expect(err).to.exist();
-                expect(credentials2).to.exist();
-                done();
-            });
-        });
-    });
-
     describe('client', () => {
 
         describe('header()', () => {
+
+            it('generates a header then successfully parse it (configuration)', (done) => {
+
+                const req = {
+                    method: 'GET',
+                    url: '/resource/4?filter=a',
+                    host: 'example.com',
+                    port: 8080
+                };
+
+                credentialsFunc('123456', (err, credentials1) => {
+
+                    expect(err).to.not.exist();
+
+                    req.authorization = Browser.client.header('http://example.com:8080/resource/4?filter=a', req.method, { credentials: credentials1, ext: 'some-app-data' }).field;
+                    expect(req.authorization).to.exist();
+
+                    Hawk.server.authenticate(req, credentialsFunc, {}, (err, credentials2, artifacts) => {
+
+                        expect(err).to.not.exist();
+                        expect(credentials2.user).to.equal('steve');
+                        expect(artifacts.ext).to.equal('some-app-data');
+                        done();
+                    });
+                });
+            });
+
+            it('generates a header then successfully parse it (node request)', (done) => {
+
+                const req = {
+                    method: 'POST',
+                    url: '/resource/4?filter=a',
+                    headers: {
+                        host: 'example.com:8080',
+                        'content-type': 'text/plain;x=y'
+                    }
+                };
+
+                const payload = 'some not so random text';
+
+                credentialsFunc('123456', (err, credentials1) => {
+
+                    expect(err).to.not.exist();
+
+                    const reqHeader = Browser.client.header('http://example.com:8080/resource/4?filter=a', req.method, { credentials: credentials1, ext: 'some-app-data', payload: payload, contentType: req.headers['content-type'] });
+                    req.headers.authorization = reqHeader.field;
+
+                    Hawk.server.authenticate(req, credentialsFunc, {}, (err, credentials2, artifacts) => {
+
+                        expect(err).to.not.exist();
+                        expect(credentials2.user).to.equal('steve');
+                        expect(artifacts.ext).to.equal('some-app-data');
+                        expect(Hawk.server.authenticatePayload(payload, credentials2, artifacts, req.headers['content-type'])).to.equal(true);
+                        done();
+                    });
+                });
+            });
+
+            it('generates a header then successfully parse it (time offset)', (done) => {
+
+                const req = {
+                    method: 'GET',
+                    url: '/resource/4?filter=a',
+                    host: 'example.com',
+                    port: 8080
+                };
+
+                credentialsFunc('123456', (err, credentials1) => {
+
+                    expect(err).to.not.exist();
+
+                    req.authorization = Browser.client.header('http://example.com:8080/resource/4?filter=a', req.method, { credentials: credentials1, ext: 'some-app-data', localtimeOffsetMsec: 100000 }).field;
+                    expect(req.authorization).to.exist();
+
+                    Hawk.server.authenticate(req, credentialsFunc, { localtimeOffsetMsec: 100000 }, (err, credentials2, artifacts) => {
+
+                        expect(err).to.not.exist();
+                        expect(credentials2.user).to.equal('steve');
+                        expect(artifacts.ext).to.equal('some-app-data');
+                        done();
+                    });
+                });
+            });
+
+            it('generates a header then successfully parse it (no server header options)', (done) => {
+
+                const req = {
+                    method: 'POST',
+                    url: '/resource/4?filter=a',
+                    headers: {
+                        host: 'example.com:8080',
+                        'content-type': 'text/plain;x=y'
+                    }
+                };
+
+                const payload = 'some not so random text';
+
+                credentialsFunc('123456', (err, credentials1) => {
+
+                    expect(err).to.not.exist();
+
+                    const reqHeader = Browser.client.header('http://example.com:8080/resource/4?filter=a', req.method, { credentials: credentials1, ext: 'some-app-data', payload: payload, contentType: req.headers['content-type'] });
+                    req.headers.authorization = reqHeader.field;
+
+                    Hawk.server.authenticate(req, credentialsFunc, {}, (err, credentials2, artifacts) => {
+
+                        expect(err).to.not.exist();
+                        expect(credentials2.user).to.equal('steve');
+                        expect(artifacts.ext).to.equal('some-app-data');
+                        expect(Hawk.server.authenticatePayload(payload, credentials2, artifacts, req.headers['content-type'])).to.equal(true);
+
+                        const res = {
+                            headers: {
+                                'content-type': 'text/plain'
+                            },
+                            getResponseHeader: function (header) {
+
+                                return res.headers[header.toLowerCase()];
+                            }
+                        };
+
+                        res.headers['server-authorization'] = Hawk.server.header(credentials2, artifacts);
+                        expect(res.headers['server-authorization']).to.exist();
+
+                        expect(Browser.client.authenticate(res, credentials2, artifacts)).to.equal(true);
+                        done();
+                    });
+                });
+            });
+
+            it('generates a header then successfully parse it (no server header)', (done) => {
+
+                const req = {
+                    method: 'POST',
+                    url: '/resource/4?filter=a',
+                    headers: {
+                        host: 'example.com:8080',
+                        'content-type': 'text/plain;x=y'
+                    }
+                };
+
+                const payload = 'some not so random text';
+
+                credentialsFunc('123456', (err, credentials1) => {
+
+                    expect(err).to.not.exist();
+
+                    const reqHeader = Browser.client.header('http://example.com:8080/resource/4?filter=a', req.method, { credentials: credentials1, ext: 'some-app-data', payload: payload, contentType: req.headers['content-type'] });
+                    req.headers.authorization = reqHeader.field;
+
+                    Hawk.server.authenticate(req, credentialsFunc, {}, (err, credentials2, artifacts) => {
+
+                        expect(err).to.not.exist();
+                        expect(credentials2.user).to.equal('steve');
+                        expect(artifacts.ext).to.equal('some-app-data');
+                        expect(Hawk.server.authenticatePayload(payload, credentials2, artifacts, req.headers['content-type'])).to.equal(true);
+
+                        const res = {
+                            headers: {
+                                'content-type': 'text/plain'
+                            },
+                            getResponseHeader: function (header) {
+
+                                return res.headers[header.toLowerCase()];
+                            }
+                        };
+
+                        expect(Browser.client.authenticate(res, credentials2, artifacts)).to.equal(true);
+                        done();
+                    });
+                });
+            });
+
+            it('generates a header with stale ts and successfully authenticate on second call', (done) => {
+
+                const req = {
+                    method: 'GET',
+                    url: '/resource/4?filter=a',
+                    host: 'example.com',
+                    port: 8080
+                };
+
+                credentialsFunc('123456', (err, credentials1) => {
+
+                    expect(err).to.not.exist();
+
+                    Browser.utils.setNtpSecOffset(60 * 60 * 1000);
+                    const header = Browser.client.header('http://example.com:8080/resource/4?filter=a', req.method, { credentials: credentials1, ext: 'some-app-data' });
+                    req.authorization = header.field;
+                    expect(req.authorization).to.exist();
+
+                    Hawk.server.authenticate(req, credentialsFunc, {}, (err, credentials2, artifacts2) => {
+
+                        expect(err).to.exist();
+                        expect(err.message).to.equal('Stale timestamp');
+
+                        const res = {
+                            headers: {
+                                'www-authenticate': err.output.headers['WWW-Authenticate']
+                            },
+                            getResponseHeader: function (lookup) {
+
+                                return res.headers[lookup.toLowerCase()];
+                            }
+                        };
+
+                        expect(Browser.utils.getNtpSecOffset()).to.equal(60 * 60 * 1000);
+                        expect(Browser.client.authenticate(res, credentials2, header.artifacts)).to.equal(true);
+                        expect(Browser.utils.getNtpSecOffset()).to.equal(0);
+
+                        req.authorization = Browser.client.header('http://example.com:8080/resource/4?filter=a', req.method, { credentials: credentials2, ext: 'some-app-data' }).field;
+                        expect(req.authorization).to.exist();
+
+                        Hawk.server.authenticate(req, credentialsFunc, {}, (err, credentials3, artifacts3) => {
+
+                            expect(err).to.not.exist();
+                            expect(credentials3.user).to.equal('steve');
+                            expect(artifacts3.ext).to.equal('some-app-data');
+                            done();
+                        });
+                    });
+                });
+            });
+
+            it('generates a header with stale ts and successfully authenticate on second call (manual localStorage)', (done) => {
+
+                const req = {
+                    method: 'GET',
+                    url: '/resource/4?filter=a',
+                    host: 'example.com',
+                    port: 8080
+                };
+
+                credentialsFunc('123456', (err, credentials1) => {
+
+                    expect(err).to.not.exist();
+
+                    const localStorage = new Browser.internals.LocalStorage();
+
+                    Browser.utils.setStorage(localStorage);
+
+                    Browser.utils.setNtpSecOffset(60 * 60 * 1000);
+                    const header = Browser.client.header('http://example.com:8080/resource/4?filter=a', req.method, { credentials: credentials1, ext: 'some-app-data' });
+                    req.authorization = header.field;
+                    expect(req.authorization).to.exist();
+
+                    Hawk.server.authenticate(req, credentialsFunc, {}, (err, credentials2, artifacts2) => {
+
+                        expect(err).to.exist();
+                        expect(err.message).to.equal('Stale timestamp');
+
+                        const res = {
+                            headers: {
+                                'www-authenticate': err.output.headers['WWW-Authenticate']
+                            },
+                            getResponseHeader: function (lookup) {
+
+                                return res.headers[lookup.toLowerCase()];
+                            }
+                        };
+
+                        expect(parseInt(localStorage.getItem('hawk_ntp_offset'))).to.equal(60 * 60 * 1000);
+                        expect(Browser.utils.getNtpSecOffset()).to.equal(60 * 60 * 1000);
+                        expect(Browser.client.authenticate(res, credentials2, header.artifacts)).to.equal(true);
+                        expect(Browser.utils.getNtpSecOffset()).to.equal(0);
+                        expect(parseInt(localStorage.getItem('hawk_ntp_offset'))).to.equal(0);
+
+                        req.authorization = Browser.client.header('http://example.com:8080/resource/4?filter=a', req.method, { credentials: credentials2, ext: 'some-app-data' }).field;
+                        expect(req.authorization).to.exist();
+
+                        Hawk.server.authenticate(req, credentialsFunc, {}, (err, credentials3, artifacts3) => {
+
+                            expect(err).to.not.exist();
+                            expect(credentials3.user).to.equal('steve');
+                            expect(artifacts3.ext).to.equal('some-app-data');
+                            done();
+                        });
+                    });
+                });
+            });
+
+            it('generates a header then fails to parse it (missing server header hash)', (done) => {
+
+                const req = {
+                    method: 'POST',
+                    url: '/resource/4?filter=a',
+                    headers: {
+                        host: 'example.com:8080',
+                        'content-type': 'text/plain;x=y'
+                    }
+                };
+
+                const payload = 'some not so random text';
+
+                credentialsFunc('123456', (err, credentials1) => {
+
+                    expect(err).to.not.exist();
+
+                    const reqHeader = Browser.client.header('http://example.com:8080/resource/4?filter=a', req.method, { credentials: credentials1, ext: 'some-app-data', payload: payload, contentType: req.headers['content-type'] });
+                    req.headers.authorization = reqHeader.field;
+
+                    Hawk.server.authenticate(req, credentialsFunc, {}, (err, credentials2, artifacts) => {
+
+                        expect(err).to.not.exist();
+                        expect(credentials2.user).to.equal('steve');
+                        expect(artifacts.ext).to.equal('some-app-data');
+                        expect(Hawk.server.authenticatePayload(payload, credentials2, artifacts, req.headers['content-type'])).to.equal(true);
+
+                        const res = {
+                            headers: {
+                                'content-type': 'text/plain'
+                            },
+                            getResponseHeader: function (header) {
+
+                                return res.headers[header.toLowerCase()];
+                            }
+                        };
+
+                        res.headers['server-authorization'] = Hawk.server.header(credentials2, artifacts);
+                        expect(res.headers['server-authorization']).to.exist();
+
+                        expect(Browser.client.authenticate(res, credentials2, artifacts, { payload: 'some reply' })).to.equal(false);
+                        done();
+                    });
+                });
+            });
+
+            it('generates a header then successfully parse it (with hash)', (done) => {
+
+                const req = {
+                    method: 'GET',
+                    url: '/resource/4?filter=a',
+                    host: 'example.com',
+                    port: 8080
+                };
+
+                credentialsFunc('123456', (err, credentials1) => {
+
+                    expect(err).to.not.exist();
+
+                    req.authorization = Browser.client.header('http://example.com:8080/resource/4?filter=a', req.method, { credentials: credentials1, payload: 'hola!', ext: 'some-app-data' }).field;
+                    Hawk.server.authenticate(req, credentialsFunc, {}, (err, credentials2, artifacts) => {
+
+                        expect(err).to.not.exist();
+                        expect(credentials2.user).to.equal('steve');
+                        expect(artifacts.ext).to.equal('some-app-data');
+                        done();
+                    });
+                });
+            });
+
+            it('generates a header then successfully parse it then validate payload', (done) => {
+
+                const req = {
+                    method: 'GET',
+                    url: '/resource/4?filter=a',
+                    host: 'example.com',
+                    port: 8080
+                };
+
+                credentialsFunc('123456', (err, credentials1) => {
+
+                    expect(err).to.not.exist();
+
+                    req.authorization = Browser.client.header('http://example.com:8080/resource/4?filter=a', req.method, { credentials: credentials1, payload: 'hola!', ext: 'some-app-data' }).field;
+                    Hawk.server.authenticate(req, credentialsFunc, {}, (err, credentials2, artifacts) => {
+
+                        expect(err).to.not.exist();
+                        expect(credentials2.user).to.equal('steve');
+                        expect(artifacts.ext).to.equal('some-app-data');
+                        expect(Hawk.server.authenticatePayload('hola!', credentials2, artifacts)).to.be.true();
+                        expect(Hawk.server.authenticatePayload('hello!', credentials2, artifacts)).to.be.false();
+                        done();
+                    });
+                });
+            });
+
+            it('generates a header then successfully parse it (app)', (done) => {
+
+                const req = {
+                    method: 'GET',
+                    url: '/resource/4?filter=a',
+                    host: 'example.com',
+                    port: 8080
+                };
+
+                credentialsFunc('123456', (err, credentials1) => {
+
+                    expect(err).to.not.exist();
+
+                    req.authorization = Browser.client.header('http://example.com:8080/resource/4?filter=a', req.method, { credentials: credentials1, ext: 'some-app-data', app: 'asd23ased' }).field;
+                    Hawk.server.authenticate(req, credentialsFunc, {}, (err, credentials2, artifacts) => {
+
+                        expect(err).to.not.exist();
+                        expect(credentials2.user).to.equal('steve');
+                        expect(artifacts.ext).to.equal('some-app-data');
+                        expect(artifacts.app).to.equal('asd23ased');
+                        done();
+                    });
+                });
+            });
+
+            it('generates a header then successfully parse it (app, dlg)', (done) => {
+
+                const req = {
+                    method: 'GET',
+                    url: '/resource/4?filter=a',
+                    host: 'example.com',
+                    port: 8080
+                };
+
+                credentialsFunc('123456', (err, credentials1) => {
+
+                    expect(err).to.not.exist();
+
+                    req.authorization = Browser.client.header('http://example.com:8080/resource/4?filter=a', req.method, { credentials: credentials1, ext: 'some-app-data', app: 'asd23ased', dlg: '23434szr3q4d' }).field;
+                    Hawk.server.authenticate(req, credentialsFunc, {}, (err, credentials2, artifacts) => {
+
+                        expect(err).to.not.exist();
+                        expect(credentials2.user).to.equal('steve');
+                        expect(artifacts.ext).to.equal('some-app-data');
+                        expect(artifacts.app).to.equal('asd23ased');
+                        expect(artifacts.dlg).to.equal('23434szr3q4d');
+                        done();
+                    });
+                });
+            });
+
+            it('generates a header then fail authentication due to bad hash', (done) => {
+
+                const req = {
+                    method: 'GET',
+                    url: '/resource/4?filter=a',
+                    host: 'example.com',
+                    port: 8080
+                };
+
+                credentialsFunc('123456', (err, credentials1) => {
+
+                    expect(err).to.not.exist();
+
+                    req.authorization = Browser.client.header('http://example.com:8080/resource/4?filter=a', req.method, { credentials: credentials1, payload: 'hola!', ext: 'some-app-data' }).field;
+                    Hawk.server.authenticate(req, credentialsFunc, { payload: 'byebye!' }, (err, credentials2, artifacts) => {
+
+                        expect(err).to.exist();
+                        expect(err.output.payload.message).to.equal('Bad payload hash');
+                        done();
+                    });
+                });
+            });
+
+            it('generates a header for one resource then fail to authenticate another', (done) => {
+
+                const req = {
+                    method: 'GET',
+                    url: '/resource/4?filter=a',
+                    host: 'example.com',
+                    port: 8080
+                };
+
+                credentialsFunc('123456', (err, credentials1) => {
+
+                    expect(err).to.not.exist();
+
+                    req.authorization = Browser.client.header('http://example.com:8080/resource/4?filter=a', req.method, { credentials: credentials1, ext: 'some-app-data' }).field;
+                    req.url = '/something/else';
+
+                    Hawk.server.authenticate(req, credentialsFunc, {}, (err, credentials2, artifacts) => {
+
+                        expect(err).to.exist();
+                        expect(credentials2).to.exist();
+                        done();
+                    });
+                });
+            });
 
             it('returns a valid authorization header (sha1)', (done) => {
 
@@ -973,7 +722,374 @@ describe('Browser', () => {
             });
         });
 
+        describe('bewit()', () => {
+
+            it('should generate a bewit then successfully authenticate it', (done) => {
+
+                const req = {
+                    method: 'GET',
+                    url: '/resource/4?a=1&b=2',
+                    host: 'example.com',
+                    port: 80
+                };
+
+                credentialsFunc('123456', (err, credentials1) => {
+
+                    expect(err).to.not.exist();
+
+                    const bewit = Browser.client.bewit('http://example.com/resource/4?a=1&b=2', { credentials: credentials1, ttlSec: 60 * 60 * 24 * 365 * 100, ext: 'some-app-data' });
+                    req.url += '&bewit=' + bewit;
+
+                    Hawk.uri.authenticate(req, credentialsFunc, {}, (err, credentials2, attributes) => {
+
+                        expect(err).to.not.exist();
+                        expect(credentials2.user).to.equal('steve');
+                        expect(attributes.ext).to.equal('some-app-data');
+                        done();
+                    });
+                });
+            });
+
+            it('should generate a bewit then successfully authenticate it (no ext)', (done) => {
+
+                const req = {
+                    method: 'GET',
+                    url: '/resource/4?a=1&b=2',
+                    host: 'example.com',
+                    port: 80
+                };
+
+                credentialsFunc('123456', (err, credentials1) => {
+
+                    expect(err).to.not.exist();
+
+                    const bewit = Browser.client.bewit('http://example.com/resource/4?a=1&b=2', { credentials: credentials1, ttlSec: 60 * 60 * 24 * 365 * 100 });
+                    req.url += '&bewit=' + bewit;
+
+                    Hawk.uri.authenticate(req, credentialsFunc, {}, (err, credentials2, attributes) => {
+
+                        expect(err).to.not.exist();
+                        expect(credentials2.user).to.equal('steve');
+                        done();
+                    });
+                });
+            });
+
+            it('returns a valid bewit value', (done) => {
+
+                const credentials = {
+                    id: '123456',
+                    key: '2983d45yun89q',
+                    algorithm: 'sha256'
+                };
+
+                const bewit = Browser.client.bewit('https://example.com/somewhere/over/the/rainbow', { credentials: credentials, ttlSec: 300, localtimeOffsetMsec: 1356420407232 - Hawk.utils.now(), ext: 'xandyandz' });
+                expect(bewit).to.equal('MTIzNDU2XDEzNTY0MjA3MDdca3NjeHdOUjJ0SnBQMVQxekRMTlBiQjVVaUtJVTl0T1NKWFRVZEc3WDloOD1ceGFuZHlhbmR6');
+                done();
+            });
+
+            it('returns a valid bewit value (explicit HTTP port)', (done) => {
+
+                const credentials = {
+                    id: '123456',
+                    key: '2983d45yun89q',
+                    algorithm: 'sha256'
+                };
+
+                const bewit = Browser.client.bewit('http://example.com:8080/somewhere/over/the/rainbow', { credentials: credentials, ttlSec: 300, localtimeOffsetMsec: 1356420407232 - Hawk.utils.now(), ext: 'xandyandz' });
+                expect(bewit).to.equal('MTIzNDU2XDEzNTY0MjA3MDdcaFpiSjNQMmNLRW80a3kwQzhqa1pBa1J5Q1p1ZWc0V1NOYnhWN3ZxM3hIVT1ceGFuZHlhbmR6');
+                done();
+            });
+
+            it('returns a valid bewit value (explicit HTTPS port)', (done) => {
+
+                const credentials = {
+                    id: '123456',
+                    key: '2983d45yun89q',
+                    algorithm: 'sha256'
+                };
+
+                const bewit = Browser.client.bewit('https://example.com:8043/somewhere/over/the/rainbow', { credentials: credentials, ttlSec: 300, localtimeOffsetMsec: 1356420407232 - Hawk.utils.now(), ext: 'xandyandz' });
+                expect(bewit).to.equal('MTIzNDU2XDEzNTY0MjA3MDdcL2t4UjhwK0xSaTdvQTRnUXc3cWlxa3BiVHRKYkR4OEtRMC9HRUwvVytTUT1ceGFuZHlhbmR6');
+                done();
+            });
+
+            it('returns a valid bewit value (null ext)', (done) => {
+
+                const credentials = {
+                    id: '123456',
+                    key: '2983d45yun89q',
+                    algorithm: 'sha256'
+                };
+
+                const bewit = Browser.client.bewit('https://example.com/somewhere/over/the/rainbow', { credentials: credentials, ttlSec: 300, localtimeOffsetMsec: 1356420407232 - Hawk.utils.now(), ext: null });
+                expect(bewit).to.equal('MTIzNDU2XDEzNTY0MjA3MDdcSUdZbUxnSXFMckNlOEN4dktQczRKbFdJQStValdKSm91d2dBUmlWaENBZz1c');
+                done();
+            });
+
+            it('errors on invalid options', (done) => {
+
+                const bewit = Browser.client.bewit('https://example.com/somewhere/over/the/rainbow', 4);
+                expect(bewit).to.equal('');
+                done();
+            });
+
+            it('errors on missing uri', (done) => {
+
+                const credentials = {
+                    id: '123456',
+                    key: '2983d45yun89q',
+                    algorithm: 'sha256'
+                };
+
+                const bewit = Browser.client.bewit('', { credentials: credentials, ttlSec: 300, localtimeOffsetMsec: 1356420407232 - Hawk.utils.now(), ext: 'xandyandz' });
+                expect(bewit).to.equal('');
+                done();
+            });
+
+            it('errors on invalid uri', (done) => {
+
+                const credentials = {
+                    id: '123456',
+                    key: '2983d45yun89q',
+                    algorithm: 'sha256'
+                };
+
+                const bewit = Browser.client.bewit(5, { credentials: credentials, ttlSec: 300, localtimeOffsetMsec: 1356420407232 - Hawk.utils.now(), ext: 'xandyandz' });
+                expect(bewit).to.equal('');
+                done();
+            });
+
+            it('errors on invalid credentials (id)', (done) => {
+
+                const credentials = {
+                    key: '2983d45yun89q',
+                    algorithm: 'sha256'
+                };
+
+                const bewit = Browser.client.bewit('https://example.com/somewhere/over/the/rainbow', { credentials: credentials, ttlSec: 3000, ext: 'xandyandz' });
+                expect(bewit).to.equal('');
+                done();
+            });
+
+            it('errors on missing credentials', (done) => {
+
+                const bewit = Browser.client.bewit('https://example.com/somewhere/over/the/rainbow', { ttlSec: 3000, ext: 'xandyandz' });
+                expect(bewit).to.equal('');
+                done();
+            });
+
+            it('errors on invalid credentials (key)', (done) => {
+
+                const credentials = {
+                    id: '123456',
+                    algorithm: 'sha256'
+                };
+
+                const bewit = Browser.client.bewit('https://example.com/somewhere/over/the/rainbow', { credentials: credentials, ttlSec: 3000, ext: 'xandyandz' });
+                expect(bewit).to.equal('');
+                done();
+            });
+
+            it('errors on invalid algorithm', (done) => {
+
+                const credentials = {
+                    id: '123456',
+                    key: '2983d45yun89q',
+                    algorithm: 'hmac-sha-0'
+                };
+
+                const bewit = Browser.client.bewit('https://example.com/somewhere/over/the/rainbow', { credentials: credentials, ttlSec: 300, ext: 'xandyandz' });
+                expect(bewit).to.equal('');
+                done();
+            });
+
+            it('errors on missing options', (done) => {
+
+                const bewit = Browser.client.bewit('https://example.com/somewhere/over/the/rainbow');
+                expect(bewit).to.equal('');
+                done();
+            });
+        });
+
         describe('authenticate()', () => {
+
+            it('handles XMLHttpRequest request object', (done) => {
+
+                const req = {
+                    method: 'POST',
+                    url: '/resource/4?filter=a',
+                    headers: {
+                        host: 'example.com:8080',
+                        'content-type': 'text/plain;x=y'
+                    }
+                };
+
+                const payload = 'some not so random text';
+
+                credentialsFunc('123456', (err, credentials1) => {
+
+                    expect(err).to.not.exist();
+
+                    const reqHeader = Browser.client.header('http://example.com:8080/resource/4?filter=a', req.method, { credentials: credentials1, ext: 'some-app-data', payload: payload, contentType: req.headers['content-type'] });
+                    req.headers.authorization = reqHeader.field;
+
+                    Hawk.server.authenticate(req, credentialsFunc, {}, (err, credentials2, artifacts) => {
+
+                        expect(err).to.not.exist();
+                        expect(credentials2.user).to.equal('steve');
+                        expect(artifacts.ext).to.equal('some-app-data');
+                        expect(Hawk.server.authenticatePayload(payload, credentials2, artifacts, req.headers['content-type'])).to.equal(true);
+
+                        const res = {
+                            _headers: {
+                                'content-type': 'text/plain'
+                            },
+                            getResponseHeader: function (header) {
+
+                                return res._headers[header.toLowerCase()];
+                            }
+                        };
+
+                        res._headers['server-authorization'] = Hawk.server.header(credentials2, artifacts, { payload: 'some reply', contentType: 'text/plain', ext: 'response-specific' });
+                        expect(res._headers['server-authorization']).to.exist();
+
+                        expect(Browser.client.authenticate(res, credentials2, artifacts, { payload: 'some reply' })).to.equal(true);
+                        done();
+                    });
+                });
+            });
+
+            it('handles Browserify response object', (done) => {
+
+                const req = {
+                    method: 'POST',
+                    url: '/resource/4?filter=a',
+                    headers: {
+                        host: 'example.com:8080',
+                        'content-type': 'text/plain;x=y'
+                    }
+                };
+
+                const payload = 'some not so random text';
+
+                credentialsFunc('123456', (err, credentials1) => {
+
+                    expect(err).to.not.exist();
+
+                    const reqHeader = Browser.client.header('http://example.com:8080/resource/4?filter=a', req.method, { credentials: credentials1, ext: 'some-app-data', payload: payload, contentType: req.headers['content-type'] });
+                    req.headers.authorization = reqHeader.field;
+
+                    Hawk.server.authenticate(req, credentialsFunc, {}, (err, credentials2, artifacts) => {
+
+                        expect(err).to.not.exist();
+                        expect(credentials2.user).to.equal('steve');
+                        expect(artifacts.ext).to.equal('some-app-data');
+                        expect(Hawk.server.authenticatePayload(payload, credentials2, artifacts, req.headers['content-type'])).to.equal(true);
+
+                        const res = {
+                            _headers: {
+                                'content-type': 'text/plain'
+                            },
+                            getHeader: function (header) {
+
+                                return res._headers[header.toLowerCase()];
+                            }
+                        };
+
+                        res._headers['server-authorization'] = Hawk.server.header(credentials2, artifacts, { payload: 'some reply', contentType: 'text/plain', ext: 'response-specific' });
+                        expect(res._headers['server-authorization']).to.exist();
+
+                        expect(Browser.client.authenticate(res, credentials2, artifacts, { payload: 'some reply' })).to.equal(true);
+                        done();
+                    });
+                });
+            });
+
+            it('handles configuration response object', (done) => {
+
+                const req = {
+                    method: 'POST',
+                    url: '/resource/4?filter=a',
+                    headers: {
+                        host: 'example.com:8080',
+                        'content-type': 'text/plain;x=y'
+                    }
+                };
+
+                const payload = 'some not so random text';
+
+                credentialsFunc('123456', (err, credentials1) => {
+
+                    expect(err).to.not.exist();
+
+                    const reqHeader = Browser.client.header('http://example.com:8080/resource/4?filter=a', req.method, { credentials: credentials1, ext: 'some-app-data', payload: payload, contentType: req.headers['content-type'] });
+                    req.headers.authorization = reqHeader.field;
+
+                    Hawk.server.authenticate(req, credentialsFunc, {}, (err, credentials2, artifacts) => {
+
+                        expect(err).to.not.exist();
+                        expect(credentials2.user).to.equal('steve');
+                        expect(artifacts.ext).to.equal('some-app-data');
+                        expect(Hawk.server.authenticatePayload(payload, credentials2, artifacts, req.headers['content-type'])).to.equal(true);
+
+                        const res = {
+                            headers: {
+                                'content-type': 'text/plain'
+                            }
+                        };
+
+                        res.headers['server-authorization'] = Hawk.server.header(credentials2, artifacts, { payload: 'some reply', contentType: 'text/plain', ext: 'response-specific' });
+                        expect(res.headers['server-authorization']).to.exist();
+
+                        expect(Browser.client.authenticate(res, credentials2, artifacts, { payload: 'some reply' })).to.equal(true);
+                        done();
+                    });
+                });
+            });
+
+            it('handles Fetch api response object', (done) => {
+
+                const req = {
+                    method: 'POST',
+                    url: '/resource/4?filter=a',
+                    headers: {
+                        host: 'example.com:8080',
+                        'content-type': 'text/plain;x=y'
+                    }
+                };
+
+                const payload = 'some not so random text';
+
+                credentialsFunc('123456', (err, credentials1) => {
+
+                    expect(err).to.not.exist();
+
+                    const reqHeader = Browser.client.header('http://example.com:8080/resource/4?filter=a', req.method, { credentials: credentials1, ext: 'some-app-data', payload: payload, contentType: req.headers['content-type'] });
+                    req.headers.authorization = reqHeader.field;
+
+                    Hawk.server.authenticate(req, credentialsFunc, {}, (err, credentials2, artifacts) => {
+
+                        expect(err).to.not.exist();
+                        expect(credentials2.user).to.equal('steve');
+                        expect(artifacts.ext).to.equal('some-app-data');
+                        expect(Hawk.server.authenticatePayload(payload, credentials2, artifacts, req.headers['content-type'])).to.equal(true);
+
+                        const res = {
+                            headers: {
+                                get: (name) => res.headers[name.toLowerCase()],
+                                'content-type': 'text/plain'
+                            }
+                        };
+
+                        res.headers['server-authorization'] = Hawk.server.header(credentials2, artifacts, { payload: 'some reply', contentType: 'text/plain', ext: 'response-specific' });
+                        expect(res.headers['server-authorization']).to.exist();
+
+                        expect(Browser.client.authenticate(res, credentials2, artifacts, { payload: 'some reply' })).to.equal(true);
+                        done();
+                    });
+                });
+            });
 
             it('skips tsm validation when missing ts', (done) => {
 
@@ -1542,12 +1658,12 @@ describe('Browser', () => {
             });
         });
 
-        const str = 'https://www.google.ca/webhp?sourceid=chrome-instant&ion=1&espv=2&ie=UTF-8#q=url';
-        const base64str = 'aHR0cHM6Ly93d3cuZ29vZ2xlLmNhL3dlYmhwP3NvdXJjZWlkPWNocm9tZS1pbnN0YW50Jmlvbj0xJmVzcHY9MiZpZT1VVEYtOCNxPXVybA';
-
         describe('base64urlEncode()', () => {
 
             it('should base64 URL-safe decode a string', (done) => {
+
+                const str = 'https://www.google.ca/webhp?sourceid=chrome-instant&ion=1&espv=2&ie=UTF-8#q=url';
+                const base64str = 'aHR0cHM6Ly93d3cuZ29vZ2xlLmNhL3dlYmhwP3NvdXJjZWlkPWNocm9tZS1pbnN0YW50Jmlvbj0xJmVzcHY9MiZpZT1VVEYtOCNxPXVybA';
 
                 expect(Browser.utils.base64urlEncode(str)).to.equal(base64str);
                 done();
