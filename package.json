@@ -13,7 +13,7 @@
     "hawk"
   ],
   "engines": {
-    "node": ">=4.0.0"
+    "node": ">=4.5.0"
   },
   "dependencies": {
     "hoek": "4.x.x",
