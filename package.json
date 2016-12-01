@@ -1,7 +1,7 @@
 {
   "name": "hawk",
   "description": "HTTP Hawk Authentication Scheme",
-  "version": "6.0.0",
+  "version": "6.0.1",
   "author": "Eran Hammer <eran@hammer.io> (http://hueniverse.com)",
   "repository": "git://github.com/hueniverse/hawk",
   "main": "lib/index.js",
@@ -24,7 +24,7 @@
   "devDependencies": {
     "babel-cli": "^6.1.2",
     "babel-preset-es2015": "^6.1.2",
-    "code": "3.x.x",
+    "code": "4.x.x",
     "lab": "11.x.x"
   },
   "babel": {
