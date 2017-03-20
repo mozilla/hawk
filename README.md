@@ -218,7 +218,8 @@ server. The **Hawk** credentials issued to the client include the following attr
 
 * Key identifier: `dh37fgj492je`
 * Key: `werxhqb98rpaxn39848xrunpaw3489ruxnpa98w4rxn`
-* Algorithm: `sha256`
+* Algorithm: `hmac sha256`
+* Hash: `6R4rV5iE+NPoym+WwjeHzjAGXUtLNIxmo1vpMofpLAE=`
 
 The client generates the authentication header by calculating a timestamp (e.g. the number of seconds since January 1,
 1970 00:00:00 GMT), generating a nonce, and constructing the normalized request string (each value followed by a newline
@@ -269,7 +270,8 @@ For example:
 
 * Payload: `Thank you for flying Hawk`
 * Content Type: `text/plain`
-* Hash (sha256): `Yi9LfIIFRtBEPt74PVmbTF/xVAwPn7ub15ePICfgnuY=`
+* Algorithm: `sha256`
+* Hash: `Yi9LfIIFRtBEPt74PVmbTF/xVAwPn7ub15ePICfgnuY=`
 
 Results in the following input to the payload hash function (newline terminated values):
 
