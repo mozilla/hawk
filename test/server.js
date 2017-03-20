@@ -111,6 +111,25 @@ describe('Server', () => {
             });
         });
 
+        it('parses a valid authentication header (url basePath override)', (done) => {
+
+            const req = {
+                method: 'GET',
+                url: '/4?filter=a',
+                headers: {
+                    host: 'example.com:8080',
+                    authorization: 'Hawk id="1", ts="1353788437", nonce="k3j4h2", mac="zy79QQ5/EYFmQqutVnYb73gAc/U=", ext="hello"'
+                }
+            };
+
+            Hawk.server.authenticate(req, credentialsFunc, { localtimeOffsetMsec: 1353788437000 - Hawk.utils.now(), basePath: '/resource' }, (err, credentials, artifacts) => {
+
+                expect(err).to.not.exist();
+                expect(credentials.user).to.equal('steve');
+                done();
+            });
+        });
+
         it('parses a valid authentication header (POST with payload)', (done) => {
 
             const req = {
