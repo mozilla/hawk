@@ -68,5 +68,20 @@ describe('Crypto', () => {
 
             done();
         });
+
+        it('should return a valid normalized string handling undefined host', function (done) {
+
+            expect(Hawk.crypto.generateNormalizedString('header', {
+                ts: 1357747017,
+                nonce: 'k3k4j5',
+                method: 'GET',
+                resource: '/resource/something',
+                port: 8080,
+                hash: 'U4MKKSmiVxk37JCCrAVIjV/OhB3y+NdwoCr6RShbVkE=',
+                ext: 'this is some app data'
+            })).to.equal('hawk.1.header\n1357747017\nk3k4j5\nGET\n/resource/something\n\n8080\nU4MKKSmiVxk37JCCrAVIjV/OhB3y+NdwoCr6RShbVkE=\nthis is some app data\n');
+
+            done();
+        });
     });
 });
