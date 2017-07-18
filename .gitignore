@@ -3,11 +3,8 @@
 npm-debug.log
 dump.rdb
 node_modules
-components
-build
 results.tap
 results.xml
-npm-shrinkwrap.json
 config.json
 .DS_Store
 */.DS_Store
@@ -16,5 +13,6 @@ config.json
 */._*
 */*/._*
 coverage.*
-lib-cov
-dist
+.settings
+package-lock.json
+
