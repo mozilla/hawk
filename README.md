@@ -3,9 +3,9 @@
 <img align="right" src="https://raw.github.com/hueniverse/hawk/master/images/logo.png" /> **Hawk** is an HTTP authentication scheme using a message authentication code (MAC) algorithm to provide partial
 HTTP request cryptographic verification. For more complex use cases such as access delegation, see [Oz](https://github.com/hueniverse/oz).
 
-Current version: **6.x**
+Current version: **7.x**
 
-Note: 6.x, 5.x, 4.x, 3.x, and 2.x are the same exact protocol as 1.1. The version increments reflect changes in the node API.
+Note: the protocol has not changed since version 1.1. The version increments reflect changes in the node API.
 
 [![Build Status](https://travis-ci.org/hueniverse/hawk.svg?branch=master)](https://travis-ci.org/hueniverse/hawk)
 
@@ -105,7 +105,7 @@ const Hawk = require('hawk');
 
 // Credentials lookup function
 
-const credentialsFunc = function (id, callback) {
+const credentialsFunc = function (id) {
 
     const credentials = {
         key: 'werxhqb98rpaxn39848xrunpaw3489ruxnpa98w4rxn',
@@ -113,32 +113,31 @@ const credentialsFunc = function (id, callback) {
         user: 'Steve'
     };
 
-    return callback(null, credentials);
+    return credentials;
 };
 
 // Create HTTP server
 
-const handler = function (req, res) {
+const handler = async function (req, res) {
 
     // Authenticate incoming request
 
-    Hawk.server.authenticate(req, credentialsFunc, {}, (err, credentials, artifacts) => {
+    const ( credentials, artifacts } = await Hawk.server.authenticate(req, credentialsFunc);
 
-        // Prepare response
+    // Prepare response
 
-        const payload = (!err ? `Hello ${credentials.user} ${artifacts.ext}` : 'Shoosh!');
-        const headers = { 'Content-Type': 'text/plain' };
+    const payload = (!err ? `Hello ${credentials.user} ${artifacts.ext}` : 'Shoosh!');
+    const headers = { 'Content-Type': 'text/plain' };
 
-        // Generate Server-Authorization response header
+    // Generate Server-Authorization response header
 
-        const header = Hawk.server.header(credentials, artifacts, { payload, contentType: headers['Content-Type'] });
-        headers['Server-Authorization'] = header;
+    const header = Hawk.server.header(credentials, artifacts, { payload, contentType: headers['Content-Type'] });
+    headers['Server-Authorization'] = header;
 
-        // Send the response back
+    // Send the response back
 
-        res.writeHead(!err ? 200 : 401, headers);
-        res.end(payload);
-    });
+    res.writeHead(!err ? 200 : 401, headers);
+    res.end(payload);
 };
 
 // Start server
@@ -171,8 +170,8 @@ const requestOptions = {
 
 // Generate Authorization request header
 
-const header = Hawk.client.header('http://example.com:8000/resource/1?b=1&a=2', 'GET', { credentials: credentials, ext: 'some-app-data' });
-requestOptions.headers.Authorization = header.field;
+const { header } = Hawk.client.header('http://example.com:8000/resource/1?b=1&a=2', 'GET', { credentials: credentials, ext: 'some-app-data' });
+requestOptions.headers.Authorization = header;
 
 // Send authenticated request
 
@@ -385,25 +384,29 @@ const Hawk = require('hawk');
 
 // Credentials lookup function
 
-const credentialsFunc = function (id, callback) {
+const credentialsFunc = function (id) {
 
     const credentials = {
         key: 'werxhqb98rpaxn39848xrunpaw3489ruxnpa98w4rxn',
         algorithm: 'sha256'
     };
 
-    return callback(null, credentials);
+    return credentials;
 };
 
 // Create HTTP server
 
 const handler = function (req, res) {
 
-    Hawk.uri.authenticate(req, credentialsFunc, {}, (err, credentials, attributes) => {
-
-        res.writeHead(!err ? 200 : 401, { 'Content-Type': 'text/plain' });
-        res.end(!err ? 'Access granted' : 'Shoosh!');
-    });
+    try {
+        const { credentials, attributes } = await Hawk.uri.authenticate(req, credentialsFunc);
+        res.writeHead(200, { 'Content-Type': 'text/plain' });
+        res.end('Access granted');
+    }
+    catch (err) {
+        res.writeHead(401, { 'Content-Type': 'text/plain' });
+        res.end('Shoosh!');
+    }
 };
 
 Http.createServer(handler).listen(8000, 'example.com');

@@ -5,6 +5,7 @@
 const Code = require('code');
 const Hawk = require('../lib');
 const Lab = require('lab');
+
 const Package = require('../package.json');
 
 
@@ -15,9 +16,7 @@ const internals = {};
 
 // Test shortcuts
 
-const lab = exports.lab = Lab.script();
-const describe = lab.experiment;
-const it = lab.test;
+const { describe, it } = exports.lab = Lab.script();
 const expect = Code.expect;
 
 
@@ -25,7 +24,7 @@ describe('Utils', () => {
 
     describe('parseHost()', () => {
 
-        it('returns port 80 for non tls node request', (done) => {
+        it('returns port 80 for non tls node request', () => {
 
             const req = {
                 method: 'POST',
@@ -37,10 +36,9 @@ describe('Utils', () => {
             };
 
             expect(Hawk.utils.parseHost(req, 'Host').port).to.equal(80);
-            done();
         });
 
-        it('returns port 443 for non tls node request', (done) => {
+        it('returns port 443 for non tls node request', () => {
 
             const req = {
                 method: 'POST',
@@ -55,10 +53,9 @@ describe('Utils', () => {
             };
 
             expect(Hawk.utils.parseHost(req, 'Host').port).to.equal(443);
-            done();
         });
 
-        it('returns port 443 for non tls node request (IPv6)', (done) => {
+        it('returns port 443 for non tls node request (IPv6)', () => {
 
             const req = {
                 method: 'POST',
@@ -73,10 +70,9 @@ describe('Utils', () => {
             };
 
             expect(Hawk.utils.parseHost(req, 'Host').port).to.equal(443);
-            done();
         });
 
-        it('parses IPv6 headers', (done) => {
+        it('parses IPv6 headers', () => {
 
             const req = {
                 method: 'POST',
@@ -93,10 +89,9 @@ describe('Utils', () => {
             const host = Hawk.utils.parseHost(req, 'Host');
             expect(host.port).to.equal('8000');
             expect(host.name).to.equal('[123:123:123]');
-            done();
         });
 
-        it('errors on header too long', (done) => {
+        it('errors on header too long', () => {
 
             let long = '';
             for (let i = 0; i < 5000; ++i) {
@@ -104,13 +99,12 @@ describe('Utils', () => {
             }
 
             expect(Hawk.utils.parseHost({ headers: { host: long } })).to.be.null();
-            done();
         });
     });
 
     describe('parseAuthorizationHeader()', () => {
 
-        it('errors on header too long', (done) => {
+        it('errors on header too long', () => {
 
             let long = 'Scheme a="';
             for (let i = 0; i < 5000; ++i) {
@@ -118,34 +112,28 @@ describe('Utils', () => {
             }
             long += '"';
 
-            const err = Hawk.utils.parseAuthorizationHeader(long, ['a']);
-            expect(err).to.be.instanceof(Error);
-            expect(err.message).to.equal('Header length too long');
-            done();
+            expect(() => Hawk.utils.parseAuthorizationHeader(long, ['a'])).to.throw('Header length too long');
         });
     });
 
     describe('version()', () => {
 
-        it('returns the correct package version number', (done) => {
+        it('returns the correct package version number', () => {
 
             expect(Hawk.utils.version()).to.equal(Package.version);
-            done();
         });
     });
 
     describe('unauthorized()', () => {
 
-        it('returns a hawk 401', (done) => {
+        it('returns a hawk 401', () => {
 
             expect(Hawk.utils.unauthorized('kaboom').output.headers['WWW-Authenticate']).to.equal('Hawk error="kaboom"');
-            done();
         });
 
-        it('supports attributes', (done) => {
+        it('supports attributes', () => {
 
             expect(Hawk.utils.unauthorized('kaboom', { a: 'b' }).output.headers['WWW-Authenticate']).to.equal('Hawk a="b", error="kaboom"');
-            done();
         });
     });
 });

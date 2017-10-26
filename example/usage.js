@@ -23,27 +23,38 @@ const internals = {
 
 // Credentials lookup function
 
-const credentialsFunc = function (id, callback) {
+const credentialsFunc = function (id) {
 
-    return callback(null, internals.credentials[id]);
+    return internals.credentials[id];
 };
 
 
 // Create HTTP server
 
-const handler = function (req, res) {
+const handler = async function (req, res) {
 
-    Hawk.server.authenticate(req, credentialsFunc, {}, (err, credentials, artifacts) => {
+    try {
+        const { credentials, artifacts } = await Hawk.server.authenticate(req, credentialsFunc);
 
-        const payload = (!err ? 'Hello ' + credentials.user + ' ' + artifacts.ext : 'Shoosh!');
+        const payload = 'Hello ' + credentials.user + ' ' + artifacts.ext;
         const headers = {
             'Content-Type': 'text/plain',
             'Server-Authorization': Hawk.server.header(credentials, artifacts, { payload, contentType: 'text/plain' })
         };
 
-        res.writeHead(!err ? 200 : 401, headers);
+        res.writeHead(200, headers);
         res.end(payload);
-    });
+    }
+    catch (err) {
+        const payload = 'Shoosh!';
+        const headers = {
+            'Content-Type': 'text/plain',
+            'Server-Authorization': Hawk.server.header(err.credentials, err.artifacts, { payload, contentType: 'text/plain' })
+        };
+
+        res.writeHead(401, headers);
+        res.end(payload);
+    }
 };
 
 Http.createServer(handler).listen(8000, '127.0.0.1');
@@ -63,30 +74,23 @@ Request('http://127.0.0.1:8000/resource/1?b=1&a=2', (err, response, body) => {
 
 // Send authenticated request
 
-credentialsFunc('dh37fgj492je', (err, credentials) => {
+const credentials = credentialsFunc('dh37fgj492je');
+const header = Hawk.client.header('http://127.0.0.1:8000/resource/1?b=1&a=2', 'GET', { credentials, ext: 'and welcome!' });
+const options = {
+    uri: 'http://127.0.0.1:8000/resource/1?b=1&a=2',
+    method: 'GET',
+    headers: {
+        authorization: header.header
+    }
+};
+
+Request(options, (err, response, body) => {
 
     if (err) {
         process.exit(1);
     }
 
-    const header = Hawk.client.header('http://127.0.0.1:8000/resource/1?b=1&a=2', 'GET', { credentials, ext: 'and welcome!' });
-    const options = {
-        uri: 'http://127.0.0.1:8000/resource/1?b=1&a=2',
-        method: 'GET',
-        headers: {
-            authorization: header.field
-        }
-    };
-
-    Request(options, (err, response, body) => {
-
-        if (err) {
-            process.exit(1);
-        }
-
-        const isValid = Hawk.client.authenticate(response, credentials, header.artifacts, { payload: body });
-        console.log(response.statusCode + ': ' + body + (isValid ? ' (valid)' : ' (invalid)'));
-        process.exit(0);
-    });
+    const isValid = Hawk.client.authenticate(response, credentials, header.artifacts, { payload: body });
+    console.log(response.statusCode + ': ' + body + (isValid ? ' (valid)' : ' (invalid)'));
+    process.exit(0);
 });
-

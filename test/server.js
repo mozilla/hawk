@@ -15,29 +15,25 @@ const internals = {};
 
 // Test shortcuts
 
-const lab = exports.lab = Lab.script();
-const describe = lab.experiment;
-const it = lab.test;
+const { describe, it } = exports.lab = Lab.script();
 const expect = Code.expect;
 
 
 describe('Server', () => {
 
-    const credentialsFunc = function (id, callback) {
+    const credentialsFunc = function (id) {
 
-        const credentials = {
+        return {
             id,
             key: 'werxhqb98rpaxn39848xrunpaw3489ruxnpa98w4rxn',
             algorithm: (id === '1' ? 'sha1' : 'sha256'),
             user: 'steve'
         };
-
-        return callback(null, credentials);
     };
 
     describe('authenticate()', () => {
 
-        it('parses a valid authentication header (sha1)', (done) => {
+        it('parses a valid authentication header (sha1)', async () => {
 
             const req = {
                 method: 'GET',
@@ -47,15 +43,11 @@ describe('Server', () => {
                 authorization: 'Hawk id="1", ts="1353788437", nonce="k3j4h2", mac="zy79QQ5/EYFmQqutVnYb73gAc/U=", ext="hello"'
             };
 
-            Hawk.server.authenticate(req, credentialsFunc, { localtimeOffsetMsec: 1353788437000 - Hawk.utils.now() }, (err, credentials, artifacts) => {
-
-                expect(err).to.not.exist();
-                expect(credentials.user).to.equal('steve');
-                done();
-            });
+            const { credentials } = await Hawk.server.authenticate(req, credentialsFunc, { localtimeOffsetMsec: 1353788437000 - Hawk.utils.now() });
+            expect(credentials.user).to.equal('steve');
         });
 
-        it('parses a valid authentication header (sha256)', (done) => {
+        it('parses a valid authentication header (sha256)', async () => {
 
             const req = {
                 method: 'GET',
@@ -65,15 +57,11 @@ describe('Server', () => {
                 authorization: 'Hawk id="dh37fgj492je", ts="1353832234", nonce="j4h3g2", mac="m8r1rHbXN6NgO+KIIhjO7sFRyd78RNGVUwehe8Cp2dU=", ext="some-app-data"'
             };
 
-            Hawk.server.authenticate(req, credentialsFunc, { localtimeOffsetMsec: 1353832234000 - Hawk.utils.now() }, (err, credentials, artifacts) => {
-
-                expect(err).to.not.exist();
-                expect(credentials.user).to.equal('steve');
-                done();
-            });
+            const { credentials } = await Hawk.server.authenticate(req, credentialsFunc, { localtimeOffsetMsec: 1353832234000 - Hawk.utils.now() });
+            expect(credentials.user).to.equal('steve');
         });
 
-        it('parses a valid authentication header (host override)', (done) => {
+        it('parses a valid authentication header (host override)', async () => {
 
             const req = {
                 method: 'GET',
@@ -84,15 +72,11 @@ describe('Server', () => {
                 }
             };
 
-            Hawk.server.authenticate(req, credentialsFunc, { host: 'example.com', localtimeOffsetMsec: 1353788437000 - Hawk.utils.now() }, (err, credentials, artifacts) => {
-
-                expect(err).to.not.exist();
-                expect(credentials.user).to.equal('steve');
-                done();
-            });
+            const { credentials } = await Hawk.server.authenticate(req, credentialsFunc, { host: 'example.com', localtimeOffsetMsec: 1353788437000 - Hawk.utils.now() });
+            expect(credentials.user).to.equal('steve');
         });
 
-        it('parses a valid authentication header (host port override)', (done) => {
+        it('parses a valid authentication header (host port override)', async () => {
 
             const req = {
                 method: 'GET',
@@ -103,15 +87,11 @@ describe('Server', () => {
                 }
             };
 
-            Hawk.server.authenticate(req, credentialsFunc, { host: 'example.com', port: 8080, localtimeOffsetMsec: 1353788437000 - Hawk.utils.now() }, (err, credentials, artifacts) => {
-
-                expect(err).to.not.exist();
-                expect(credentials.user).to.equal('steve');
-                done();
-            });
+            const { credentials } = await Hawk.server.authenticate(req, credentialsFunc, { host: 'example.com', port: 8080, localtimeOffsetMsec: 1353788437000 - Hawk.utils.now() });
+            expect(credentials.user).to.equal('steve');
         });
 
-        it('parses a valid authentication header (POST with payload)', (done) => {
+        it('parses a valid authentication header (POST with payload)', async () => {
 
             const req = {
                 method: 'POST',
@@ -121,15 +101,11 @@ describe('Server', () => {
                 authorization: 'Hawk id="123456", ts="1357926341", nonce="1AwuJD", hash="qAiXIVv+yjDATneWxZP2YCTa9aHRgQdnH9b3Wc+o3dg=", ext="some-app-data", mac="UeYcj5UoTVaAWXNvJfLVia7kU3VabxCqrccXP8sUGC4="'
             };
 
-            Hawk.server.authenticate(req, credentialsFunc, { localtimeOffsetMsec: 1357926341000 - Hawk.utils.now() }, (err, credentials, artifacts) => {
-
-                expect(err).to.not.exist();
-                expect(credentials.user).to.equal('steve');
-                done();
-            });
+            const { credentials } = await Hawk.server.authenticate(req, credentialsFunc, { localtimeOffsetMsec: 1357926341000 - Hawk.utils.now() });
+            expect(credentials.user).to.equal('steve');
         });
 
-        it('errors on missing hash', (done) => {
+        it('errors on missing hash', async () => {
 
             const req = {
                 method: 'GET',
@@ -139,15 +115,10 @@ describe('Server', () => {
                 authorization: 'Hawk id="dh37fgj492je", ts="1353832234", nonce="j4h3g2", mac="m8r1rHbXN6NgO+KIIhjO7sFRyd78RNGVUwehe8Cp2dU=", ext="some-app-data"'
             };
 
-            Hawk.server.authenticate(req, credentialsFunc, { payload: 'body', localtimeOffsetMsec: 1353832234000 - Hawk.utils.now() }, (err, credentials, artifacts) => {
-
-                expect(err).to.exist();
-                expect(err.output.payload.message).to.equal('Missing required payload hash');
-                done();
-            });
+            await expect(Hawk.server.authenticate(req, credentialsFunc, { payload: 'body', localtimeOffsetMsec: 1353832234000 - Hawk.utils.now() })).to.reject('Missing required payload hash');
         });
 
-        it('errors on a stale timestamp', (done) => {
+        it('errors on a stale timestamp', async () => {
 
             const req = {
                 method: 'GET',
@@ -157,27 +128,22 @@ describe('Server', () => {
                 authorization: 'Hawk id="123456", ts="1362337299", nonce="UzmxSs", ext="some-app-data", mac="wnNUxchvvryMH2RxckTdZ/gY3ijzvccx4keVvELC61w="'
             };
 
-            Hawk.server.authenticate(req, credentialsFunc, {}, (err, credentials, artifacts) => {
+            const err = await expect(Hawk.server.authenticate(req, credentialsFunc)).to.reject('Stale timestamp');
+            const header = err.output.headers['WWW-Authenticate'];
+            const ts = header.match(/^Hawk ts\=\"(\d+)\"\, tsm\=\"([^\"]+)\"\, error=\"Stale timestamp\"$/);
+            const now = Hawk.utils.now();
+            expect(parseInt(ts[1], 10) * 1000).to.be.within(now - 1000, now + 1000);
 
-                expect(err).to.exist();
-                expect(err.output.payload.message).to.equal('Stale timestamp');
-                const header = err.output.headers['WWW-Authenticate'];
-                const ts = header.match(/^Hawk ts\=\"(\d+)\"\, tsm\=\"([^\"]+)\"\, error=\"Stale timestamp\"$/);
-                const now = Hawk.utils.now();
-                expect(parseInt(ts[1], 10) * 1000).to.be.within(now - 1000, now + 1000);
+            const res = {
+                headers: {
+                    'www-authenticate': header
+                }
+            };
 
-                const res = {
-                    headers: {
-                        'www-authenticate': header
-                    }
-                };
-
-                expect(Hawk.client.authenticate(res, credentials, artifacts)).to.equal(true);
-                done();
-            });
+            expect(() => Hawk.client.authenticate(res, err.credentials, err.artifacts)).to.not.throw();
         });
 
-        it('errors on a replay', (done) => {
+        it('errors on a replay', async () => {
 
             const req = {
                 method: 'GET',
@@ -190,32 +156,23 @@ describe('Server', () => {
             const memoryCache = {};
             const options = {
                 localtimeOffsetMsec: 1353788437000 - Hawk.utils.now(),
-                nonceFunc: function (key, nonce, ts, callback) {
+                nonceFunc: function (key, nonce, ts) {
 
                     if (memoryCache[key + nonce]) {
-                        return callback(new Error());
+                        throw new Error();
                     }
 
                     memoryCache[key + nonce] = true;
-                    return callback();
                 }
             };
 
-            Hawk.server.authenticate(req, credentialsFunc, options, (err, credentials1, artifacts1) => {
+            const { credentials } = await Hawk.server.authenticate(req, credentialsFunc, options);
+            expect(credentials.user).to.equal('steve');
 
-                expect(err).to.not.exist();
-                expect(credentials1.user).to.equal('steve');
-
-                Hawk.server.authenticate(req, credentialsFunc, options, (err, credentials2, artifacts2) => {
-
-                    expect(err).to.exist();
-                    expect(err.output.payload.message).to.equal('Invalid nonce');
-                    done();
-                });
-            });
+            await expect(Hawk.server.authenticate(req, credentialsFunc, options)).to.reject('Invalid nonce');
         });
 
-        it('does not error on nonce collision if keys differ', (done) => {
+        it('does not error on nonce collision if keys differ', async () => {
 
             const reqSteve = {
                 method: 'GET',
@@ -233,7 +190,7 @@ describe('Server', () => {
                 authorization: 'Hawk id="456", ts="1353788437", nonce="k3j4h2", mac="LXfmTnRzrLd9TD7yfH+4se46Bx6AHyhpM94hLCiNia4=", ext="hello"'
             };
 
-            const credentialsFuncion = function (id, callback) {
+            const credentialsFuncion = function (id) {
 
                 const credentials = {
                     '123': {
@@ -250,38 +207,30 @@ describe('Server', () => {
                     }
                 };
 
-                return callback(null, credentials[id]);
+                return credentials[id];
             };
 
             const memoryCache = {};
             const options = {
                 localtimeOffsetMsec: 1353788437000 - Hawk.utils.now(),
-                nonceFunc: function (key, nonce, ts, callback) {
+                nonceFunc: function (key, nonce, ts) {
 
                     if (memoryCache[key + nonce]) {
-                        return callback(new Error());
+                        throw new Error();
                     }
 
                     memoryCache[key + nonce] = true;
-                    return callback();
                 }
             };
 
-            Hawk.server.authenticate(reqSteve, credentialsFuncion, options, (err, credentials1, artifacts1) => {
+            const { credentials: credentials1 } = await Hawk.server.authenticate(reqSteve, credentialsFuncion, options);
+            expect(credentials1.user).to.equal('steve');
 
-                expect(err).to.not.exist();
-                expect(credentials1.user).to.equal('steve');
-
-                Hawk.server.authenticate(reqBob, credentialsFuncion, options, (err, credentials2, artifacts2) => {
-
-                    expect(err).to.not.exist();
-                    expect(credentials2.user).to.equal('bob');
-                    done();
-                });
-            });
+            const { credentials: credentials2 } = await Hawk.server.authenticate(reqBob, credentialsFuncion, options);
+            expect(credentials2.user).to.equal('bob');
         });
 
-        it('errors on an invalid authentication header: wrong scheme', (done) => {
+        it('errors on an invalid authentication header: wrong scheme', async () => {
 
             const req = {
                 method: 'GET',
@@ -291,15 +240,10 @@ describe('Server', () => {
                 authorization: 'Basic asdasdasdasd'
             };
 
-            Hawk.server.authenticate(req, credentialsFunc, { localtimeOffsetMsec: 1353788437000 - Hawk.utils.now() }, (err, credentials, artifacts) => {
-
-                expect(err).to.exist();
-                expect(err.output.payload.message).to.not.exist();
-                done();
-            });
+            await expect(Hawk.server.authenticate(req, credentialsFunc, { localtimeOffsetMsec: 1353788437000 - Hawk.utils.now() })).to.reject('Unauthorized');
         });
 
-        it('errors on an invalid authentication header: no scheme', (done) => {
+        it('errors on an invalid authentication header: no scheme', async () => {
 
             const req = {
                 method: 'GET',
@@ -309,15 +253,10 @@ describe('Server', () => {
                 authorization: '!@#'
             };
 
-            Hawk.server.authenticate(req, credentialsFunc, { localtimeOffsetMsec: 1353788437000 - Hawk.utils.now() }, (err, credentials, artifacts) => {
-
-                expect(err).to.exist();
-                expect(err.output.payload.message).to.equal('Invalid header syntax');
-                done();
-            });
+            await expect(Hawk.server.authenticate(req, credentialsFunc, { localtimeOffsetMsec: 1353788437000 - Hawk.utils.now() })).to.reject('Invalid header syntax');
         });
 
-        it('errors on an missing authorization header', (done) => {
+        it('errors on an missing authorization header', async () => {
 
             const req = {
                 method: 'GET',
@@ -326,15 +265,11 @@ describe('Server', () => {
                 port: 8080
             };
 
-            Hawk.server.authenticate(req, credentialsFunc, {}, (err, credentials, artifacts) => {
-
-                expect(err).to.exist();
-                expect(err.isMissing).to.equal(true);
-                done();
-            });
+            const err = await expect(Hawk.server.authenticate(req, credentialsFunc)).to.reject();
+            expect(err.isMissing).to.equal(true);
         });
 
-        it('errors on an missing host header', (done) => {
+        it('errors on an missing host header', async () => {
 
             const req = {
                 method: 'GET',
@@ -344,15 +279,10 @@ describe('Server', () => {
                 }
             };
 
-            Hawk.server.authenticate(req, credentialsFunc, { localtimeOffsetMsec: 1353788437000 - Hawk.utils.now() }, (err, credentials, artifacts) => {
-
-                expect(err).to.exist();
-                expect(err.output.payload.message).to.equal('Invalid Host header');
-                done();
-            });
+            await expect(Hawk.server.authenticate(req, credentialsFunc, { localtimeOffsetMsec: 1353788437000 - Hawk.utils.now() })).to.reject('Invalid Host header');
         });
 
-        it('errors on an missing authorization attribute (id)', (done) => {
+        it('errors on an missing authorization attribute (id)', async () => {
 
             const req = {
                 method: 'GET',
@@ -362,15 +292,10 @@ describe('Server', () => {
                 authorization: 'Hawk ts="1353788437", nonce="k3j4h2", mac="/qwS4UjfVWMcUyW6EEgUH4jlr7T/wuKe3dKijvTvSos=", ext="hello"'
             };
 
-            Hawk.server.authenticate(req, credentialsFunc, { localtimeOffsetMsec: 1353788437000 - Hawk.utils.now() }, (err, credentials, artifacts) => {
-
-                expect(err).to.exist();
-                expect(err.output.payload.message).to.equal('Missing attributes');
-                done();
-            });
+            await expect(Hawk.server.authenticate(req, credentialsFunc, { localtimeOffsetMsec: 1353788437000 - Hawk.utils.now() })).to.reject('Missing attributes');
         });
 
-        it('errors on an missing authorization attribute (ts)', (done) => {
+        it('errors on an missing authorization attribute (ts)', async () => {
 
             const req = {
                 method: 'GET',
@@ -380,15 +305,10 @@ describe('Server', () => {
                 authorization: 'Hawk id="123", nonce="k3j4h2", mac="/qwS4UjfVWMcUyW6EEgUH4jlr7T/wuKe3dKijvTvSos=", ext="hello"'
             };
 
-            Hawk.server.authenticate(req, credentialsFunc, { localtimeOffsetMsec: 1353788437000 - Hawk.utils.now() }, (err, credentials, artifacts) => {
-
-                expect(err).to.exist();
-                expect(err.output.payload.message).to.equal('Missing attributes');
-                done();
-            });
+            await expect(Hawk.server.authenticate(req, credentialsFunc, { localtimeOffsetMsec: 1353788437000 - Hawk.utils.now() })).to.reject('Missing attributes');
         });
 
-        it('errors on an missing authorization attribute (nonce)', (done) => {
+        it('errors on an missing authorization attribute (nonce)', async () => {
 
             const req = {
                 method: 'GET',
@@ -398,15 +318,10 @@ describe('Server', () => {
                 authorization: 'Hawk id="123", ts="1353788437", mac="/qwS4UjfVWMcUyW6EEgUH4jlr7T/wuKe3dKijvTvSos=", ext="hello"'
             };
 
-            Hawk.server.authenticate(req, credentialsFunc, { localtimeOffsetMsec: 1353788437000 - Hawk.utils.now() }, (err, credentials, artifacts) => {
-
-                expect(err).to.exist();
-                expect(err.output.payload.message).to.equal('Missing attributes');
-                done();
-            });
+            await expect(Hawk.server.authenticate(req, credentialsFunc, { localtimeOffsetMsec: 1353788437000 - Hawk.utils.now() })).to.reject('Missing attributes');
         });
 
-        it('errors on an missing authorization attribute (mac)', (done) => {
+        it('errors on an missing authorization attribute (mac)', async () => {
 
             const req = {
                 method: 'GET',
@@ -416,15 +331,10 @@ describe('Server', () => {
                 authorization: 'Hawk id="123", ts="1353788437", nonce="k3j4h2", ext="hello"'
             };
 
-            Hawk.server.authenticate(req, credentialsFunc, { localtimeOffsetMsec: 1353788437000 - Hawk.utils.now() }, (err, credentials, artifacts) => {
-
-                expect(err).to.exist();
-                expect(err.output.payload.message).to.equal('Missing attributes');
-                done();
-            });
+            await expect(Hawk.server.authenticate(req, credentialsFunc, { localtimeOffsetMsec: 1353788437000 - Hawk.utils.now() })).to.reject('Missing attributes');
         });
 
-        it('errors on an unknown authorization attribute', (done) => {
+        it('errors on an unknown authorization attribute', async () => {
 
             const req = {
                 method: 'GET',
@@ -434,15 +344,10 @@ describe('Server', () => {
                 authorization: 'Hawk id="123", ts="1353788437", nonce="k3j4h2", x="3", mac="/qwS4UjfVWMcUyW6EEgUH4jlr7T/wuKe3dKijvTvSos=", ext="hello"'
             };
 
-            Hawk.server.authenticate(req, credentialsFunc, { localtimeOffsetMsec: 1353788437000 - Hawk.utils.now() }, (err, credentials, artifacts) => {
-
-                expect(err).to.exist();
-                expect(err.output.payload.message).to.equal('Unknown attribute: x');
-                done();
-            });
+            await expect(Hawk.server.authenticate(req, credentialsFunc, { localtimeOffsetMsec: 1353788437000 - Hawk.utils.now() })).to.reject('Unknown attribute: x');
         });
 
-        it('errors on an bad authorization header format', (done) => {
+        it('errors on an bad authorization header format', async () => {
 
             const req = {
                 method: 'GET',
@@ -452,15 +357,10 @@ describe('Server', () => {
                 authorization: 'Hawk id="123\\", ts="1353788437", nonce="k3j4h2", mac="/qwS4UjfVWMcUyW6EEgUH4jlr7T/wuKe3dKijvTvSos=", ext="hello"'
             };
 
-            Hawk.server.authenticate(req, credentialsFunc, { localtimeOffsetMsec: 1353788437000 - Hawk.utils.now() }, (err, credentials, artifacts) => {
-
-                expect(err).to.exist();
-                expect(err.output.payload.message).to.equal('Bad header format');
-                done();
-            });
+            await expect(Hawk.server.authenticate(req, credentialsFunc, { localtimeOffsetMsec: 1353788437000 - Hawk.utils.now() })).to.reject('Bad header format');
         });
 
-        it('errors on an bad authorization attribute value', (done) => {
+        it('errors on an bad authorization attribute value', async () => {
 
             const req = {
                 method: 'GET',
@@ -470,15 +370,10 @@ describe('Server', () => {
                 authorization: 'Hawk id="\t", ts="1353788437", nonce="k3j4h2", mac="/qwS4UjfVWMcUyW6EEgUH4jlr7T/wuKe3dKijvTvSos=", ext="hello"'
             };
 
-            Hawk.server.authenticate(req, credentialsFunc, { localtimeOffsetMsec: 1353788437000 - Hawk.utils.now() }, (err, credentials, artifacts) => {
-
-                expect(err).to.exist();
-                expect(err.output.payload.message).to.equal('Bad attribute value: id');
-                done();
-            });
+            await expect(Hawk.server.authenticate(req, credentialsFunc, { localtimeOffsetMsec: 1353788437000 - Hawk.utils.now() })).to.reject('Bad attribute value: id');
         });
 
-        it('errors on an empty authorization attribute value', (done) => {
+        it('errors on an empty authorization attribute value', async () => {
 
             const req = {
                 method: 'GET',
@@ -488,15 +383,10 @@ describe('Server', () => {
                 authorization: 'Hawk id="", ts="1353788437", nonce="k3j4h2", mac="/qwS4UjfVWMcUyW6EEgUH4jlr7T/wuKe3dKijvTvSos=", ext="hello"'
             };
 
-            Hawk.server.authenticate(req, credentialsFunc, { localtimeOffsetMsec: 1353788437000 - Hawk.utils.now() }, (err, credentials, artifacts) => {
-
-                expect(err).to.exist();
-                expect(err.output.payload.message).to.equal('Bad attribute value: id');
-                done();
-            });
+            await expect(Hawk.server.authenticate(req, credentialsFunc, { localtimeOffsetMsec: 1353788437000 - Hawk.utils.now() })).to.reject('Bad attribute value: id');
         });
 
-        it('errors on duplicated authorization attribute key', (done) => {
+        it('errors on duplicated authorization attribute key', async () => {
 
             const req = {
                 method: 'GET',
@@ -506,15 +396,10 @@ describe('Server', () => {
                 authorization: 'Hawk id="123", id="456", ts="1353788437", nonce="k3j4h2", mac="/qwS4UjfVWMcUyW6EEgUH4jlr7T/wuKe3dKijvTvSos=", ext="hello"'
             };
 
-            Hawk.server.authenticate(req, credentialsFunc, { localtimeOffsetMsec: 1353788437000 - Hawk.utils.now() }, (err, credentials, artifacts) => {
-
-                expect(err).to.exist();
-                expect(err.output.payload.message).to.equal('Duplicate attribute: id');
-                done();
-            });
+            await expect(Hawk.server.authenticate(req, credentialsFunc, { localtimeOffsetMsec: 1353788437000 - Hawk.utils.now() })).to.reject('Duplicate attribute: id');
         });
 
-        it('errors on an invalid authorization header format', (done) => {
+        it('errors on an invalid authorization header format', async () => {
 
             const req = {
                 method: 'GET',
@@ -524,15 +409,10 @@ describe('Server', () => {
                 authorization: 'Hawk'
             };
 
-            Hawk.server.authenticate(req, credentialsFunc, { localtimeOffsetMsec: 1353788437000 - Hawk.utils.now() }, (err, credentials, artifacts) => {
-
-                expect(err).to.exist();
-                expect(err.output.payload.message).to.equal('Invalid header syntax');
-                done();
-            });
+            await expect(Hawk.server.authenticate(req, credentialsFunc, { localtimeOffsetMsec: 1353788437000 - Hawk.utils.now() })).to.reject('Invalid header syntax');
         });
 
-        it('errors on an bad host header (missing host)', (done) => {
+        it('errors on an bad host header (missing host)', async () => {
 
             const req = {
                 method: 'GET',
@@ -543,15 +423,10 @@ describe('Server', () => {
                 }
             };
 
-            Hawk.server.authenticate(req, credentialsFunc, { localtimeOffsetMsec: 1353788437000 - Hawk.utils.now() }, (err, credentials, artifacts) => {
-
-                expect(err).to.exist();
-                expect(err.output.payload.message).to.equal('Invalid Host header');
-                done();
-            });
+            await expect(Hawk.server.authenticate(req, credentialsFunc, { localtimeOffsetMsec: 1353788437000 - Hawk.utils.now() })).to.reject('Invalid Host header');
         });
 
-        it('errors on an bad host header (pad port)', (done) => {
+        it('errors on an bad host header (pad port)', async () => {
 
             const req = {
                 method: 'GET',
@@ -562,15 +437,10 @@ describe('Server', () => {
                 }
             };
 
-            Hawk.server.authenticate(req, credentialsFunc, { localtimeOffsetMsec: 1353788437000 - Hawk.utils.now() }, (err, credentials, artifacts) => {
-
-                expect(err).to.exist();
-                expect(err.output.payload.message).to.equal('Invalid Host header');
-                done();
-            });
+            await expect(Hawk.server.authenticate(req, credentialsFunc, { localtimeOffsetMsec: 1353788437000 - Hawk.utils.now() })).to.reject('Invalid Host header');
         });
 
-        it('errors on credentialsFunc error', (done) => {
+        it('errors on credentialsFunc error', async () => {
 
             const req = {
                 method: 'GET',
@@ -580,20 +450,15 @@ describe('Server', () => {
                 authorization: 'Hawk id="123", ts="1353788437", nonce="k3j4h2", mac="/qwS4UjfVWMcUyW6EEgUH4jlr7T/wuKe3dKijvTvSos=", ext="hello"'
             };
 
-            const credentialsFuncion = function (id, callback) {
+            const credentialsFuncion = function (id) {
 
-                return callback(new Error('Unknown user'));
+                throw new Error('Unknown user');
             };
 
-            Hawk.server.authenticate(req, credentialsFuncion, { localtimeOffsetMsec: 1353788437000 - Hawk.utils.now() }, (err, credentials, artifacts) => {
-
-                expect(err).to.exist();
-                expect(err.message).to.equal('Unknown user');
-                done();
-            });
+            await expect(Hawk.server.authenticate(req, credentialsFuncion, { localtimeOffsetMsec: 1353788437000 - Hawk.utils.now() })).to.reject('Unknown user');
         });
 
-        it('errors on credentialsFunc error (with credentials)', (done) => {
+        it('errors on credentialsFunc error (with credentials)', async () => {
 
             const req = {
                 method: 'GET',
@@ -603,21 +468,18 @@ describe('Server', () => {
                 authorization: 'Hawk id="123", ts="1353788437", nonce="k3j4h2", mac="/qwS4UjfVWMcUyW6EEgUH4jlr7T/wuKe3dKijvTvSos=", ext="hello"'
             };
 
-            const credentialsFuncion = function (id, callback) {
+            const credentialsFuncion = function (id) {
 
-                return callback(new Error('Unknown user'), { some: 'value' });
+                const error = new Error('Unknown user');
+                error.credentials = { some: 'value' };
+                throw error;
             };
 
-            Hawk.server.authenticate(req, credentialsFuncion, { localtimeOffsetMsec: 1353788437000 - Hawk.utils.now() }, (err, credentials, artifacts) => {
-
-                expect(err).to.exist();
-                expect(err.message).to.equal('Unknown user');
-                expect(credentials.some).to.equal('value');
-                done();
-            });
+            const err = await expect(Hawk.server.authenticate(req, credentialsFuncion, { localtimeOffsetMsec: 1353788437000 - Hawk.utils.now() })).to.reject('Unknown user');
+            expect(err.credentials.some).to.equal('value');
         });
 
-        it('errors on missing credentials', (done) => {
+        it('errors on missing credentials', async () => {
 
             const req = {
                 method: 'GET',
@@ -627,20 +489,15 @@ describe('Server', () => {
                 authorization: 'Hawk id="123", ts="1353788437", nonce="k3j4h2", mac="/qwS4UjfVWMcUyW6EEgUH4jlr7T/wuKe3dKijvTvSos=", ext="hello"'
             };
 
-            const credentialsFuncion = function (id, callback) {
+            const credentialsFuncion = function (id) {
 
-                return callback(null, null);
+                return null;
             };
 
-            Hawk.server.authenticate(req, credentialsFuncion, { localtimeOffsetMsec: 1353788437000 - Hawk.utils.now() }, (err, credentials, artifacts) => {
-
-                expect(err).to.exist();
-                expect(err.output.payload.message).to.equal('Unknown credentials');
-                done();
-            });
+            await expect(Hawk.server.authenticate(req, credentialsFuncion, { localtimeOffsetMsec: 1353788437000 - Hawk.utils.now() })).to.reject('Unknown credentials');
         });
 
-        it('errors on invalid credentials (id)', (done) => {
+        it('errors on invalid credentials (id)', async () => {
 
             const req = {
                 method: 'GET',
@@ -650,26 +507,19 @@ describe('Server', () => {
                 authorization: 'Hawk id="123", ts="1353788437", nonce="k3j4h2", mac="/qwS4UjfVWMcUyW6EEgUH4jlr7T/wuKe3dKijvTvSos=", ext="hello"'
             };
 
-            const credentialsFuncion = function (id, callback) {
+            const credentialsFuncion = function (id) {
 
-                const credentials = {
+                return {
                     key: 'werxhqb98rpaxn39848xrunpaw3489ruxnpa98w4rxn',
                     user: 'steve'
                 };
-
-                return callback(null, credentials);
             };
 
-            Hawk.server.authenticate(req, credentialsFuncion, { localtimeOffsetMsec: 1353788437000 - Hawk.utils.now() }, (err, credentials, artifacts) => {
-
-                expect(err).to.exist();
-                expect(err.message).to.equal('Invalid credentials');
-                expect(err.output.payload.message).to.equal('An internal server error occurred');
-                done();
-            });
+            const err = await expect(Hawk.server.authenticate(req, credentialsFuncion, { localtimeOffsetMsec: 1353788437000 - Hawk.utils.now() })).to.reject('Invalid credentials');
+            expect(err.output.payload.message).to.equal('An internal server error occurred');
         });
 
-        it('errors on invalid credentials (key)', (done) => {
+        it('errors on invalid credentials (key)', async () => {
 
             const req = {
                 method: 'GET',
@@ -679,26 +529,19 @@ describe('Server', () => {
                 authorization: 'Hawk id="123", ts="1353788437", nonce="k3j4h2", mac="/qwS4UjfVWMcUyW6EEgUH4jlr7T/wuKe3dKijvTvSos=", ext="hello"'
             };
 
-            const credentialsFuncion = function (id, callback) {
+            const credentialsFuncion = function (id) {
 
-                const credentials = {
+                return {
                     id: '23434d3q4d5345d',
                     user: 'steve'
                 };
-
-                return callback(null, credentials);
             };
 
-            Hawk.server.authenticate(req, credentialsFuncion, { localtimeOffsetMsec: 1353788437000 - Hawk.utils.now() }, (err, credentials, artifacts) => {
-
-                expect(err).to.exist();
-                expect(err.message).to.equal('Invalid credentials');
-                expect(err.output.payload.message).to.equal('An internal server error occurred');
-                done();
-            });
+            const err = await expect(Hawk.server.authenticate(req, credentialsFuncion, { localtimeOffsetMsec: 1353788437000 - Hawk.utils.now() })).to.reject('Invalid credentials');
+            expect(err.output.payload.message).to.equal('An internal server error occurred');
         });
 
-        it('errors on unknown credentials algorithm', (done) => {
+        it('errors on unknown credentials algorithm', async () => {
 
             const req = {
                 method: 'GET',
@@ -708,27 +551,20 @@ describe('Server', () => {
                 authorization: 'Hawk id="123", ts="1353788437", nonce="k3j4h2", mac="/qwS4UjfVWMcUyW6EEgUH4jlr7T/wuKe3dKijvTvSos=", ext="hello"'
             };
 
-            const credentialsFuncion = function (id, callback) {
+            const credentialsFuncion = function (id) {
 
-                const credentials = {
+                return {
                     key: 'werxhqb98rpaxn39848xrunpaw3489ruxnpa98w4rxn',
                     algorithm: 'hmac-sha-0',
                     user: 'steve'
                 };
-
-                return callback(null, credentials);
             };
 
-            Hawk.server.authenticate(req, credentialsFuncion, { localtimeOffsetMsec: 1353788437000 - Hawk.utils.now() }, (err, credentials, artifacts) => {
-
-                expect(err).to.exist();
-                expect(err.message).to.equal('Unknown algorithm');
-                expect(err.output.payload.message).to.equal('An internal server error occurred');
-                done();
-            });
+            const err = await expect(Hawk.server.authenticate(req, credentialsFuncion, { localtimeOffsetMsec: 1353788437000 - Hawk.utils.now() })).to.reject('Unknown algorithm');
+            expect(err.output.payload.message).to.equal('An internal server error occurred');
         });
 
-        it('errors on unknown bad mac', (done) => {
+        it('errors on unknown bad mac', async () => {
 
             const req = {
                 method: 'GET',
@@ -738,29 +574,22 @@ describe('Server', () => {
                 authorization: 'Hawk id="123", ts="1353788437", nonce="k3j4h2", mac="/qwS4UjfVWMcU4jlr7T/wuKe3dKijvTvSos=", ext="hello"'
             };
 
-            const credentialsFuncion = function (id, callback) {
+            const credentialsFuncion = function (id) {
 
-                const credentials = {
+                return {
                     key: 'werxhqb98rpaxn39848xrunpaw3489ruxnpa98w4rxn',
                     algorithm: 'sha256',
                     user: 'steve'
                 };
-
-                return callback(null, credentials);
             };
 
-            Hawk.server.authenticate(req, credentialsFuncion, { localtimeOffsetMsec: 1353788437000 - Hawk.utils.now() }, (err, credentials, artifacts) => {
-
-                expect(err).to.exist();
-                expect(err.output.payload.message).to.equal('Bad mac');
-                done();
-            });
+            await expect(Hawk.server.authenticate(req, credentialsFuncion, { localtimeOffsetMsec: 1353788437000 - Hawk.utils.now() })).to.reject('Bad mac');
         });
     });
 
     describe('header()', () => {
 
-        it('generates header', (done) => {
+        it('generates header', () => {
 
             const credentials = {
                 id: '123456',
@@ -784,10 +613,9 @@ describe('Server', () => {
 
             const header = Hawk.server.header(credentials, artifacts, { payload: 'some reply', contentType: 'text/plain', ext: 'response-specific' });
             expect(header).to.equal('Hawk mac=\"n14wVJK4cOxAytPUMc5bPezQzuJGl5n7MYXhFQgEKsE=\", hash=\"f9cDF/TDm7TkYRLnGwRMfeDzT6LixQVLvrIKhh0vgmM=\", ext=\"response-specific\"');
-            done();
         });
 
-        it('generates header (empty payload)', (done) => {
+        it('generates header (empty payload)', () => {
 
             const credentials = {
                 id: '123456',
@@ -811,10 +639,9 @@ describe('Server', () => {
 
             const header = Hawk.server.header(credentials, artifacts, { payload: '', contentType: 'text/plain', ext: 'response-specific' });
             expect(header).to.equal('Hawk mac=\"i8/kUBDx0QF+PpCtW860kkV/fa9dbwEoe/FpGUXowf0=\", hash=\"q/t+NNAkQZNlq/aAD6PlexImwQTxwgT2MahfTa9XRLA=\", ext=\"response-specific\"');
-            done();
         });
 
-        it('generates header (pre calculated hash)', (done) => {
+        it('generates header (pre calculated hash)', () => {
 
             const credentials = {
                 id: '123456',
@@ -840,10 +667,9 @@ describe('Server', () => {
             options.hash = Hawk.crypto.calculatePayloadHash(options.payload, credentials.algorithm, options.contentType);
             const header = Hawk.server.header(credentials, artifacts, options);
             expect(header).to.equal('Hawk mac=\"n14wVJK4cOxAytPUMc5bPezQzuJGl5n7MYXhFQgEKsE=\", hash=\"f9cDF/TDm7TkYRLnGwRMfeDzT6LixQVLvrIKhh0vgmM=\", ext=\"response-specific\"');
-            done();
         });
 
-        it('generates header (null ext)', (done) => {
+        it('generates header (null ext)', () => {
 
             const credentials = {
                 id: '123456',
@@ -866,10 +692,9 @@ describe('Server', () => {
 
             const header = Hawk.server.header(credentials, artifacts, { payload: 'some reply', contentType: 'text/plain', ext: null });
             expect(header).to.equal('Hawk mac=\"6PrybJTJs20jsgBw5eilXpcytD8kUbaIKNYXL+6g0ns=\", hash=\"f9cDF/TDm7TkYRLnGwRMfeDzT6LixQVLvrIKhh0vgmM=\"');
-            done();
         });
 
-        it('errors on missing artifacts', (done) => {
+        it('errors on missing artifacts', () => {
 
             const credentials = {
                 id: '123456',
@@ -880,10 +705,9 @@ describe('Server', () => {
 
             const header = Hawk.server.header(credentials, null, { payload: 'some reply', contentType: 'text/plain', ext: 'response-specific' });
             expect(header).to.equal('');
-            done();
         });
 
-        it('errors on invalid artifacts', (done) => {
+        it('errors on invalid artifacts', () => {
 
             const credentials = {
                 id: '123456',
@@ -894,10 +718,9 @@ describe('Server', () => {
 
             const header = Hawk.server.header(credentials, 5, { payload: 'some reply', contentType: 'text/plain', ext: 'response-specific' });
             expect(header).to.equal('');
-            done();
         });
 
-        it('errors on missing credentials', (done) => {
+        it('errors on missing credentials', () => {
 
             const artifacts = {
                 method: 'POST',
@@ -914,10 +737,9 @@ describe('Server', () => {
 
             const header = Hawk.server.header(null, artifacts, { payload: 'some reply', contentType: 'text/plain', ext: 'response-specific' });
             expect(header).to.equal('');
-            done();
         });
 
-        it('errors on invalid credentials (key)', (done) => {
+        it('errors on invalid credentials (key)', () => {
 
             const credentials = {
                 id: '123456',
@@ -940,10 +762,9 @@ describe('Server', () => {
 
             const header = Hawk.server.header(credentials, artifacts, { payload: 'some reply', contentType: 'text/plain', ext: 'response-specific' });
             expect(header).to.equal('');
-            done();
         });
 
-        it('errors on invalid algorithm', (done) => {
+        it('errors on invalid algorithm', () => {
 
             const credentials = {
                 id: '123456',
@@ -967,13 +788,12 @@ describe('Server', () => {
 
             const header = Hawk.server.header(credentials, artifacts, { payload: 'some reply', contentType: 'text/plain', ext: 'response-specific' });
             expect(header).to.equal('');
-            done();
         });
     });
 
     describe('authenticateBewit()', () => {
 
-        it('errors on uri too long', (done) => {
+        it('errors on uri too long', async () => {
 
             let long = '/';
             for (let i = 0; i < 5000; ++i) {
@@ -988,378 +808,215 @@ describe('Server', () => {
                 authorization: 'Hawk id="1", ts="1353788437", nonce="k3j4h2", mac="zy79QQ5/EYFmQqutVnYb73gAc/U=", ext="hello"'
             };
 
-            Hawk.server.authenticateBewit(req, credentialsFunc, {}, (err, credentials, bewit) => {
-
-                expect(err).to.exist();
-                expect(err.output.statusCode).to.equal(400);
-                expect(err.message).to.equal('Resource path exceeds max length');
-                done();
-            });
+            const err = await expect(Hawk.server.authenticateBewit(req, credentialsFunc)).to.reject('Resource path exceeds max length');
+            expect(err.output.statusCode).to.equal(400);
         });
     });
 
     describe('authenticateMessage()', () => {
 
-        it('errors on invalid authorization (ts)', (done) => {
+        it('errors on invalid authorization (ts)', async () => {
 
-            credentialsFunc('123456', (err, credentials1) => {
+            const credentials = credentialsFunc('123456');
+            const auth = Hawk.client.message('example.com', 8080, 'some message', { credentials });
+            delete auth.ts;
 
-                expect(err).to.not.exist();
-
-                const auth = Hawk.client.message('example.com', 8080, 'some message', { credentials: credentials1 });
-                delete auth.ts;
-
-                Hawk.server.authenticateMessage('example.com', 8080, 'some message', auth, credentialsFunc, {}, (err, credentials2) => {
-
-                    expect(err).to.exist();
-                    expect(err.message).to.equal('Invalid authorization');
-                    done();
-                });
-            });
+            await expect(Hawk.server.authenticateMessage('example.com', 8080, 'some message', auth, credentialsFunc)).to.reject('Invalid authorization');
         });
 
-        it('errors on invalid authorization (nonce)', (done) => {
+        it('errors on invalid authorization (nonce)', async () => {
 
-            credentialsFunc('123456', (err, credentials1) => {
+            const credentials = credentialsFunc('123456');
+            const auth = Hawk.client.message('example.com', 8080, 'some message', { credentials });
+            delete auth.nonce;
 
-                expect(err).to.not.exist();
-
-                const auth = Hawk.client.message('example.com', 8080, 'some message', { credentials: credentials1 });
-                delete auth.nonce;
-
-                Hawk.server.authenticateMessage('example.com', 8080, 'some message', auth, credentialsFunc, {}, (err, credentials2) => {
-
-                    expect(err).to.exist();
-                    expect(err.message).to.equal('Invalid authorization');
-                    done();
-                });
-            });
+            await expect(Hawk.server.authenticateMessage('example.com', 8080, 'some message', auth, credentialsFunc)).to.reject('Invalid authorization');
         });
 
-        it('errors on invalid authorization (hash)', (done) => {
+        it('errors on invalid authorization (hash)', async () => {
 
-            credentialsFunc('123456', (err, credentials1) => {
+            const credentials = credentialsFunc('123456');
+            const auth = Hawk.client.message('example.com', 8080, 'some message', { credentials });
+            delete auth.hash;
 
-                expect(err).to.not.exist();
-
-                const auth = Hawk.client.message('example.com', 8080, 'some message', { credentials: credentials1 });
-                delete auth.hash;
-
-                Hawk.server.authenticateMessage('example.com', 8080, 'some message', auth, credentialsFunc, {}, (err, credentials2) => {
-
-                    expect(err).to.exist();
-                    expect(err.message).to.equal('Invalid authorization');
-                    done();
-                });
-            });
+            await expect(Hawk.server.authenticateMessage('example.com', 8080, 'some message', auth, credentialsFunc)).to.reject('Invalid authorization');
         });
 
-        it('errors with credentials', (done) => {
+        it('errors with credentials', async () => {
 
-            credentialsFunc('123456', (err, credentials1) => {
+            const credentials = credentialsFunc('123456');
+            const auth = Hawk.client.message('example.com', 8080, 'some message', { credentials });
 
-                expect(err).to.not.exist();
+            const err = await expect(Hawk.server.authenticateMessage('example.com', 8080, 'some message', auth, (id) => {
 
-                const auth = Hawk.client.message('example.com', 8080, 'some message', { credentials: credentials1 });
-
-                Hawk.server.authenticateMessage('example.com', 8080, 'some message', auth, (id, callback) => {
-
-                    callback(new Error('something'), { some: 'value' });
-                }, {}, (err, credentials2) => {
-
-                    expect(err).to.exist();
-                    expect(err.message).to.equal('something');
-                    expect(credentials2.some).to.equal('value');
-                    done();
-                });
-            });
+                const error = new Error('something');
+                error.credentials = { some: 'value' };
+                throw error;
+            })).to.reject('something');
+            expect(err.credentials.some).to.equal('value');
         });
 
-        it('errors on nonce collision', (done) => {
+        it('errors on nonce collision', async () => {
 
-            credentialsFunc('123456', (err, credentials1) => {
+            const credentials = credentialsFunc('123456');
+            const auth = Hawk.client.message('example.com', 8080, 'some message', { credentials });
 
-                expect(err).to.not.exist();
+            const nonceFunc = function (key, nonce, ts) {
 
-                const auth = Hawk.client.message('example.com', 8080, 'some message', { credentials: credentials1 });
-                Hawk.server.authenticateMessage('example.com', 8080, 'some message', auth, credentialsFunc, {
-                    nonceFunc: function (key, nonce, ts, nonceCallback) {
+                throw new Error();
+            };
 
-                        nonceCallback(true);
-                    }
-                }, (err, credentials2) => {
-
-                    expect(err).to.exist();
-                    expect(err.message).to.equal('Invalid nonce');
-                    done();
-                });
-            });
+            await expect(Hawk.server.authenticateMessage('example.com', 8080, 'some message', auth, credentialsFunc, { nonceFunc })).to.reject('Invalid nonce');
         });
 
-        it('should generate an authorization then successfully parse it', (done) => {
+        it('should generate an authorization then successfully parse it', async () => {
 
-            credentialsFunc('123456', (err, credentials1) => {
+            const credentials1 = credentialsFunc('123456');
+            const auth = Hawk.client.message('example.com', 8080, 'some message', { credentials: credentials1 });
+            expect(auth).to.exist();
 
-                expect(err).to.not.exist();
-
-                const auth = Hawk.client.message('example.com', 8080, 'some message', { credentials: credentials1 });
-                expect(auth).to.exist();
-
-                Hawk.server.authenticateMessage('example.com', 8080, 'some message', auth, credentialsFunc, {}, (err, credentials2) => {
-
-                    expect(err).to.not.exist();
-                    expect(credentials2.user).to.equal('steve');
-                    done();
-                });
-            });
+            const { credentials: credentials2 } = await Hawk.server.authenticateMessage('example.com', 8080, 'some message', auth, credentialsFunc);
+            expect(credentials2.user).to.equal('steve');
         });
 
-        it('should fail authorization on mismatching host', (done) => {
+        it('should fail authorization on mismatching host', async () => {
 
-            credentialsFunc('123456', (err, credentials1) => {
+            const credentials = credentialsFunc('123456');
+            const auth = Hawk.client.message('example.com', 8080, 'some message', { credentials });
+            expect(auth).to.exist();
 
-                expect(err).to.not.exist();
-
-                const auth = Hawk.client.message('example.com', 8080, 'some message', { credentials: credentials1 });
-                expect(auth).to.exist();
-
-                Hawk.server.authenticateMessage('example1.com', 8080, 'some message', auth, credentialsFunc, {}, (err, credentials2) => {
-
-                    expect(err).to.exist();
-                    expect(err.message).to.equal('Bad mac');
-                    done();
-                });
-            });
+            await expect(Hawk.server.authenticateMessage('example1.com', 8080, 'some message', auth, credentialsFunc)).to.reject('Bad mac');
         });
 
-        it('should fail authorization on stale timestamp', (done) => {
+        it('should fail authorization on stale timestamp', async () => {
 
-            credentialsFunc('123456', (err, credentials1) => {
+            const credentials = credentialsFunc('123456');
+            const auth = Hawk.client.message('example.com', 8080, 'some message', { credentials });
+            expect(auth).to.exist();
 
-                expect(err).to.not.exist();
-
-                const auth = Hawk.client.message('example.com', 8080, 'some message', { credentials: credentials1 });
-                expect(auth).to.exist();
-
-                Hawk.server.authenticateMessage('example.com', 8080, 'some message', auth, credentialsFunc, { localtimeOffsetMsec: 100000 }, (err, credentials2) => {
-
-                    expect(err).to.exist();
-                    expect(err.message).to.equal('Stale timestamp');
-                    done();
-                });
-            });
+            await expect(Hawk.server.authenticateMessage('example.com', 8080, 'some message', auth, credentialsFunc, { localtimeOffsetMsec: 100000 })).to.reject('Stale timestamp');
         });
 
-        it('overrides timestampSkewSec', (done) => {
+        it('overrides timestampSkewSec', async () => {
 
-            credentialsFunc('123456', (err, credentials1) => {
+            const credentials = credentialsFunc('123456');
+            const auth = Hawk.client.message('example.com', 8080, 'some message', { credentials, localtimeOffsetMsec: 100000 });
+            expect(auth).to.exist();
 
-                expect(err).to.not.exist();
-
-                const auth = Hawk.client.message('example.com', 8080, 'some message', { credentials: credentials1, localtimeOffsetMsec: 100000 });
-                expect(auth).to.exist();
-
-                Hawk.server.authenticateMessage('example.com', 8080, 'some message', auth, credentialsFunc, { timestampSkewSec: 500 }, (err, credentials2) => {
-
-                    expect(err).to.not.exist();
-                    done();
-                });
-            });
+            await expect(Hawk.server.authenticateMessage('example.com', 8080, 'some message', auth, credentialsFunc, { timestampSkewSec: 500 })).to.not.reject();
         });
 
-        it('should fail authorization on invalid authorization', (done) => {
+        it('should fail authorization on invalid authorization', async () => {
 
-            credentialsFunc('123456', (err, credentials1) => {
+            const credentials = credentialsFunc('123456');
+            const auth = Hawk.client.message('example.com', 8080, 'some message', { credentials });
+            expect(auth).to.exist();
+            delete auth.id;
 
-                expect(err).to.not.exist();
-
-                const auth = Hawk.client.message('example.com', 8080, 'some message', { credentials: credentials1 });
-                expect(auth).to.exist();
-                delete auth.id;
-
-                Hawk.server.authenticateMessage('example.com', 8080, 'some message', auth, credentialsFunc, {}, (err, credentials2) => {
-
-                    expect(err).to.exist();
-                    expect(err.message).to.equal('Invalid authorization');
-                    done();
-                });
-            });
+            await expect(Hawk.server.authenticateMessage('example.com', 8080, 'some message', auth, credentialsFunc)).to.reject('Invalid authorization');
         });
 
-        it('should fail authorization on bad hash', (done) => {
+        it('should fail authorization on bad hash', async () => {
 
-            credentialsFunc('123456', (err, credentials1) => {
+            const credentials = credentialsFunc('123456');
+            const auth = Hawk.client.message('example.com', 8080, 'some message', { credentials });
+            expect(auth).to.exist();
 
-                expect(err).to.not.exist();
-
-                const auth = Hawk.client.message('example.com', 8080, 'some message', { credentials: credentials1 });
-                expect(auth).to.exist();
-
-                Hawk.server.authenticateMessage('example.com', 8080, 'some message1', auth, credentialsFunc, {}, (err, credentials2) => {
-
-                    expect(err).to.exist();
-                    expect(err.message).to.equal('Bad message hash');
-                    done();
-                });
-            });
+            await expect(Hawk.server.authenticateMessage('example.com', 8080, 'some message1', auth, credentialsFunc)).to.reject('Bad message hash');
         });
 
-        it('should fail authorization on nonce error', (done) => {
+        it('should fail authorization on nonce error', async () => {
 
-            credentialsFunc('123456', (err, credentials1) => {
+            const credentials = credentialsFunc('123456');
+            const auth = Hawk.client.message('example.com', 8080, 'some message', { credentials });
+            expect(auth).to.exist();
 
-                expect(err).to.not.exist();
+            await expect(Hawk.server.authenticateMessage('example.com', 8080, 'some message', auth, credentialsFunc, {
+                nonceFunc: function (key, nonce, ts) {
 
-                const auth = Hawk.client.message('example.com', 8080, 'some message', { credentials: credentials1 });
-                expect(auth).to.exist();
-
-                Hawk.server.authenticateMessage('example.com', 8080, 'some message', auth, credentialsFunc, {
-                    nonceFunc: function (key, nonce, ts, callback) {
-
-                        callback(new Error('kaboom'));
-                    }
-                }, (err, credentials2) => {
-
-                    expect(err).to.exist();
-                    expect(err.message).to.equal('Invalid nonce');
-                    done();
-                });
-            });
+                    throw new Error('kaboom');
+                }
+            })).to.reject('Invalid nonce');
         });
 
-        it('should fail authorization on credentials error', (done) => {
+        it('should fail authorization on credentials error', async () => {
 
-            credentialsFunc('123456', (err, credentials1) => {
+            const credentials = credentialsFunc('123456');
+            const auth = Hawk.client.message('example.com', 8080, 'some message', { credentials });
+            expect(auth).to.exist();
 
-                expect(err).to.not.exist();
+            const errFunc = function (id) {
 
-                const auth = Hawk.client.message('example.com', 8080, 'some message', { credentials: credentials1 });
-                expect(auth).to.exist();
+                throw new Error('kablooey');
+            };
 
-                const errFunc = function (id, callback) {
-
-                    callback(new Error('kablooey'));
-                };
-
-                Hawk.server.authenticateMessage('example.com', 8080, 'some message', auth, errFunc, {}, (err, credentials2) => {
-
-                    expect(err).to.exist();
-                    expect(err.message).to.equal('kablooey');
-                    done();
-                });
-            });
+            await expect(Hawk.server.authenticateMessage('example.com', 8080, 'some message', auth, errFunc)).to.reject('kablooey');
         });
 
-        it('should fail authorization on missing credentials', (done) => {
+        it('should fail authorization on missing credentials', async () => {
 
-            credentialsFunc('123456', (err, credentials1) => {
+            const credentials = credentialsFunc('123456');
+            const auth = Hawk.client.message('example.com', 8080, 'some message', { credentials });
+            expect(auth).to.exist();
 
-                expect(err).to.not.exist();
-
-                const auth = Hawk.client.message('example.com', 8080, 'some message', { credentials: credentials1 });
-                expect(auth).to.exist();
-
-                const errFunc = function (id, callback) {
-
-                    callback();
-                };
-
-                Hawk.server.authenticateMessage('example.com', 8080, 'some message', auth, errFunc, {}, (err, credentials2) => {
-
-                    expect(err).to.exist();
-                    expect(err.message).to.equal('Unknown credentials');
-                    done();
-                });
-            });
+            const errFunc = function (id) { };
+            await expect(Hawk.server.authenticateMessage('example.com', 8080, 'some message', auth, errFunc)).to.reject('Unknown credentials');
         });
 
-        it('should fail authorization on invalid credentials', (done) => {
+        it('should fail authorization on invalid credentials', async () => {
 
-            credentialsFunc('123456', (err, credentials1) => {
+            const credentials = credentialsFunc('123456');
+            const auth = Hawk.client.message('example.com', 8080, 'some message', { credentials });
+            expect(auth).to.exist();
 
-                expect(err).to.not.exist();
+            const errFunc = function (id) {
 
-                const auth = Hawk.client.message('example.com', 8080, 'some message', { credentials: credentials1 });
-                expect(auth).to.exist();
+                return {};
+            };
 
-                const errFunc = function (id, callback) {
-
-                    callback(null, {});
-                };
-
-                Hawk.server.authenticateMessage('example.com', 8080, 'some message', auth, errFunc, {}, (err, credentials2) => {
-
-                    expect(err).to.exist();
-                    expect(err.message).to.equal('Invalid credentials');
-                    done();
-                });
-            });
+            await expect(Hawk.server.authenticateMessage('example.com', 8080, 'some message', auth, errFunc)).to.reject('Invalid credentials');
         });
 
-        it('should fail authorization on invalid credentials algorithm', (done) => {
+        it('should fail authorization on invalid credentials algorithm', async () => {
 
-            credentialsFunc('123456', (err, credentials1) => {
+            const credentials = credentialsFunc('123456');
+            const auth = Hawk.client.message('example.com', 8080, 'some message', { credentials });
+            expect(auth).to.exist();
 
-                expect(err).to.not.exist();
+            const errFunc = function (id) {
 
-                const auth = Hawk.client.message('example.com', 8080, 'some message', { credentials: credentials1 });
-                expect(auth).to.exist();
+                return { key: '123', algorithm: '456' };
+            };
 
-                const errFunc = function (id, callback) {
-
-                    callback(null, { key: '123', algorithm: '456' });
-                };
-
-                Hawk.server.authenticateMessage('example.com', 8080, 'some message', auth, errFunc, {}, (err, credentials2) => {
-
-                    expect(err).to.exist();
-                    expect(err.message).to.equal('Unknown algorithm');
-                    done();
-                });
-            });
+            await expect(Hawk.server.authenticateMessage('example.com', 8080, 'some message', auth, errFunc)).to.reject('Unknown algorithm');
         });
 
-        it('should fail on missing host', (done) => {
+        it('should fail on missing host', () => {
 
-            credentialsFunc('123456', (err, credentials) => {
-
-                expect(err).to.not.exist();
-
-                const auth = Hawk.client.message(null, 8080, 'some message', { credentials });
-                expect(auth).to.not.exist();
-                done();
-            });
+            const credentials = credentialsFunc('123456');
+            expect(() => Hawk.client.message(null, 8080, 'some message', { credentials })).to.throw('Invalid inputs');
         });
 
-        it('should fail on missing credentials', (done) => {
+        it('should fail on missing credentials', () => {
 
-            const auth = Hawk.client.message('example.com', 8080, 'some message', {});
-            expect(auth).to.not.exist();
-            done();
+            expect(() => Hawk.client.message('example.com', 8080, 'some message')).to.throw('Invalid credentials');
         });
 
-        it('should fail on invalid algorithm', (done) => {
+        it('should fail on invalid algorithm', () => {
 
-            credentialsFunc('123456', (err, credentials) => {
-
-                expect(err).to.not.exist();
-
-                const creds = Hoek.clone(credentials);
-                creds.algorithm = 'blah';
-                const auth = Hawk.client.message('example.com', 8080, 'some message', { credentials: creds });
-                expect(auth).to.not.exist();
-                done();
-            });
+            const credentials = credentialsFunc('123456');
+            const creds = Hoek.clone(credentials);
+            creds.algorithm = 'blah';
+            expect(() => Hawk.client.message('example.com', 8080, 'some message', { credentials: creds })).to.throw('Unknown algorithm');
         });
     });
 
     describe('authenticatePayloadHash()', () => {
 
-        it('checks payload hash', (done) => {
+        it('checks payload hash', () => {
 
-            expect(Hawk.server.authenticatePayloadHash('abcdefg', { hash: 'abcdefg' })).to.equal(true);
-            expect(Hawk.server.authenticatePayloadHash('1234567', { hash: 'abcdefg' })).to.equal(false);
-            done();
+            expect(() => Hawk.server.authenticatePayloadHash('abcdefg', { hash: 'abcdefg' })).to.not.throw();
+            expect(() => Hawk.server.authenticatePayloadHash('1234567', { hash: 'abcdefg' })).to.throw('Bad payload hash');
         });
     });
 });

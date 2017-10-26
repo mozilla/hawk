@@ -14,9 +14,7 @@ const internals = {};
 
 // Test shortcuts
 
-const lab = exports.lab = Lab.script();
-const describe = lab.experiment;
-const it = lab.test;
+const { describe, it } = exports.lab = Lab.script();
 const expect = Code.expect;
 
 
@@ -24,7 +22,7 @@ describe('Crypto', () => {
 
     describe('generateNormalizedString()', () => {
 
-        it('should return a valid normalized string', (done) => {
+        it('should return a valid normalized string', () => {
 
             expect(Hawk.crypto.generateNormalizedString('header', {
                 ts: 1357747017,
@@ -34,11 +32,9 @@ describe('Crypto', () => {
                 host: 'example.com',
                 port: 8080
             })).to.equal('hawk.1.header\n1357747017\nk3k4j5\nGET\n/resource/something\nexample.com\n8080\n\n\n');
-
-            done();
         });
 
-        it('should return a valid normalized string (ext)', (done) => {
+        it('should return a valid normalized string (ext)', () => {
 
             expect(Hawk.crypto.generateNormalizedString('header', {
                 ts: 1357747017,
@@ -49,11 +45,9 @@ describe('Crypto', () => {
                 port: 8080,
                 ext: 'this is some app data'
             })).to.equal('hawk.1.header\n1357747017\nk3k4j5\nGET\n/resource/something\nexample.com\n8080\n\nthis is some app data\n');
-
-            done();
         });
 
-        it('should return a valid normalized string (payload + ext)', (done) => {
+        it('should return a valid normalized string (payload + ext)', () => {
 
             expect(Hawk.crypto.generateNormalizedString('header', {
                 ts: 1357747017,
@@ -65,8 +59,6 @@ describe('Crypto', () => {
                 hash: 'U4MKKSmiVxk37JCCrAVIjV/OhB3y+NdwoCr6RShbVkE=',
                 ext: 'this is some app data'
             })).to.equal('hawk.1.header\n1357747017\nk3k4j5\nGET\n/resource/something\nexample.com\n8080\nU4MKKSmiVxk37JCCrAVIjV/OhB3y+NdwoCr6RShbVkE=\nthis is some app data\n');
-
-            done();
         });
     });
 });
