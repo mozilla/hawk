@@ -703,8 +703,7 @@ describe('Server', () => {
                 user: 'steve'
             };
 
-            const header = Hawk.server.header(credentials, null, { payload: 'some reply', contentType: 'text/plain', ext: 'response-specific' });
-            expect(header).to.equal('');
+            expect(() => Hawk.server.header(credentials, null, { payload: 'some reply', contentType: 'text/plain', ext: 'response-specific' })).to.throw('Invalid inputs');
         });
 
         it('errors on invalid artifacts', () => {
@@ -716,8 +715,7 @@ describe('Server', () => {
                 user: 'steve'
             };
 
-            const header = Hawk.server.header(credentials, 5, { payload: 'some reply', contentType: 'text/plain', ext: 'response-specific' });
-            expect(header).to.equal('');
+            expect(() => Hawk.server.header(credentials, 5, { payload: 'some reply', contentType: 'text/plain', ext: 'response-specific' })).to.throw('Invalid inputs');
         });
 
         it('errors on missing credentials', () => {
@@ -735,8 +733,7 @@ describe('Server', () => {
                 id: '123456'
             };
 
-            const header = Hawk.server.header(null, artifacts, { payload: 'some reply', contentType: 'text/plain', ext: 'response-specific' });
-            expect(header).to.equal('');
+            expect(() => Hawk.server.header(null, artifacts, { payload: 'some reply', contentType: 'text/plain', ext: 'response-specific' })).to.throw('Invalid credentials');
         });
 
         it('errors on invalid credentials (key)', () => {
@@ -760,8 +757,7 @@ describe('Server', () => {
                 id: '123456'
             };
 
-            const header = Hawk.server.header(credentials, artifacts, { payload: 'some reply', contentType: 'text/plain', ext: 'response-specific' });
-            expect(header).to.equal('');
+            expect(() => Hawk.server.header(credentials, artifacts, { payload: 'some reply', contentType: 'text/plain', ext: 'response-specific' })).to.throw('Invalid credentials');
         });
 
         it('errors on invalid algorithm', () => {
@@ -786,8 +782,7 @@ describe('Server', () => {
                 id: '123456'
             };
 
-            const header = Hawk.server.header(credentials, artifacts, { payload: 'some reply', contentType: 'text/plain', ext: 'response-specific' });
-            expect(header).to.equal('');
+            expect(() => Hawk.server.header(credentials, artifacts, { payload: 'some reply', contentType: 'text/plain', ext: 'response-specific' })).to.throw('Unknown algorithm');
         });
     });
 
