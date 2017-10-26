@@ -1,0 +1,12 @@
+{
+  "presets": [
+    [
+      "env",
+      {
+        "forceAllTransforms": true,
+        "loose": true
+      }
+    ],
+    "babel-preset-minify"
+  ]
+}
