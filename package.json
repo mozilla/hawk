@@ -22,8 +22,9 @@
     "sntp": "2.x.x"
   },
   "devDependencies": {
-    "babel-cli": "^6.1.2",
-    "babel-preset-es2015": "^6.1.2",
+    "babel-cli": "^6.26.0",
+    "babel-preset-env": "^1.6.1",
+    "babel-preset-minify": "^0.2.0",
     "code": "4.x.x",
     "lab": "14.x.x"
   },
