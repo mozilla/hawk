@@ -803,7 +803,7 @@ describe('Server', () => {
                 authorization: 'Hawk id="1", ts="1353788437", nonce="k3j4h2", mac="zy79QQ5/EYFmQqutVnYb73gAc/U=", ext="hello"'
             };
 
-            const err = await expect(Hawk.server.authenticateBewit(req, credentialsFunc)).to.reject('Resource path exceeds max length');
+            const err = await expect(Hawk.server.authenticateBewit(req, credentialsFunc, {})).to.reject('Resource path exceeds max length');
             expect(err.output.statusCode).to.equal(400);
         });
     });
