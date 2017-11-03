@@ -13,11 +13,11 @@
     "hawk"
   ],
   "engines": {
-    "node": ">=8.8.0"
+    "node": ">=8.9.0"
   },
   "dependencies": {
     "hoek": "5.x.x",
-    "boom": "6.x.x",
+    "boom": "7.x.x",
     "cryptiles": "4.x.x",
     "sntp": "3.x.x"
   },
