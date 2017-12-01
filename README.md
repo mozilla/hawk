@@ -545,7 +545,7 @@ implementors must manually verify that the host header received matches their ex
 ### Where is the protocol specification?
 
 If you are looking for some prose explaining how all this works, **this is it**. **Hawk** is being developed as an open source
-project instead of a standard. In other words, the [code](/hueniverse/hawk/tree/master/lib) is the specification. Not sure about
+project instead of a standard. In other words, the [code](https://github.com/hueniverse/hawk/tree/master/lib) is the specification. Not sure about
 something? Open an issue!
 
 ### Is it done?
