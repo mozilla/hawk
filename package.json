@@ -28,11 +28,6 @@
     "code": "5.x.x",
     "lab": "15.x.x"
   },
-  "babel": {
-    "presets": [
-      "es2015"
-    ]
-  },
   "scripts": {
     "build-client": "mkdir -p dist; babel lib/browser.js --out-file dist/browser.js",
     "prepare": "npm run-script build-client",
