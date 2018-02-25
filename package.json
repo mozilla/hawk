@@ -17,7 +17,7 @@
   },
   "browser": "./lib/browser.js",
   "dependencies": {
-    "hoek": "2.x.x",
+    "hoek": "4.x.x",
     "boom": "2.x.x",
     "cryptiles": "2.x.x",
     "sntp": "1.x.x"
