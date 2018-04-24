@@ -124,13 +124,21 @@ const credentialsFunc = function (id) {
 
 const handler = async function (req, res) {
 
+    let payload, status;
+    
     // Authenticate incoming request
-
-    const { credentials, artifacts } = await Hawk.server.authenticate(req, credentialsFunc);
+    
+    try {
+        const { credentials, artifacts } = await Hawk.server.authenticate(req, credentialsFunc);
+        payload = `Hello ${credentials.user} ${artifacts.ext}`;
+        status = 200;
+    } catch (error) {
+        payload = 'Shoosh!';
+        status = 401;
+    }
 
     // Prepare response
 
-    const payload = (!err ? `Hello ${credentials.user} ${artifacts.ext}` : 'Shoosh!');
     const headers = { 'Content-Type': 'text/plain' };
 
     // Generate Server-Authorization response header
@@ -140,7 +148,7 @@ const handler = async function (req, res) {
 
     // Send the response back
 
-    res.writeHead(!err ? 200 : 401, headers);
+    res.writeHead(status, headers);
     res.end(payload);
 };
 
