@@ -126,7 +126,7 @@ const handler = async function (req, res) {
 
     // Authenticate incoming request
 
-    const ( credentials, artifacts } = await Hawk.server.authenticate(req, credentialsFunc);
+    const { credentials, artifacts } = await Hawk.server.authenticate(req, credentialsFunc);
 
     // Prepare response
 
