@@ -550,9 +550,7 @@ something? Open an issue!
 
 ### Is it done?
 
-As of version 0.10.0, **Hawk** is feature-complete. However, until this module reaches version 1.0.0 it is considered experimental
-and is likely to change. This also means your feedback and contribution are very welcome. Feel free to open issues with questions
-and suggestions.
+Yes. The protocol is finished. This module might change with enhancements and bug fixes but the protocol itself is locked.
 
 ### Where can I find **Hawk** implementations in other languages?
 
