@@ -110,6 +110,7 @@ describe('Utils', () => {
             for (let i = 0; i < 5000; ++i) {
                 long += 'x';
             }
+
             long += '"';
 
             expect(() => Hawk.utils.parseAuthorizationHeader(long, ['a'])).to.throw('Header length too long');

@@ -4,10 +4,10 @@
 
 const Url = require('url');
 
+const B64 = require('b64');
 const Boom = require('boom');
 const Code = require('code');
 const Hawk = require('../lib');
-const Hoek = require('hoek');
 const Lab = require('lab');
 
 
@@ -149,7 +149,7 @@ describe('Uri', () => {
 
         const bewit = credentials.id + '\\' + exp + '\\' + mac + '\\' + ext;
 
-        req.url += '&bewit=' + Hoek.base64urlEncode(bewit);
+        req.url += '&bewit=' + B64.base64urlEncode(bewit);
 
         await expect(Hawk.uri.authenticate(req, credentialsFunc)).to.reject('Invalid method');
     });

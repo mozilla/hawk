@@ -1,8 +1,7 @@
 {
   "name": "hawk",
   "description": "HTTP Hawk Authentication Scheme",
-  "version": "7.0.7",
-  "author": "Eran Hammer <eran@hammer.io> (http://hueniverse.com)",
+  "version": "7.0.8",
   "repository": "git://github.com/hueniverse/hawk",
   "main": "lib/index.js",
   "browser": "dist/browser.js",
@@ -12,11 +11,9 @@
     "scheme",
     "hawk"
   ],
-  "engines": {
-    "node": ">=8.9.0"
-  },
   "dependencies": {
-    "hoek": "5.x.x",
+    "hoek": "6.x.x",
+    "b64": "4.x.x",
     "boom": "7.x.x",
     "cryptiles": "4.x.x",
     "sntp": "3.x.x"
@@ -26,7 +23,7 @@
     "babel-preset-env": "^1.6.1",
     "babel-preset-minify": "^0.3.0",
     "code": "5.x.x",
-    "lab": "15.x.x"
+    "lab": "17.x.x"
   },
   "scripts": {
     "build-client": "mkdir -p dist; babel lib/browser.js --out-file dist/browser.js",
