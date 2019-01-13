@@ -294,7 +294,7 @@ hawk.1.header
 1353832234
 j4h3g2
 POST
-/resource/1?a=1&b=2
+/resource/1?b=1&a=2
 example.com
 8000
 Yi9LfIIFRtBEPt74PVmbTF/xVAwPn7ub15ePICfgnuY=
@@ -306,7 +306,7 @@ Then calculates the request MAC and includes the **Hawk** key identifier, timest
 and request MAC, with the request using the HTTP `Authorization` request header field:
 
 ```
-POST /resource/1?a=1&b=2 HTTP/1.1
+POST /resource/1?b=1&a=2 HTTP/1.1
 Host: example.com:8000
 Authorization: Hawk id="dh37fgj492je", ts="1353832234", nonce="j4h3g2", hash="Yi9LfIIFRtBEPt74PVmbTF/xVAwPn7ub15ePICfgnuY=", ext="some-app-ext-data", mac="aSe1DERmZuRl3pI36/9BdZmnErTw3sNzOOAUlfeKjVw="
 ```

@@ -49,13 +49,13 @@ describe('README', () => {
                 ts: options.timestamp,
                 nonce: options.nonce,
                 method: 'GET',
-                resource: '/resource?a=1&b=2',
+                resource: '/resource/1?b=1&a=2',
                 host: 'example.com',
                 port: 8000,
                 ext: options.ext
             });
 
-            expect(normalized).to.equal('hawk.1.header\n1353832234\nj4h3g2\nGET\n/resource?a=1&b=2\nexample.com\n8000\n\nsome-app-ext-data\n');
+            expect(normalized).to.equal('hawk.1.header\n1353832234\nj4h3g2\nGET\n/resource/1?b=1&a=2\nexample.com\n8000\n\nsome-app-ext-data\n');
         });
 
         const payloadOptions = Hoek.clone(options);
@@ -75,14 +75,14 @@ describe('README', () => {
                 ts: options.timestamp,
                 nonce: options.nonce,
                 method: 'POST',
-                resource: '/resource?a=1&b=2',
+                resource: '/resource/1?b=1&a=2',
                 host: 'example.com',
                 port: 8000,
                 hash: Hawk.crypto.calculatePayloadHash(payloadOptions.payload, credentials.algorithm, payloadOptions.contentType),
                 ext: options.ext
             });
 
-            expect(normalized).to.equal('hawk.1.header\n1353832234\nj4h3g2\nPOST\n/resource?a=1&b=2\nexample.com\n8000\nYi9LfIIFRtBEPt74PVmbTF/xVAwPn7ub15ePICfgnuY=\nsome-app-ext-data\n');
+            expect(normalized).to.equal('hawk.1.header\n1353832234\nj4h3g2\nPOST\n/resource/1?b=1&a=2\nexample.com\n8000\nYi9LfIIFRtBEPt74PVmbTF/xVAwPn7ub15ePICfgnuY=\nsome-app-ext-data\n');
         });
     });
 });
