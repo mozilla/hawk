@@ -1,19 +1,13 @@
 'use strict';
 
-// Load modules
+const Code = require('@hapi/code');
+const Hawk = require('..');
+const Hoek = require('@hapi/hoek');
+const Lab = require('@hapi/lab');
 
-const Code = require('code');
-const Hawk = require('../lib');
-const Hoek = require('hoek');
-const Lab = require('lab');
-
-
-// Declare internals
 
 const internals = {};
 
-
-// Test shortcuts
 
 const { describe, it } = exports.lab = Lab.script();
 const expect = Code.expect;
@@ -116,6 +110,19 @@ describe('Server', () => {
             };
 
             await expect(Hawk.server.authenticate(req, credentialsFunc, { payload: 'body', localtimeOffsetMsec: 1353832234000 - Hawk.utils.now() })).to.reject('Missing required payload hash');
+        });
+
+        it('errors on missing hash (empty payload)', async () => {
+
+            const req = {
+                method: 'GET',
+                url: '/resource/1?b=1&a=2',
+                host: 'example.com',
+                port: 8000,
+                authorization: 'Hawk id="dh37fgj492je", ts="1353832234", nonce="j4h3g2", mac="m8r1rHbXN6NgO+KIIhjO7sFRyd78RNGVUwehe8Cp2dU=", ext="some-app-data"'
+            };
+
+            await expect(Hawk.server.authenticate(req, credentialsFunc, { payload: '', localtimeOffsetMsec: 1353832234000 - Hawk.utils.now() })).to.reject('Missing required payload hash');
         });
 
         it('errors on a stale timestamp', async () => {
@@ -641,6 +648,32 @@ describe('Server', () => {
             expect(header).to.equal('Hawk mac=\"i8/kUBDx0QF+PpCtW860kkV/fa9dbwEoe/FpGUXowf0=\", hash=\"q/t+NNAkQZNlq/aAD6PlexImwQTxwgT2MahfTa9XRLA=\", ext=\"response-specific\"');
         });
 
+        it('generates header (empty ext)', () => {
+
+            const credentials = {
+                id: '123456',
+                key: 'werxhqb98rpaxn39848xrunpaw3489ruxnpa98w4rxn',
+                algorithm: 'sha256',
+                user: 'steve'
+            };
+
+            const artifacts = {
+                method: 'POST',
+                host: 'example.com',
+                port: '8080',
+                resource: '/resource/4?filter=a',
+                ts: '1398546787',
+                nonce: 'xUwusx',
+                hash: 'nJjkVtBE5Y/Bk38Aiokwn0jiJxt/0S2WRSUwWLCf5xk=',
+                ext: '',
+                mac: 'dvIvMThwi28J61Jc3P0ryAhuKpanU63GXdx6hkmQkJA=',
+                id: '123456'
+            };
+
+            const header = Hawk.server.header(credentials, artifacts, { payload: '', contentType: 'text/plain', ext: '' });
+            expect(header).to.equal('Hawk mac=\"q+fdjQv3kF56JGKLYeLzAS9dYGcvDqAXRG7MTVHAFKE=\", hash=\"q/t+NNAkQZNlq/aAD6PlexImwQTxwgT2MahfTa9XRLA=\"');
+        });
+
         it('generates header (pre calculated hash)', () => {
 
             const credentials = {
@@ -760,6 +793,30 @@ describe('Server', () => {
             expect(() => Hawk.server.header(credentials, artifacts, { payload: 'some reply', contentType: 'text/plain', ext: 'response-specific' })).to.throw('Invalid credentials');
         });
 
+        it('errors on invalid credentials (algorithm)', () => {
+
+            const credentials = {
+                id: '123456',
+                key: 'asdasd',
+                user: 'steve'
+            };
+
+            const artifacts = {
+                method: 'POST',
+                host: 'example.com',
+                port: '8080',
+                resource: '/resource/4?filter=a',
+                ts: '1398546787',
+                nonce: 'xUwusx',
+                hash: 'nJjkVtBE5Y/Bk38Aiokwn0jiJxt/0S2WRSUwWLCf5xk=',
+                ext: 'some-app-data',
+                mac: 'dvIvMThwi28J61Jc3P0ryAhuKpanU63GXdx6hkmQkJA=',
+                id: '123456'
+            };
+
+            expect(() => Hawk.server.header(credentials, artifacts, { payload: 'some reply', contentType: 'text/plain', ext: 'response-specific' })).to.throw('Invalid credentials');
+        });
+
         it('errors on invalid algorithm', () => {
 
             const credentials = {
@@ -783,6 +840,30 @@ describe('Server', () => {
             };
 
             expect(() => Hawk.server.header(credentials, artifacts, { payload: 'some reply', contentType: 'text/plain', ext: 'response-specific' })).to.throw('Unknown algorithm');
+        });
+
+        it('errors on invalid options', () => {
+
+            const credentials = {
+                id: '123456',
+                algorithm: 'sha256',
+                user: 'steve'
+            };
+
+            const artifacts = {
+                method: 'POST',
+                host: 'example.com',
+                port: '8080',
+                resource: '/resource/4?filter=a',
+                ts: '1398546787',
+                nonce: 'xUwusx',
+                hash: 'nJjkVtBE5Y/Bk38Aiokwn0jiJxt/0S2WRSUwWLCf5xk=',
+                ext: 'some-app-data',
+                mac: 'dvIvMThwi28J61Jc3P0ryAhuKpanU63GXdx6hkmQkJA=',
+                id: '123456'
+            };
+
+            expect(() => Hawk.server.header(credentials, artifacts, 'abc')).to.throw('Invalid inputs');
         });
     });
 
@@ -815,6 +896,15 @@ describe('Server', () => {
             const credentials = credentialsFunc('123456');
             const auth = Hawk.client.message('example.com', 8080, 'some message', { credentials });
             delete auth.ts;
+
+            await expect(Hawk.server.authenticateMessage('example.com', 8080, 'some message', auth, credentialsFunc)).to.reject('Invalid authorization');
+        });
+
+        it('errors on invalid authorization (mac)', async () => {
+
+            const credentials = credentialsFunc('123456');
+            const auth = Hawk.client.message('example.com', 8080, 'some message', { credentials });
+            delete auth.mac;
 
             await expect(Hawk.server.authenticateMessage('example.com', 8080, 'some message', auth, credentialsFunc)).to.reject('Invalid authorization');
         });
@@ -967,6 +1057,20 @@ describe('Server', () => {
             const errFunc = function (id) {
 
                 return {};
+            };
+
+            await expect(Hawk.server.authenticateMessage('example.com', 8080, 'some message', auth, errFunc)).to.reject('Invalid credentials');
+        });
+
+        it('should fail authorization on invalid credentials (algorithm)', async () => {
+
+            const credentials = credentialsFunc('123456');
+            const auth = Hawk.client.message('example.com', 8080, 'some message', { credentials });
+            expect(auth).to.exist();
+
+            const errFunc = function (id) {
+
+                return { key: 'asdasd' };
             };
 
             await expect(Hawk.server.authenticateMessage('example.com', 8080, 'some message', auth, errFunc)).to.reject('Invalid credentials');

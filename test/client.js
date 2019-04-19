@@ -1,18 +1,12 @@
 'use strict';
 
-// Load modules
+const Code = require('@hapi/code');
+const Hawk = require('..');
+const Lab = require('@hapi/lab');
 
-const Code = require('code');
-const Hawk = require('../lib');
-const Lab = require('lab');
-
-
-// Declare internals
 
 const internals = {};
 
-
-// Test shortcuts
 
 const { describe, it } = exports.lab = Lab.script();
 const expect = Code.expect;
@@ -121,6 +115,11 @@ describe('Client', () => {
             expect(() => Hawk.client.header('https://example.net/somewhere/over/the/rainbow', 'POST')).to.throw('Invalid argument type');
         });
 
+        it('errors on invalid options', () => {
+
+            expect(() => Hawk.client.header('https://example.net/somewhere/over/the/rainbow', 'POST', 'abc')).to.throw('Invalid argument type');
+        });
+
         it('errors on invalid credentials (id)', () => {
 
             const credentials = {
@@ -136,11 +135,21 @@ describe('Client', () => {
             expect(() => Hawk.client.header('https://example.net/somewhere/over/the/rainbow', 'POST', { ext: 'Bazinga!', timestamp: 1353809207 })).to.throw('Invalid credentials');
         });
 
-        it('errors on invalid credentials', () => {
+        it('errors on invalid credentials (key)', () => {
 
             const credentials = {
                 id: '123456',
                 algorithm: 'sha256'
+            };
+
+            expect(() => Hawk.client.header('https://example.net/somewhere/over/the/rainbow', 'POST', { credentials, ext: 'Bazinga!', timestamp: 1353809207 })).to.throw('Invalid credentials');
+        });
+
+        it('errors on invalid credentials (algorithm)', () => {
+
+            const credentials = {
+                id: '123456',
+                key: 'asdasdasd'
             };
 
             expect(() => Hawk.client.header('https://example.net/somewhere/over/the/rainbow', 'POST', { credentials, ext: 'Bazinga!', timestamp: 1353809207 })).to.throw('Invalid credentials');
@@ -236,7 +245,7 @@ describe('Client', () => {
                 user: 'steve'
             };
 
-            const { headers } = Hawk.client.authenticate(res, credentials, artifacts);
+            const { headers } = Hawk.client.authenticate(res, credentials, artifacts, { payload: null });
             expect(headers).to.equal({
                 'server-authorization': {
                     mac: 'XIJRsMl/4oL+nn+vKoeVZPdCHXB4yJkNnBbTbHFZUYE=',
@@ -350,6 +359,39 @@ describe('Client', () => {
             const { headers } = Hawk.client.authenticate({ headers: { 'www-authenticate': header } });
             expect(headers).to.equal({ 'www-authenticate': { error: 'Stale timestamp' } });
         });
+
+        it('errors on missing server-authorization header', () => {
+
+            const res = {
+                headers: {
+                    'content-type': 'text/plain'
+                }
+            };
+
+            const artifacts = {
+                method: 'POST',
+                host: 'example.com',
+                port: '8080',
+                resource: '/resource/4?filter=a',
+                ts: '1362336900',
+                nonce: 'eb5S_L',
+                hash: 'nJjkVtBE5Y/Bk38Aiokwn0jiJxt/0S2WRSUwWLCf5xk=',
+                ext: 'some-app-data',
+                app: undefined,
+                dlg: undefined,
+                mac: 'BlmSe8K+pbKIb6YsZCnt4E1GrYvY1AaYayNR82dGpIk=',
+                id: '123456'
+            };
+
+            const credentials = {
+                id: '123456',
+                key: 'werxhqb98rpaxn39848xrunpaw3489ruxnpa98w4rxn',
+                algorithm: 'sha256',
+                user: 'steve'
+            };
+
+            expect(() => Hawk.client.authenticate(res, credentials, artifacts, { required: true })).to.throw('Missing Server-Authorization header');
+        });
     });
 
     describe('message()', () => {
@@ -445,9 +487,14 @@ describe('Client', () => {
             expect(() => Hawk.client.message('example.com', 80, 5, { credentials, timestamp: 1353809207, nonce: 'abc123' })).to.throw('Invalid inputs');
         });
 
-        it('errors on missing options', () => {
+        it('errors on invalid credentials', () => {
 
             expect(() => Hawk.client.message('example.com', 80, 'I am the boodyman')).to.throw('Invalid credentials');
+        });
+
+        it('errors on invalid options', () => {
+
+            expect(() => Hawk.client.message('example.com', 80, 'I am the boodyman', '123')).to.throw('Invalid inputs');
         });
 
         it('errors on invalid credentials (id)', () => {
@@ -455,6 +502,16 @@ describe('Client', () => {
             const credentials = {
                 key: '2983d45yun89q',
                 algorithm: 'sha1'
+            };
+
+            expect(() => Hawk.client.message('example.com', 80, 'I am the boodyman', { credentials, timestamp: 1353809207, nonce: 'abc123' })).to.throw('Invalid credentials');
+        });
+
+        it('errors on invalid credentials (algorithm)', () => {
+
+            const credentials = {
+                key: '2983d45yun89q',
+                id: '123'
             };
 
             expect(() => Hawk.client.message('example.com', 80, 'I am the boodyman', { credentials, timestamp: 1353809207, nonce: 'abc123' })).to.throw('Invalid credentials');

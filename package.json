@@ -1,35 +1,24 @@
 {
-  "name": "hawk",
+  "name": "@hapi/hawk",
   "description": "HTTP Hawk Authentication Scheme",
   "version": "7.0.10",
-  "repository": "git://github.com/hueniverse/hawk",
+  "repository": "git://github.com/hapijs/hawk",
   "main": "lib/index.js",
-  "browser": "dist/browser.js",
-  "keywords": [
-    "http",
-    "authentication",
-    "scheme",
-    "hawk"
-  ],
+  "keywords": ["http", "authentication", "scheme", "hawk"],
   "dependencies": {
-    "hoek": "6.x.x",
-    "b64": "4.x.x",
-    "boom": "7.x.x",
-    "cryptiles": "4.x.x",
-    "sntp": "3.x.x"
+    "@hapi/hoek": "6.x.x",
+    "@hapi/b64": "4.x.x",
+    "@hapi/boom": "7.x.x",
+    "@hapi/cryptiles": "4.x.x",
+    "@hapi/sntp": "3.x.x"
   },
   "devDependencies": {
-    "babel-cli": "^6.26.0",
-    "babel-preset-env": "^1.6.1",
-    "babel-preset-minify": "^0.3.0",
-    "code": "5.x.x",
-    "lab": "17.x.x"
+    "@hapi/code": "5.x.x",
+    "@hapi/lab": "18.x.x"
   },
   "scripts": {
-    "build-client": "mkdir -p dist; babel lib/browser.js --out-file dist/browser.js",
-    "prepare": "npm run-script build-client",
-    "test": "lab -a code -t 100 -L",
-    "test-cov-html": "lab -a code -r html -o coverage.html"
+    "test": "lab -a @hapi/code -t 100 -L",
+    "test-cov-html": "lab -a @hapi/code -r html -o coverage.html"
   },
   "license": "BSD-3-Clause"
 }

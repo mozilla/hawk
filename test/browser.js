@@ -1,16 +1,12 @@
 'use strict';
 
-// Load modules
-
-const Code = require('code');
-const Hawk = require('../lib');
-const Hoek = require('hoek');
-const Lab = require('lab');
+const Code = require('@hapi/code');
+const Hawk = require('..');
+const Hoek = require('@hapi/hoek');
+const Lab = require('@hapi/lab');
 
 const Browser = require('../lib/browser');
 
-
-// Declare internals
 
 const internals = {};
 
@@ -483,6 +479,11 @@ describe('Browser', () => {
                 expect(() => Browser.client.header('https://example.net/somewhere/over/the/rainbow', 'POST')).to.throw('Invalid argument type');
             });
 
+            it('errors on invalid options', () => {
+
+                expect(() => Browser.client.header('https://example.net/somewhere/over/the/rainbow', 'POST', 'xyz')).to.throw('Invalid argument type');
+            });
+
             it('errors on empty uri', () => {
 
                 const credentials = {
@@ -547,6 +548,16 @@ describe('Browser', () => {
                 const credentials = {
                     id: '123456',
                     algorithm: 'sha256'
+                };
+
+                expect(() => Browser.client.header('https://example.net/somewhere/over/the/rainbow', 'POST', { credentials, ext: 'Bazinga!', timestamp: 1353809207 })).to.throw('Invalid credentials');
+            });
+
+            it('errors on invalid credentials (algorithm)', () => {
+
+                const credentials = {
+                    key: '2983d45yun89q',
+                    id: '123456'
                 };
 
                 expect(() => Browser.client.header('https://example.net/somewhere/over/the/rainbow', 'POST', { credentials, ext: 'Bazinga!', timestamp: 1353809207 })).to.throw('Invalid credentials');
@@ -670,6 +681,11 @@ describe('Browser', () => {
                 expect(() => Browser.client.bewit('https://example.com/somewhere/over/the/rainbow', 4)).to.throw('Invalid inputs');
             });
 
+            it('errors on missing options.ttlSec', () => {
+
+                expect(() => Browser.client.bewit('https://example.com/somewhere/over/the/rainbow', {})).to.throw('Invalid inputs');
+            });
+
             it('errors on missing uri', () => {
 
                 const credentials = {
@@ -697,6 +713,16 @@ describe('Browser', () => {
                 const credentials = {
                     key: '2983d45yun89q',
                     algorithm: 'sha256'
+                };
+
+                expect(() => Browser.client.bewit('https://example.com/somewhere/over/the/rainbow', { credentials, ttlSec: 3000, ext: 'xandyandz' })).to.throw('Invalid credentials');
+            });
+
+            it('errors on invalid credentials (algorithm)', () => {
+
+                const credentials = {
+                    key: '2983d45yun89q',
+                    id: '123'
                 };
 
                 expect(() => Browser.client.bewit('https://example.com/somewhere/over/the/rainbow', { credentials, ttlSec: 3000, ext: 'xandyandz' })).to.throw('Invalid credentials');
@@ -1008,6 +1034,44 @@ describe('Browser', () => {
                 expect(Browser.client.authenticate(res, credentials, artifacts)).to.equal(true);
             });
 
+            it('returns true on ignoring hash (null payload)', () => {
+
+                const res = {
+                    headers: {
+                        'content-type': 'text/plain',
+                        'server-authorization': 'Hawk mac="XIJRsMl/4oL+nn+vKoeVZPdCHXB4yJkNnBbTbHFZUYE=", hash="f9cDF/TDm7TkYRLnGwRMfeDzT6LixQVLvrIKhh0vgmM=", ext="response-specific"'
+                    },
+                    getResponseHeader: function (header) {
+
+                        return res.headers[header.toLowerCase()];
+                    }
+                };
+
+                const artifacts = {
+                    method: 'POST',
+                    host: 'example.com',
+                    port: '8080',
+                    resource: '/resource/4?filter=a',
+                    ts: '1362336900',
+                    nonce: 'eb5S_L',
+                    hash: 'nJjkVtBE5Y/Bk38Aiokwn0jiJxt/0S2WRSUwWLCf5xk=',
+                    ext: 'some-app-data',
+                    app: undefined,
+                    dlg: undefined,
+                    mac: 'BlmSe8K+pbKIb6YsZCnt4E1GrYvY1AaYayNR82dGpIk=',
+                    id: '123456'
+                };
+
+                const credentials = {
+                    id: '123456',
+                    key: 'werxhqb98rpaxn39848xrunpaw3489ruxnpa98w4rxn',
+                    algorithm: 'sha256',
+                    user: 'steve'
+                };
+
+                expect(Browser.client.authenticate(res, credentials, artifacts, { payload: null })).to.equal(true);
+            });
+
             it('errors on invalid WWW-Authenticate header format', () => {
 
                 const res = {
@@ -1121,6 +1185,11 @@ describe('Browser', () => {
                 expect(() => Browser.client.message('example.com', 8080, 'some message')).to.throw('Invalid inputs');
             });
 
+            it('errors on invalid options', () => {
+
+                expect(() => Browser.client.message('example.com', 8080, 'some message', 'abc')).to.throw('Invalid inputs');
+            });
+
             it('errors on invalid credentials (id)', () => {
 
                 const credentials = credentialsFunc('123456');
@@ -1136,6 +1205,15 @@ describe('Browser', () => {
 
                 const creds = Hoek.clone(credentials);
                 delete creds.key;
+                expect(() => Browser.client.message('example.com', 8080, 'some message', { credentials: creds })).to.throw('Invalid credentials');
+            });
+
+            it('errors on invalid credentials (algorithm)', () => {
+
+                const credentials = credentialsFunc('123456');
+
+                const creds = Hoek.clone(credentials);
+                delete creds.algorithm;
                 expect(() => Browser.client.message('example.com', 8080, 'some message', { credentials: creds })).to.throw('Invalid credentials');
             });
 

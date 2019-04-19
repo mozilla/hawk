@@ -1,20 +1,14 @@
 'use strict';
 
-// Load modules
-
-const Code = require('code');
-const Hawk = require('../lib');
-const Lab = require('lab');
+const Code = require('@hapi/code');
+const Hawk = require('..');
+const Lab = require('@hapi/lab');
 
 const Package = require('../package.json');
 
 
-// Declare internals
-
 const internals = {};
 
-
-// Test shortcuts
 
 const { describe, it } = exports.lab = Lab.script();
 const expect = Code.expect;
