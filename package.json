@@ -1,10 +1,15 @@
 {
   "name": "@hapi/hawk",
   "description": "HTTP Hawk Authentication Scheme",
-  "version": "7.0.10",
+  "version": "7.1.0",
   "repository": "git://github.com/hapijs/hawk",
   "main": "lib/index.js",
-  "keywords": ["http", "authentication", "scheme", "hawk"],
+  "keywords": [
+    "http",
+    "authentication",
+    "scheme",
+    "hawk"
+  ],
   "dependencies": {
     "@hapi/hoek": "6.x.x",
     "@hapi/b64": "4.x.x",
