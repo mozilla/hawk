@@ -2,12 +2,12 @@
 
 # hawk
 
-<img align="right" src="https://raw.github.com/hueniverse/hawk/master/images/logo.png" /> **Hawk** is an HTTP authentication scheme using a message authentication code (MAC) algorithm to provide partial
+**Hawk** is an HTTP authentication scheme using a message authentication code (MAC) algorithm to provide partial
 HTTP request cryptographic verification.
 
 Note: the protocol has not changed since version 1.1. The version increments reflect changes in the node API.
 
-[![Build Status](https://travis-ci.org/hapi/hawk.svg?branch=master)](https://travis-ci.org/hapi/hawk)
+[![Build Status](https://travis-ci.org/hapijs/hawk.svg?branch=master)](https://travis-ci.org/hapijs/hawk)
 
 # Table of Content
 
