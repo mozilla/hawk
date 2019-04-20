@@ -10,6 +10,11 @@ sudo: false
 
 install:
   - "npm install"
+  - "npm install hapi@$HAPI_VERSION"
+
+env:
+  - HAPI_VERSION="17"
+  - HAPI_VERSION="18"
 
 os:
   - "linux"

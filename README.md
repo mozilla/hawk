@@ -1,13 +1,13 @@
-![hawk Logo](https://raw.github.com/hueniverse/hawk/master/images/hawk.png)
+<a href="http://hapijs.com"><img src="https://github.com/hapijs/assets/blob/master/images/family.svg" width="180px" align="right" /></a>
+
+# hawk
 
 <img align="right" src="https://raw.github.com/hueniverse/hawk/master/images/logo.png" /> **Hawk** is an HTTP authentication scheme using a message authentication code (MAC) algorithm to provide partial
-HTTP request cryptographic verification. For more complex use cases such as access delegation, see [Oz](https://github.com/hueniverse/oz).
-
-Current version: **7.x**
+HTTP request cryptographic verification.
 
 Note: the protocol has not changed since version 1.1. The version increments reflect changes in the node API.
 
-[![Build Status](https://travis-ci.org/hueniverse/hawk.svg?branch=master)](https://travis-ci.org/hueniverse/hawk)
+[![Build Status](https://travis-ci.org/hapi/hawk.svg?branch=master)](https://travis-ci.org/hapi/hawk)
 
 # Table of Content
 
@@ -18,6 +18,7 @@ Note: the protocol has not changed since version 1.1. The version increments ref
     - [Payload Validation](#payload-validation)
     - [Response Payload Validation](#response-payload-validation)
   - [Browser Support and Considerations](#browser-support-and-considerations)
+  - [hapi Plugin](#hapi-plugin)
 - [**Single URI Authorization**](#single-uri-authorization)
   - [Usage Example](#bewit-usage-example)
 - [**Security Considerations**](#security-considerations)
@@ -98,9 +99,9 @@ the number of round trips required to authenticate the first request.
 
 Server code:
 
-```javascript
+```js
 const Http = require('http');
-const Hawk = require('hawk');
+const Hawk = require('@hapi/hawk');
 
 
 // Credentials lookup function
@@ -155,9 +156,9 @@ Http.createServer(handler).listen(8000, 'example.com');
 
 Client code:
 
-```javascript
+```js
 const Request = require('request');
-const Hawk = require('hawk');
+const Hawk = require('@hapi/hawk');
 
 
 // Client credentials
@@ -198,7 +199,7 @@ Request(requestOptions, function (error, response, body) {
 **Hawk** utilized the [**SNTP**](https://github.com/hueniverse/sntp) module for time sync management. By default, the local
 machine time is used. To automatically retrieve and synchronize the clock within the application, use the SNTP 'start()' method.
 
-```javascript
+```js
 Hawk.sntp.start();
 ```
 
@@ -366,6 +367,150 @@ Hawk client from authenticating the requests.You can read more about the why and
 [article](http://www.html5rocks.com/en/tutorials/cors/#toc-adding-cors-support-to-the-server)
 
 
+## hapi Plugin
+
+**hawk** includes an authentication plugin for **hapi** which registers two authentication schemes.
+
+### hawk Strategy
+
+The scheme supports payload authentication. The scheme requires the following options:
+
+- `getCredentialsFunc` - credential lookup function with the signature `[async] function(id)` where:
+    - `id` - the Hawk credentials identifier.
+    - _throws_ an internal error.
+    - _returns_ `{ credentials }` object where:
+        - `credentials` a credentials object passed back to the application in `request.auth.credentials`. Set to be `null` or `undefined` to
+          indicate unknown credentials (which is not considered an error state).
+- `hawk` - optional protocol options passed to `Hawk.server.authenticate()`.
+
+```js
+const Hapi = require('@hapi/hapi');
+const Hawk = require('@hapi/hawk');
+
+const credentials = {
+    d74s3nz2873n: {
+        key: 'werxhqb98rpaxn39848xrunpaw3489ruxnpa98w4rxn',
+        algorithm: 'sha256'
+    }
+};
+
+const getCredentialsFunc = function (id) {
+
+    return credentials[id];
+};
+
+const start = async () => {
+
+    const server = Hapi.server({ port: 4000 });
+
+    await server.register(Hawk);
+
+    server.auth.strategy('default', 'hawk', { getCredentialsFunc });
+    server.auth.default('default');
+
+    server.route({
+        method: 'GET',
+        path: '/',
+        handler: function (request, h) {
+
+            return 'welcome';
+        }
+    });
+
+    await server.start();
+
+    console.log('Server started listening on %s', server.info.uri);
+};
+
+start();
+
+// Ensure process exits on unhandled rejection
+
+process.on('unhandledRejection', (err) => {
+
+    throw err;
+});
+
+```
+
+### bewit Strategy
+
+The scheme can only be used with 'GET' requests and requires the following options:
+
+- `getCredentialsFunc` - credential lookup function with the signature `async function(id)` where:
+    - `id` - the Hawk credentials identifier.
+    - _throws_ an internal error.
+    - _returns_ `{ credentials }` object where:
+        - `credentials` a credentials object passed back to the application in `request.auth.credentials`. Set to be `null` or `undefined` to
+      indicate unknown credentials (which is not considered an error state).
+- `hawk` - optional protocol options passed to `Hawk.server.authenticateBewit()`.
+
+```js
+const Hapi = require('@hapi/hapi');
+const Hawk = require('@hapi/hawk');
+
+const credentials = {
+    d74s3nz2873n: {
+        key: 'werxhqb98rpaxn39848xrunpaw3489ruxnpa98w4rxn',
+        algorithm: 'sha256'
+    }
+};
+
+const getCredentialsFunc = function (id) {
+
+    return credentials[id];
+};
+
+const start = async () => {
+
+    const server = Hapi.server({ port: 4000 });
+
+    await server.register(Hawk);
+
+    server.auth.strategy('default', 'bewit', { getCredentialsFunc });
+    server.auth.default('default');
+
+    server.route({
+        method: 'GET',
+        path: '/',
+        handler: function (request, h) {
+
+            return 'welcome';
+        }
+    });
+
+    await server.start();
+
+    console.log('Server started listening on %s', server.info.uri);
+};
+
+start();
+
+// Ensure process exits on unhandled rejection
+
+process.on('unhandledRejection', (err) => {
+
+    throw err;
+});
+```
+
+To send an authenticated Bewit request, the URI must contain the `'bewit'` query parameter which can be generated using the Hawk module:
+
+```js
+const Hawk = require('@hapi/hawk');
+
+const credentials = {
+    id: 'd74s3nz2873n',
+    key: 'werxhqb98rpaxn39848xrunpaw3489ruxnpa98w4rxn',
+    algorithm: 'sha256'
+};
+
+let uri = 'http://example.com:8080/endpoint';
+const bewit = Hawk.client.getBewit(uri, { credentials: credentials, ttlSec: 60 });
+uri += '?bewit=' + bewit;
+```
+
+
 # Single URI Authorization
 
 There are cases in which limited and short-term access to a protected resource is granted to a third party which does not
@@ -385,9 +530,9 @@ the granted access timeframe.
 
 Server code:
 
-```javascript
+```js
 const Http = require('http');
-const Hawk = require('hawk');
+const Hawk = require('@hapi/hawk');
 
 
 // Credentials lookup function
@@ -422,9 +567,8 @@ Http.createServer(handler).listen(8000, 'example.com');
 
 Bewit code generation:
 
-```javascript
-const Request = require('request');
-const Hawk = require('hawk');
+```js
+const Hawk = require('@hapi/hawk');
 
 
 // Client credentials
