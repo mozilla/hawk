@@ -83,6 +83,30 @@ describe('Plugin', () => {
             expect(res.result).to.equal('Success');
         });
 
+        it('calls through to handler on successful auth (via default strategy)', async () => {
+
+            const server = Hapi.server();
+            await server.register(Hawk);
+
+            server.auth.strategy('default', 'hawk', { getCredentialsFunc });
+            server.auth.default('default');
+
+            server.route({
+                method: 'POST',
+                path: '/hawk',
+                handler: function (request, h) {
+
+                    return 'Success';
+                }
+            });
+
+            const request = { method: 'POST', url: 'http://example.com:8080/hawk', headers: { authorization: hawkHeader('john', '/hawk').header } };
+            const res = await server.inject(request);
+
+            expect(res.statusCode).to.equal(200);
+            expect(res.result).to.equal('Success');
+        });
+
         it('calls through to handler on failed optional auth', async () => {
 
             const server = Hapi.server();
