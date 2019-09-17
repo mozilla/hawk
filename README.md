@@ -272,7 +272,7 @@ and scope of the **Hawk** credentials. If valid, the server responds with the re
 using the specified hash algorithm. The hash is calculated over the concatenated value of (each followed by a newline character):
 * `hawk.1.payload`
 * the content-type in lowercase, without any parameters (e.g. `application/json`)
-* the request payload prior to any content encoding (the exact representation requirements should be specified by the server for payloads other than simple single-part ascii to ensure interoperability)
+* the request payload UTF-8 encoded, prior to any HTTP content encoding (the exact representation requirements should be specified by the server for payloads other than simple single-part ascii to ensure interoperability)
 
 For example:
 
