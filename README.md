@@ -1,10 +1,16 @@
-<a href="http://hapijs.com"><img src="https://raw.githubusercontent.com/hapijs/assets/master/images/family.png" width="180px" align="right" /></a>
+<a href="https://hapi.dev"><img src="https://raw.githubusercontent.com/hapijs/assets/master/images/family.png" width="180px" align="right" /></a>
 
 # @hapi/hawk
 
-**Hawk** is an HTTP authentication scheme using a message authentication code (MAC) algorithm to provide partial
-HTTP request cryptographic verification.
+#### HTTP Holder-Of-Key Authentication Scheme.
 
-Note: the protocol has not changed since version 1.1. The version increments reflect changes in the node API.
+**hawk** is part of the **hapi** ecosystem and was designed to work seamlessly with the [hapi web framework](https://hapi.dev) and its other components (but works great on its own or with other frameworks). If you are using a different web framework and find this module useful, check out [hapi](https://hapi.dev) – they work even better together.
 
-[![Build Status](https://travis-ci.org/hapijs/hawk.svg?branch=master)](https://travis-ci.org/hapijs/hawk)
+### Visit the [hapi.dev](https://hapi.dev) Developer Portal for tutorials, documentation, and support
+
+## Useful resources
+
+- [Documentation and API](https://hapi.dev/family/hawk/)
+- [Version status](https://hapi.dev/resources/status/#hawk) (builds, dependencies, node versions, licenses, eol)
+- [Project policies](https://hapi.dev/policies/)
+- [Free and commercial support options](https://hapi.dev/support/)
