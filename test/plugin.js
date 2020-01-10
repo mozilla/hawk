@@ -253,7 +253,7 @@ describe('Plugin', () => {
 
                     return 'Success';
                 },
-                options: { auth: 'default', validate: { query: {} } }
+                options: { auth: 'default', validate: { query: false } }
             });
 
             const authHeader = hawkHeader('john', '/hawkValidate?a=1');
