@@ -1,7 +1,7 @@
 {
   "name": "@hapi/hawk",
   "description": "HTTP Hawk Authentication Scheme",
-  "version": "7.1.2",
+  "version": "8.0.0",
   "repository": "git://github.com/hapijs/hawk",
   "main": "lib/index.js",
   "files": [
