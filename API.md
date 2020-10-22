@@ -1,4 +1,3 @@
-
 # Introduction
 
 **Hawk** is an HTTP authentication scheme providing mechanisms for making authenticated HTTP requests with
