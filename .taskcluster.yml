@@ -1,0 +1,37 @@
+version: 1
+policy:
+  pullRequests: public
+tasks:
+  $let:
+    head_rev:
+      $if: 'tasks_for == "github-pull-request"'
+      then: ${event.pull_request.head.sha}
+      else: ${event.after}
+    repository:
+      $if: 'tasks_for == "github-pull-request"'
+      then: ${event.pull_request.head.repo.html_url}
+      else: ${event.repository.html_url}
+  in:
+  - provisionerId: 'proj-taskcluster'
+    workerType: 'ci'
+    created: {$fromNow: ''}
+    deadline: {$fromNow: '1 hour'}
+    payload:
+      maxRunTime: 3600
+      image: node:12
+      command:
+        - /bin/bash
+        - '--login'
+        - '-c'
+        - >-
+          git clone ${repository} repo &&
+          cd repo &&
+          git config advice.detachedHead false &&
+          git checkout ${head_rev} &&
+          yarn &&
+          yarn test
+    metadata:
+      name: test
+      description: Tests for hawk
+      owner: nobody@mozilla.com
+      source: https://github.com/mozilla/hawk
