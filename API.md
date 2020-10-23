@@ -63,7 +63,7 @@ Server code:
 
 ```js
 const Http = require('http');
-const Hawk = require('@hapi/hawk');
+const Hawk = require('hawk');
 
 
 // Credentials lookup function
@@ -120,7 +120,7 @@ Client code:
 
 ```js
 const Request = require('request');
-const Hawk = require('@hapi/hawk');
+const Hawk = require('hawk');
 
 
 // Client credentials
@@ -350,7 +350,7 @@ Server code:
 
 ```js
 const Http = require('http');
-const Hawk = require('@hapi/hawk');
+const Hawk = require('hawk');
 
 
 // Credentials lookup function
@@ -386,7 +386,7 @@ Http.createServer(handler).listen(8000, 'example.com');
 Bewit code generation:
 
 ```js
-const Hawk = require('@hapi/hawk');
+const Hawk = require('hawk');
 
 
 // Client credentials
