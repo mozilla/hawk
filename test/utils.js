@@ -10,7 +10,7 @@ const Package = require('../package.json');
 const internals = {};
 
 
-const { describe, it } = exports.lab = Lab.script();
+const { describe, it, after } = exports.lab = Lab.script();
 const expect = Code.expect;
 
 
@@ -116,6 +116,20 @@ describe('Utils', () => {
         it('returns the correct package version number', () => {
 
             expect(Hawk.utils.version()).to.equal(Package.version);
+        });
+    });
+
+    describe('setTimeFunction()', () => {
+
+        after(() => {
+
+            Hawk.utils.setTimeFunction(Date.now);
+        });
+
+        it('creates the value that now() will return', () => {
+
+            Hawk.utils.setTimeFunction(() => 269323200000);
+            expect(Hawk.utils.now()).to.equal(269323200000);
         });
     });
 

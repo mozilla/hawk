@@ -17,8 +17,7 @@
     "@hapi/b64": "5.x.x",
     "@hapi/boom": "9.x.x",
     "@hapi/cryptiles": "5.x.x",
-    "@hapi/hoek": "9.x.x",
-    "@hapi/sntp": "4.x.x"
+    "@hapi/hoek": "9.x.x"
   },
   "devDependencies": {
     "@hapi/code": "8.x.x",

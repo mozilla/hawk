@@ -158,13 +158,19 @@ Request(requestOptions, function (error, response, body) {
 });
 ```
 
-**Hawk** utilized the [**SNTP**](https://github.com/hueniverse/sntp) module for time sync management. By default, the local
-machine time is used. To automatically retrieve and synchronize the clock within the application, use the SNTP 'start()' method.
+## Time Sync
+
+**Hawk** can utilize the [`@hapi/sntp`](https://github.com/outmoded/sntp) module for time sync management.
+By default, the local machine time is used.
+To automatically retrieve and synchronize the clock within the application, add `@hapi/sntp` to your application and initialize it at the top level:
 
 ```js
-Hawk.sntp.start();
-```
+const Sntp = require('@hapi/sntp');
+const Hawk = require('hawk');
 
+Sntp.start();
+Hawk.utils.setTimeFunction(Sntp.now)
+```
 
 ## Protocol Example
 
