@@ -323,7 +323,7 @@ Server-Authorization: Hawk mac="XIJRsMl/4oL+nn+vKoeVZPdCHXB4yJkNnBbTbHFZUYE=", h
 
 ## Browser Support and Considerations
 
-A browser script is provided for including using a `<script>` tag in [lib/browser.js](/lib/browser.js). It's also a [component](http://component.io/hueniverse/hawk).
+This library can be included in browser-based applications using Webpack or similar bundling technologies.
 
 **Hawk** relies on the _Server-Authorization_ and _WWW-Authenticate_ headers in its response to communicate with the client.
 Therefore, in case of CORS requests, it is important to consider sending _Access-Control-Expose-Headers_ with the value
@@ -333,7 +333,6 @@ can safely be accessed by the client (using getResponseHeader() on the XmlHttpRe
 ["simple response header"](http://www.w3.org/TR/cors/#simple-response-header) which excludes these fields and would prevent the
 Hawk client from authenticating the requests.You can read more about the why and how in this
 [article](http://www.html5rocks.com/en/tutorials/cors/#toc-adding-cors-support-to-the-server)
-
 
 # Single URI Authorization
 
