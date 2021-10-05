@@ -1,8 +1,0 @@
-var credentials = {
-    id: '613617dfa9d2df55e2527182', // the key identifier
-    key: 'bd86ed2a2b88ba399ea90fe040ce38e3e9bcf750b49da27c8115623c53794b9d', // the actual key
-    algorithm: 'sha256' // the algorythm used to build the request header
-  };
-
-  var header = Hawk.client.header(request.url,request.method,{ credentials: credentials});
-  request.headers.Authorization = header.field;  
