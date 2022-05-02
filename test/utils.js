@@ -55,7 +55,7 @@ describe('Utils', () => {
                 method: 'POST',
                 url: '/resource/4?filter=a',
                 headers: {
-                    host: '[123:123:123]',
+                    host: '[123:123::123]',
                     'content-type': 'text/plain;x=y'
                 },
                 connection: {
@@ -72,7 +72,7 @@ describe('Utils', () => {
                 method: 'POST',
                 url: '/resource/4?filter=a',
                 headers: {
-                    host: '[123:123:123]:8000',
+                    host: '[123:123::123]:8000',
                     'content-type': 'text/plain;x=y'
                 },
                 connection: {
@@ -82,7 +82,7 @@ describe('Utils', () => {
 
             const host = Hawk.utils.parseHost(req, 'Host');
             expect(host.port).to.equal('8000');
-            expect(host.name).to.equal('[123:123:123]');
+            expect(host.name).to.equal('[123:123::123]');
         });
 
         it('errors on header too long', () => {

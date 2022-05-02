@@ -433,6 +433,20 @@ describe('Server', () => {
             await expect(Hawk.server.authenticate(req, credentialsFunc, { localtimeOffsetMsec: 1353788437000 - Hawk.utils.now() })).to.reject('Invalid Host header');
         });
 
+        it('errors on an bad host header (includes path and query)', async () => {
+
+            const req = {
+                method: 'GET',
+                url: '/resource/4?filter=a',
+                headers: {
+                    host: 'example.com:8080/path?x=z',
+                    authorization: 'Hawk'
+                }
+            };
+
+            await expect(Hawk.server.authenticate(req, credentialsFunc, { localtimeOffsetMsec: 1353788437000 - Hawk.utils.now() })).to.reject('Invalid Host header');
+        });
+
         it('errors on an bad host header (pad port)', async () => {
 
             const req = {
