@@ -169,7 +169,7 @@ const Sntp = require('@hapi/sntp');
 const Hawk = require('hawk');
 
 Sntp.start();
-Hawk.utils.setTimeFunction(Sntp.now)
+Hawk.setTimeFunction(Sntp.now)
 ```
 
 ## Protocol Example
