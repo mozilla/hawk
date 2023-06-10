@@ -149,7 +149,7 @@ describe('Uri', () => {
 
         const exp = Math.floor(Hawk.utils.now() / 1000) + 60;
         const ext = 'some-app-data';
-        const mac = Hawk.crypto.calculateMac('bewit', credentials, {
+        const mac = Hawk.crypto.generateRequestMac('bewit', credentials, {
             ts: exp,
             nonce: '',
             method: req.method,
@@ -515,4 +515,3 @@ describe('Uri', () => {
         });
     });
 });
-
