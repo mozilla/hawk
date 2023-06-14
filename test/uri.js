@@ -270,12 +270,30 @@ describe('Uri', () => {
 
         const req = {
             method: 'GET',
-            url: '/resource/4?a=1&b=2&bewit=MTIzNDU2XDEzNTY0MTg1ODNcWk1wZlMwWU5KNHV0WHpOMmRucTRydEk3NXNXTjFjeWVITTcrL0tNZFdVQT1cc29tZS1hcHAtZGF0YQ',
+            url: '/resource',
+            host: 'example.com',
+            port: 8080
+        };
+        const credentials = credentialsFunc('123456');
+        const bewit = Hawk.uri.getBewit('https://example.com:8080/resource', { credentials, ttlSec: -10 });
+        req.url += '?bewit=' + bewit;
+
+        await expect(Hawk.uri.authenticate(req, credentialsFunc)).to.reject('Access expired');
+    });
+
+    it('validates mac before expiry', async () => {
+
+        const credentials = credentialsFunc('123456');
+        const exp = '1';
+        const expiredInvalidBewit = B64.base64urlEncode(credentials.id + '\\' + exp + '\\somemac\\');
+        const req = {
+            method: 'GET',
+            url: '/resource?bewit=' + expiredInvalidBewit,
             host: 'example.com',
             port: 8080
         };
 
-        await expect(Hawk.uri.authenticate(req, credentialsFunc)).to.reject('Access expired');
+        await expect(Hawk.uri.authenticate(req, credentialsFunc, {})).to.reject('Bad mac');
     });
 
     it('fails on credentials function error', async () => {
