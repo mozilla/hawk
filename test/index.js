@@ -307,4 +307,40 @@ describe('Hawk', () => {
         const err = await expect(Hawk.server.authenticate(req, credentialsFunc)).to.reject();
         expect(err.credentials).to.exist();
     });
+
+    it('generates a header then fails to parse it (payload tampering)', async () => {
+
+        const req = {
+            method: 'POST',
+            url: '/resource/4?filter=a',
+            headers: {
+                host: 'example.com:8080',
+                'content-type': 'text/plain;x=y'
+            }
+        };
+
+        const payload = 'some not so random text';
+
+        const credentials1 = credentialsFunc('123456');
+
+        const reqHeader = Hawk.client.header('http://example.com:8080/resource/4?filter=a', req.method, { credentials: credentials1, ext: 'some-app-data', payload, contentType: req.headers['content-type'] });
+        req.headers.authorization = reqHeader.header;
+
+        const { credentials: credentials2, artifacts } = await Hawk.server.authenticate(req, credentialsFunc);
+        expect(credentials2.user).to.equal('steve');
+        expect(artifacts.ext).to.equal('some-app-data');
+        expect(() => Hawk.server.authenticatePayload('tampered text', credentials2, artifacts, req.headers['content-type'])).to.throw('Bad payload hash');
+
+        const res = {
+            headers: {
+                'content-type': 'text/plain'
+            }
+        };
+
+        res.headers['server-authorization'] = Hawk.server.header(credentials2, artifacts, { payload: 'some reply', contentType: 'text/plain', ext: 'response-specific' });
+        expect(res.headers['server-authorization']).to.exist();
+
+        expect(() => Hawk.client.authenticate(res, credentials2, artifacts, { payload: 'some reply' })).to.not.throw();
+    });
+
 });

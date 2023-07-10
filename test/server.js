@@ -1122,6 +1122,51 @@ describe('Server', () => {
             creds.algorithm = 'blah';
             expect(() => Hawk.client.message('example.com', 8080, 'some message', { credentials: creds })).to.throw('Unknown algorithm');
         });
+
+        it('coverage for calculateMac arguments to calculatePayloadHash', async () => {
+
+            const credentials = credentialsFunc('123456');
+            const payload = 'some not so random text';
+            const req = {
+                method: 'POST',
+                url: '/resource/4?filter=a',
+                host: 'example.com',
+                port: 8080,
+                headers: {
+                    host: 'example.com:8080',
+                    'content-type': 'text/plain'
+                }
+            };
+
+            const exp = Math.floor(Hawk.utils.now() / 1000) + 60;
+            const ext = 'some-app-data';
+            const nonce = '1AwuJD';
+            const hash = Hawk.crypto.calculatePayloadHash(payload, 'sha256', req.headers['content-type']);
+            const opts = {
+                ts: exp,
+                nonce,
+                method: req.method,
+                resource: req.url,
+                host: req.host,
+                port: req.port,
+                hash,
+                ext
+            };
+            const mac = Hawk.crypto.calculateServerMac('header', credentials, opts, payload, req.headers['content-type']);
+            const header = 'Hawk id="' + credentials.id +
+                '", ts="' + exp +
+                '", nonce="' + nonce +
+                '", hash="' + hash +
+                '", ext="' + ext +
+                '", mac="' + mac + '"';
+
+            req.headers.authorization = header;
+            // missing contentType
+            Hawk.crypto.calculateServerMac('header', credentials, opts, payload);
+            Hawk.crypto.calculateMac('header', credentials, opts);
+            await expect(Hawk.server.authenticate(req, credentialsFunc)).to.not.reject();
+        });
+
     });
 
     describe('authenticatePayloadHash()', () => {
@@ -1133,4 +1178,3 @@ describe('Server', () => {
         });
     });
 });
-
