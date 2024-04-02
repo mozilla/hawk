@@ -1,7 +1,7 @@
 {
   "name": "hawk",
   "description": "HTTP Hawk Authentication Scheme",
-  "version": "9.0.1",
+  "version": "9.0.2",
   "repository": "git://github.com/mozilla/hawk",
   "main": "lib/index.js",
   "files": [
