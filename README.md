@@ -1,3 +1,6 @@
+> [!WARNING] 
+> SECURITY FIXES ONLY: This project is not actively maintained. All other contributions will not be accepted.
+
 # hawk
 
 #### HTTP Holder-Of-Key Authentication Scheme.
