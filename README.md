@@ -1,4 +1,4 @@
-[!Attention] 
+> [!Attention] 
 > Mozilla has archived this repository because both the protocol and documentation have reached completion, with no further updates or changes necessary.
 > 
 > While the existing code will remain available for reference or fork, no further updates or support should be expected.
